@@ -1,6 +1,7 @@
 package uk.ac.standrews.cs.utilities.archive;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
@@ -13,6 +14,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class TimeoutExecutorTests {
 
     /*

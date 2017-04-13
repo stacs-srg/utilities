@@ -23,6 +23,7 @@
  ***************************************************************************/
 package uk.ac.standrews.cs.utilities.archive;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
@@ -40,6 +41,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@Ignore
 public class TimingTests {
 
     private static final int TEST_TIMEOUT_1 = 50000;

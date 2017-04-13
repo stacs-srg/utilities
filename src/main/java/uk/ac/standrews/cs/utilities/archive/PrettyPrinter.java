@@ -104,7 +104,7 @@ public final class PrettyPrinter {
     /**
      * Concatenates {@link #toString()} representations of the full contents of an array. Calls {@link #toString()} on each element.
      * <p>
-     * <p>Uses the {@link #DEFAULT_SEPARATOR_CHAR} ({@value #DEFAULT_SEPARATOR_CHAR}) and surrounds the result with brackets. For more customization use
+     * <p>Uses the ({@value #DEFAULT_SEPARATOR_CHAR}) and surrounds the result with brackets. For more customization use
      * {@link #toString(Object[], String, boolean)}.
      *
      * @param array an array
