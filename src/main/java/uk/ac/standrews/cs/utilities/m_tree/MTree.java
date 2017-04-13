@@ -118,7 +118,7 @@ public class MTree<T> {
     //------------------------- Utility methods
 
     /**
-     * Mathod to extract values from DataDistance lists
+     * Method to extract values from DataDistance lists
      *
      * @param data_distances a list of distances from which to extract values
      * @return the set of values from the list
@@ -133,7 +133,7 @@ public class MTree<T> {
     }
 
     /**
-     * Mathod to extract distances from DataDistance lists
+     * Method to extract distances from DataDistance lists
      *
      * @param data_distances a list of distances from which to extract values
      * @return the set of distances from the list
@@ -530,8 +530,8 @@ public class MTree<T> {
 
     /**
      * Takes two pivots and a list of Nodes and re-partitions into two Lists of nodes
-     * Partitioning based on proximity - those nodes closest to p1 go into the  first partition
-     * those nodes closest to p2 go intio the second.
+     * Partitioning based on proximity - those nodes closest to p1 go into the first partition
+     * those nodes closest to p2 go into the second.
      *
      * @param p1 the first data
      * @param p2 the second data
@@ -621,10 +621,10 @@ public class MTree<T> {
         void addChild(Node newNode) {
 
             children.add(newNode);
-            float newdistance = distance_wrapper.distance(this.data, newNode.data);
-            newNode.distance_to_parent = newdistance;
+            float new_distance = distance_wrapper.distance(this.data, newNode.data);
+            newNode.distance_to_parent = new_distance;
             newNode.parent = this;
-            float new_radii = newdistance + newNode.radius;
+            float new_radii = new_distance + newNode.radius;
             if (new_radii > radius) {
                 radius = new_radii;
             }
