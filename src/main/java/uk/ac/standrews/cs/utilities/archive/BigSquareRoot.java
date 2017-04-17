@@ -24,21 +24,15 @@ import java.math.BigInteger;
 
 /**
  * @author http://www.merriampark.com/bigsqrt.htm#Source
- *         <p>
- *         Does what it says on the tin
  */
+@SuppressWarnings("unused")
 public class BigSquareRoot {
 
     private static BigDecimal ZERO = new BigDecimal("0");
     private static BigDecimal ONE = new BigDecimal("1");
     private static BigDecimal TWO = new BigDecimal("2");
-    public static final int DEFAULT_MAX_ITERATIONS = 50;
-    public static final int DEFAULT_SCALE = 10;
-
-    private static BigDecimal error;
-    private static int iterations;
-    private static int scale = DEFAULT_SCALE;
-    private static int maxIterations = DEFAULT_MAX_ITERATIONS;
+    private static final int DEFAULT_MAX_ITERATIONS = 50;
+    private static final int DEFAULT_SCALE = 10;
 
     //--------------------------
     // Get initial approximation
@@ -51,8 +45,7 @@ public class BigSquareRoot {
             length--;
         }
         length /= 2;
-        BigDecimal guess = ONE.movePointRight(length);
-        return guess;
+        return ONE.movePointRight(length);
     }
 
     //----------------
@@ -63,7 +56,7 @@ public class BigSquareRoot {
         return sqrt(new BigDecimal(n));
     }
 
-    public static BigDecimal sqrt(BigDecimal n) {
+    private static BigDecimal sqrt(BigDecimal n) {
 
         // Make sure n is a positive number
 
@@ -74,27 +67,26 @@ public class BigSquareRoot {
             return ZERO;
         }
 
-        BigDecimal initialGuess = getInitialApproximation(n);
-        BigDecimal lastGuess = ZERO;
+        final BigDecimal initialGuess = getInitialApproximation(n);
         BigDecimal guess = new BigDecimal(initialGuess.toString());
 
         // Iterate
 
-        iterations = 0;
+        int iterations = 0;
         boolean more = true;
         while (more) {
-            lastGuess = guess;
+            final BigDecimal lastGuess = guess;
+            int scale = DEFAULT_SCALE;
             guess = n.divide(guess, scale, BigDecimal.ROUND_HALF_UP);
             guess = guess.add(lastGuess);
             guess = guess.divide(TWO, scale, BigDecimal.ROUND_HALF_UP);
-            error = n.subtract(guess.multiply(guess));
-            if (++iterations >= maxIterations) {
+            BigDecimal error = n.subtract(guess.multiply(guess));
+            if (++iterations >= DEFAULT_MAX_ITERATIONS) {
                 more = false;
             } else if (lastGuess.equals(guess)) {
                 more = error.abs().compareTo(ONE) >= 0;
             }
         }
         return guess;
-
     }
 }

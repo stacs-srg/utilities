@@ -27,10 +27,7 @@ import java.util.*;
  */
 public class DateManipulation {
 
-    /**
-     * Number of days in non-leap-year.
-     */
-    public static final int DAYS_IN_NON_LEAP_YEAR = 365;
+    static final int DAYS_IN_NON_LEAP_YEAR = 365;
 
     private static final int HOURS_AT_MIDDAY = 12;
     private static final long MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -39,7 +36,7 @@ public class DateManipulation {
     private static final Calendar CALENDAR;
     private static final Map<String, Integer> CALENDAR_MONTHS;
 
-    public static final int START_YEAR = 1600;
+    static final int START_YEAR = 1600;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 
     static {
@@ -54,7 +51,7 @@ public class DateManipulation {
 
         CALENDAR = Calendar.getInstance();
 
-        CALENDAR.set(START_YEAR, 0, 1, HOURS_AT_MIDDAY, 0, 0);
+        CALENDAR.set(START_YEAR, Calendar.JANUARY, 1, HOURS_AT_MIDDAY, 0, 0);
 
         CALENDAR_MONTHS = CALENDAR.getDisplayNames(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
         START_IN_MILLIS = CALENDAR.getTimeInMillis();
@@ -68,7 +65,7 @@ public class DateManipulation {
      * @param day   the day of the month
      * @return the number of days elapsed
      */
-    public static synchronized int dateToDays(final int year, final int month, final int day) {
+    static synchronized int dateToDays(final int year, final int month, final int day) {
 
         // Get the millisecond representation of midday on the given date.
         CALENDAR.set(year, month, day, HOURS_AT_MIDDAY, 0, 0);
@@ -81,7 +78,7 @@ public class DateManipulation {
      * @param date the date from which to calculate the days
      * @return the number of days elapsed
      */
-    public static synchronized int dateToDays(final Date date) {
+    private static synchronized int dateToDays(final Date date) {
 
         CALENDAR.setTime(date);
         return millisToDays();
@@ -94,6 +91,7 @@ public class DateManipulation {
      * @return a java.sql.Date representation of the date
      * @throws ParseException if the date representation is not valid
      */
+    @SuppressWarnings("unused")
     public static synchronized java.sql.Date stringToSQLDate(final String date) throws ParseException {
 
         try {
@@ -102,6 +100,7 @@ public class DateManipulation {
             final int month = indexOfMonth(st.nextToken());
             final int year = Integer.parseInt(st.nextToken());
 
+            //noinspection MagicConstant
             CALENDAR.set(year, month, day);
             return new java.sql.Date(CALENDAR.getTimeInMillis());
 
@@ -126,26 +125,31 @@ public class DateManipulation {
      * @param days the number of elapsed days
      * @return a text representation of the date
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized String daysToString(final int days) {
 
         return formatDate(daysToDate(days));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized String formatDate(final Date date, final SimpleDateFormat formatter) {
 
         return formatter.format(date);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized String formatDate(final Date date) {
 
         return formatDate(date, DATE_FORMAT);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized Date parseDate(final String date_string, final SimpleDateFormat formatter) throws ParseException {
 
         return formatter.parse(date_string);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized Date parseDate(final String date_string) throws ParseException {
 
         return parseDate(date_string, DATE_FORMAT);
@@ -157,6 +161,7 @@ public class DateManipulation {
      * @param days the number of elapsed days
      * @return a representation of the date
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized Date daysToDate(final int days) {
 
         setCalendarToDate(days);
@@ -169,12 +174,14 @@ public class DateManipulation {
      * @param days the number of elapsed days
      * @return a representation of the java.sql.Date
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized java.sql.Date daysToSQLDate(final int days) {
 
         setCalendarToDate(days);
         return new java.sql.Date(CALENDAR.getTimeInMillis());
     }
 
+    @SuppressWarnings("unused")
     public static synchronized java.sql.Date dateToSQLDate(final Date date) {
 
         return daysToSQLDate(dateToDays(date));
@@ -186,6 +193,7 @@ public class DateManipulation {
      * @param days the number of elapsed days
      * @return the day of the month, numbered from 1
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int daysToDay(final int days) {
 
         setCalendarToDate(days);
@@ -198,6 +206,7 @@ public class DateManipulation {
      * @param days the number of elapsed days
      * @return the month, numbered from 0 for January
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int daysToMonth(final int days) {
 
         setCalendarToDate(days);
@@ -210,6 +219,7 @@ public class DateManipulation {
      * @param days the number of elapsed days
      * @return the year
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int daysToYear(final int days) {
 
         setCalendarToDate(days);
@@ -222,6 +232,7 @@ public class DateManipulation {
      * @param year the year
      * @return true if the year is a leap year, which is the case if it is divisible by 400, or by 4 and not by 100.
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized boolean isLeapYear(final int year) {
 
         CALENDAR.set(Calendar.YEAR, year);
@@ -235,6 +246,7 @@ public class DateManipulation {
      * @param years a number of years
      * @return the date obtained from adding the number of years to the date, represented in the same way as the date parameter
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int addYears(final int days, final int years) {
 
         setCalendarToDate(days);
@@ -242,28 +254,33 @@ public class DateManipulation {
         return millisToDays();
     }
 
+    @SuppressWarnings("unused")
     public static synchronized int subtractYears(final int days, final int years) {
 
         return addYears(days, -years);
     }
 
+    @SuppressWarnings("unused")
     public static synchronized Date addDays(final Date date, final int days) {
 
         return daysToDate(dateToDays(date) + days);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int dateToDay(final Date date) {
 
         setCalendarToDate(date);
         return CALENDAR.get(Calendar.DAY_OF_MONTH);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int dateToMonth(final Date date) {
 
         setCalendarToDate(date);
         return CALENDAR.get(Calendar.MONTH) + 1;     // Months are indexed from zero.
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int dateToYear(final Date date) {
 
         setCalendarToDate(date);
@@ -277,11 +294,13 @@ public class DateManipulation {
      * @param days2 the second date
      * @return the difference between the dates in days
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int differenceInDays(final int days1, final int days2) {
 
         return days2 - days1;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int differenceInDays(final Date date1, final Date date2) {
 
         return differenceInDays(dateToDays(date1), dateToDays(date2));
@@ -294,6 +313,7 @@ public class DateManipulation {
      * @param days2 the second date
      * @return the difference between the dates in days
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int differenceInCalendarYears(final int days1, final int days2) {
 
         return daysToYear(days2) - daysToYear(days1);
@@ -306,6 +326,7 @@ public class DateManipulation {
      * @param date2 the second date
      * @return the difference between the dates in days
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int differenceInCalendarYears(final Date date1, final Date date2) {
 
         return differenceInCalendarYears(dateToDays(date1), dateToDays(date2));
@@ -318,6 +339,7 @@ public class DateManipulation {
      * @param date2 the second date
      * @return the difference between the dates in days
      */
+    @SuppressWarnings("WeakerAccess")
     public static synchronized int differenceInYears(final Date date1, final Date date2) {
 
         return daysToYear(differenceInDays(date1, date2)) - START_YEAR;
