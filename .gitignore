@@ -8,7 +8,6 @@ target
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/vcs.xml
-/.idea/kotlinc.xml
 /.idea/workspace.xml
 /.idea/encodings.xml
-/.idea/inspectionProfiles/Project_Default.xml
+/.idea/kotlinc.xml

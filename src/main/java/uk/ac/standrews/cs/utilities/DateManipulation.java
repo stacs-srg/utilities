@@ -65,7 +65,8 @@ public class DateManipulation {
      * @param day   the day of the month
      * @return the number of days elapsed
      */
-    static synchronized int dateToDays(final int year, final int month, final int day) {
+    @SuppressWarnings("WeakerAccess")
+    public static synchronized int dateToDays(final int year, final int month, final int day) {
 
         // Get the millisecond representation of midday on the given date.
         CALENDAR.set(year, month, day, HOURS_AT_MIDDAY, 0, 0);
@@ -78,7 +79,8 @@ public class DateManipulation {
      * @param date the date from which to calculate the days
      * @return the number of days elapsed
      */
-    private static synchronized int dateToDays(final Date date) {
+    @SuppressWarnings("WeakerAccess")
+    public static synchronized int dateToDays(final Date date) {
 
         CALENDAR.setTime(date);
         return millisToDays();
