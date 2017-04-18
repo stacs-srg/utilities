@@ -26,16 +26,10 @@ import java.util.Map.Entry;
  *
  * @author Angus Macdonald (angus.macdonald@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public final class PrettyPrinter {
 
-    public static final String DEFAULT_SEPARATOR_CHAR = ", ";
-
-    /**
-     * Prevent instantiation of utility class.
-     */
-    private PrettyPrinter() {
-
-    }
+    private static final String DEFAULT_SEPARATOR_CHAR = ", ";
 
     /**
      * Concatenates representations of the full contents of a collection. Calls {@link #toString()} on each element.
@@ -181,7 +175,7 @@ public final class PrettyPrinter {
             if (!first) {
                 sb.append("\n");
             }
-            sb.append("Key: " + entry.getKey() + "\t\tValue" + entry.getValue());
+            sb.append("Key: ").append(entry.getKey()).append("\t\tValue").append(entry.getValue());
             first = false;
         }
 
@@ -217,7 +211,7 @@ public final class PrettyPrinter {
 
         assert array.getClass().isArray() : "This method assumes that the object being passed in is an array.";
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append("Array [");
 

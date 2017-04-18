@@ -18,15 +18,13 @@ package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
 
 public class Point {
 
-    public float x;
-    public float y;
+    float x;
+    float y;
 
     public Point(float x, float y) {
         this.x = x;
         this.y = y;
     }
-
-    private final static float epsilon = 0.00000000001F;
 
     public String toString() {
         return "[" + x + "," + y + "]";
@@ -36,8 +34,8 @@ public class Point {
 
         if (o instanceof Point) {
             Point p = (Point) o;
-            return this.x == p.x && this.y == p.y;
-            // return (Math.abs(this.x - p.x) < epsilon) && (Math.abs(this.y - p.y) < epsilon);
+            return x == p.x && y == p.y;
+
         } else return false;
     }
 }

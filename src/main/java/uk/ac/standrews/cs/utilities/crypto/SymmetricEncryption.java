@@ -60,9 +60,6 @@ public class SymmetricEncryption {
         }
     }
 
-    private SymmetricEncryption() {
-    }
-
     /**
      * Encrypts the given plain text string using the given AES key, and MIME-encodes the result.
      *
@@ -71,6 +68,7 @@ public class SymmetricEncryption {
      * @return the encrypted and MIME-encoded text
      * @throws CryptoException if the text cannot be encrypted
      */
+    @SuppressWarnings("WeakerAccess")
     public static String encrypt(final SecretKey key, final String plain_text) throws CryptoException {
 
         try (final InputStream input_stream = new ByteArrayInputStream(plain_text.getBytes());
@@ -93,6 +91,7 @@ public class SymmetricEncryption {
      * @return the plain text
      * @throws CryptoException if the decryption cannot be completed
      */
+    @SuppressWarnings("WeakerAccess")
     public static String decrypt(final SecretKey key, final String cipher_text) throws CryptoException {
 
         try (final InputStream input_stream = new ByteArrayInputStream(cipher_text.getBytes());
@@ -116,6 +115,7 @@ public class SymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void encrypt(final SecretKey key, final Path plain_text_path, final Path cipher_text_path) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path);
@@ -134,6 +134,7 @@ public class SymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void decrypt(final SecretKey key, final Path cipher_text_path, final Path plain_text_path) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path);
@@ -152,6 +153,7 @@ public class SymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
+    @SuppressWarnings("unused")
     public static void encrypt(final SecretKey key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path)) {
@@ -169,6 +171,7 @@ public class SymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
+    @SuppressWarnings("unused")
     public static void decrypt(final SecretKey key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path)) {
@@ -185,6 +188,7 @@ public class SymmetricEncryption {
      * @param output_stream the output stream for the resulting encrypted data
      * @throws CryptoException if the encryption cannot be completed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void encrypt(final SecretKey key, InputStream input_stream, OutputStream output_stream) throws CryptoException {
 
         try {
@@ -211,6 +215,7 @@ public class SymmetricEncryption {
      * @param output_stream the output stream for the resulting data
      * @throws CryptoException if the encryption cannot be completed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void decrypt(final SecretKey key, final InputStream input_stream, final OutputStream output_stream) throws CryptoException {
 
         try {
@@ -240,6 +245,7 @@ public class SymmetricEncryption {
      * @return the extracted key
      * @throws CryptoException if a valid key cannot be extracted
      */
+    @SuppressWarnings("WeakerAccess")
     public static SecretKey getKey(final String mime_encoded_AES_key) throws CryptoException {
 
         try {
@@ -255,6 +261,7 @@ public class SymmetricEncryption {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static String keyToString(final SecretKey AES_key) {
 
         return new String(MIMEEncode(AES_key.getEncoded()));
@@ -266,6 +273,7 @@ public class SymmetricEncryption {
      * @return a random key
      * @throws CryptoException if the key cannot be generated
      */
+    @SuppressWarnings("WeakerAccess")
     public static SecretKey generateRandomKey() throws CryptoException {
 
         final byte[] key_bytes = new byte[KEY_LENGTH_IN_BYTES];
@@ -275,6 +283,7 @@ public class SymmetricEncryption {
         return getKey(key_bytes);
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected static SecretKey getKey(final byte[] key_bytes) throws CryptoException {
 
         try {

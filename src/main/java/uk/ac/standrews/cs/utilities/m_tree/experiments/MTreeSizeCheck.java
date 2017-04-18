@@ -29,27 +29,28 @@ import java.util.Random;
  * Designed to test the scalability of MTree implementation.
  * Created by al on 21/03/2017.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class MTreeSizeCheck {
 
-    int initial = 5000000; // 5 million
-    int increment = 5000000; // 5 million
-    int max = 30000000; // 30 million.
+    private int initial = 5000000; // 5 million
+    private int increment = 5000000; // 5 million
+    private int max = 30000000; // 30 million.
 
-    EuclideanDistance ed = new EuclideanDistance();
+    private EuclideanDistance distance_metric = new EuclideanDistance();
 
-    public void loadtest() {
+    private void loadTest() {
 
         for (int i = initial; i < max; i += increment) {
-            create_tree(i);
+            createTree(i);
         }
     }
 
     /**
      * Create an MTree of the specified size.
      */
-    private void create_tree(int size) {
+    private void createTree(int size) {
 
-        MTree<Point> tree = new MTree<>(ed);
+        MTree<Point> tree = new MTree<>(distance_metric);
 
         long time = System.currentTimeMillis();
         System.out.println("Creating tree of size " + size);
@@ -68,6 +69,6 @@ public class MTreeSizeCheck {
 
     public static void main(String args[]) {
 
-        new MTreeSizeCheck().loadtest();
+        new MTreeSizeCheck().loadTest();
     }
 }

@@ -38,7 +38,7 @@ public class ProgressIndicatorTest {
         assertEquals(0.4, getLastProportionComplete(5, 100, 40), 0.00001);
     }
 
-    private int getNumberOfIndicatorSteps(int number_of_updates, int total_configured_steps, int total_actual_steps) {
+    private int getNumberOfIndicatorSteps(int number_of_updates, int total_configured_steps, @SuppressWarnings("SameParameterValue") int total_actual_steps) {
 
         TestProgressIndicator1 indicator = new TestProgressIndicator1(number_of_updates);
 
@@ -51,7 +51,7 @@ public class ProgressIndicatorTest {
         return indicator.invocation_count;
     }
 
-    private double getLastProportionComplete(int number_of_updates, int total_configured_steps, int total_actual_steps) {
+    private double getLastProportionComplete(@SuppressWarnings("SameParameterValue") int number_of_updates, @SuppressWarnings("SameParameterValue") int total_configured_steps, @SuppressWarnings("SameParameterValue") int total_actual_steps) {
 
         TestProgressIndicator2 indicator = new TestProgressIndicator2(number_of_updates);
 

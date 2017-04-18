@@ -24,6 +24,7 @@ import java.util.List;
  *
  * @param <Element> the element type
  */
+@SuppressWarnings("unused")
 public class QuickSort<Element> {
 
     private final List<Element> list;

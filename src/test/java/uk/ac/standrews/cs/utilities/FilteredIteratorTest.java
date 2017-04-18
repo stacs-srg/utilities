@@ -18,6 +18,7 @@ package uk.ac.standrews.cs.utilities;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
@@ -108,14 +109,8 @@ public class FilteredIteratorTest {
 
     private Iterator<Integer> makeEvensIterator(Integer[] array) {
 
-        Iterator<Integer> original = new ArrayIterator<>(array);
-        Predicate<Integer> even_filter = new Predicate<Integer>() {
-
-            public boolean test(Integer t) {
-
-                return t % 2 == 0;
-            }
-        };
+        Iterator<Integer> original = Arrays.stream(array).iterator();
+        Predicate<Integer> even_filter = t -> t % 2 == 0;
         return new FilteredIterator<>(original, even_filter);
     }
 }

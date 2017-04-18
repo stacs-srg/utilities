@@ -28,9 +28,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-/**
- * Created by al on 27/01/2017.
- */
 public class MTreeEuclidean2DTest {
 
     private MTree<Point> tree;
@@ -40,7 +37,7 @@ public class MTreeEuclidean2DTest {
     public void setUp() throws Exception {
 
         distance = new EuclideanDistance();
-        tree = new MTree(distance);
+        tree = new MTree<>(distance);
     }
 
     /**
@@ -247,7 +244,8 @@ public class MTreeEuclidean2DTest {
      */
     @Test
     public void findClosestFromSquares() {
-        int count = addSquares();
+
+        addSquares();
 
         Point p = new Point(0.0F, 0.0F);
 
@@ -256,7 +254,7 @@ public class MTreeEuclidean2DTest {
             float search_circle = (float) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid float errors
             List<DataDistance<Point>> result = tree.rangeSearch(p, search_circle);
             List<Point> values = tree.mapValues(result);
-            // System.out.println( "d=" + search_circle + " results requested_result_set_size =" + result.requested_result_set_size() + " results: " + result );
+
             for (Point pp : values) {
                 assertTrue(tree.contains(pp));
                 assertTrue(distance.distance(pp, p) <= search_circle);    // and it is in range.
@@ -269,10 +267,11 @@ public class MTreeEuclidean2DTest {
      */
     @Test
     public void findClosest() {
-        int count = addSquares();
+
+        addSquares();
         Point p = new Point(20.6F, 20.6F);
         DataDistance<Point> result = tree.nearestNeighbour(p);
-        //System.out.println(result);
+
         assertEquals(result.value, new Point(21.0F, 21.0F)); // closest point to 20.6,20.6 - TODO better tests?
     }
 
@@ -281,7 +280,8 @@ public class MTreeEuclidean2DTest {
      */
     @Test
     public void findClosestN() {
-        int count = addSquares();
+
+        addSquares();
         Point p = new Point(0.0F, 0.0F);
         for (int i = 4; i < 50; i += 4) {
             // move out in squares of size 4, each loop should include 4 more nodes

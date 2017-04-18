@@ -27,24 +27,13 @@ import java.util.Enumeration;
  * @author Stuart Norcross (stuart@cs.st-andrews.ac.uk)
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public final class NetworkUtil {
-
-    /**
-     * The maximum number that can be specified as port number.
-     */
-    public static final int MAX_PORT_NUMBER = 0xFFFF;
 
     /**
      * The undefined port.
      */
-    public static final int UNDEFINED_PORT = -1;
-
-    /**
-     * Prevent instantiation of utility class.
-     */
-    private NetworkUtil() {
-
-    }
+    private static final int UNDEFINED_PORT = -1;
 
     /**
      * Returns the first non-loopback IPv4 address (Inet4Address) that can be found for an interface on the local host.
@@ -55,6 +44,7 @@ public final class NetworkUtil {
      * @return the first IPv4 address found
      * @throws UnknownHostException if no IPv4 address can be found
      */
+    @SuppressWarnings("WeakerAccess")
     public static InetAddress getLocalIPv4Address() throws UnknownHostException {
 
         final InetAddress default_local_address = InetAddress.getLocalHost();
@@ -102,6 +92,7 @@ public final class NetworkUtil {
      * @return the corresponding local address
      * @throws UnknownHostException if no IPv4 address can be found
      */
+    @SuppressWarnings("WeakerAccess")
     public static InetSocketAddress getLocalIPv4InetSocketAddress(final int port) throws UnknownHostException {
 
         return new InetSocketAddress(getLocalIPv4Address(), port);
@@ -132,7 +123,7 @@ public final class NetworkUtil {
         final String host_name = extractHostName(host_and_port);
         final int port = extractPortNumber(host_and_port);
 
-        if (host_name == "") {
+        if (host_name.equals("")) {
             if (port == UNDEFINED_PORT) {
                 return getLocalIPv4InetSocketAddress(default_port);
             }
@@ -152,6 +143,7 @@ public final class NetworkUtil {
      * @return a corresponding InetSocketAddress
      * @throws UnknownHostException if the specified host cannot be resolved
      */
+    @SuppressWarnings("WeakerAccess")
     public static InetSocketAddress getInetSocketAddress(final InetAddress host, final int port) throws UnknownHostException {
 
         return new InetSocketAddress(host, port);
@@ -165,6 +157,7 @@ public final class NetworkUtil {
      * @return a corresponding InetSocketAddress
      * @throws UnknownHostException if the specified host cannot be resolved
      */
+    @SuppressWarnings("WeakerAccess")
     public static InetSocketAddress getInetSocketAddress(final String host_name, final int port) throws UnknownHostException {
 
         return getInetSocketAddress(InetAddress.getByName(host_name), port);
@@ -177,6 +170,7 @@ public final class NetworkUtil {
      * @param host_and_port a string of the form "host:port", "host", "host:", ":port"
      * @return the host name
      */
+    @SuppressWarnings("WeakerAccess")
     public static String extractHostName(final String host_and_port) {
 
         if (host_and_port == null) {
@@ -198,6 +192,7 @@ public final class NetworkUtil {
      * @param host_and_port a string of the form "host:port", "host", "host:" or ":port"
      * @return the port number as a string
      */
+    @SuppressWarnings("WeakerAccess")
     public static String extractPortNumberAsString(final String host_and_port) {
 
         if (host_and_port == null) {
@@ -221,6 +216,7 @@ public final class NetworkUtil {
      * @param host_and_port a string of the form "host:port", "host", "host:" or ":port"
      * @return the port number
      */
+    @SuppressWarnings("WeakerAccess")
     public static int extractPortNumber(final String host_and_port) {
 
         try {
@@ -255,6 +251,7 @@ public final class NetworkUtil {
      * @param address an address
      * @return a description of the address
      */
+    @SuppressWarnings("WeakerAccess")
     public static String formatHostAddress(final InetSocketAddress address) {
 
         if (address != null) {
@@ -274,6 +271,7 @@ public final class NetworkUtil {
      * @param port a port
      * @return a description of the address
      */
+    @SuppressWarnings("WeakerAccess")
     public static String formatHostAddress(final String host, final int port) {
 
         return host + ":" + port;
@@ -297,6 +295,7 @@ public final class NetworkUtil {
      * @param port    a port
      * @return a description of the address
      */
+    @SuppressWarnings("WeakerAccess")
     public static String formatHostAddress(final InetAddress address, final int port) {
 
         return formatHostAddress(address.getHostAddress(), port);
@@ -310,7 +309,8 @@ public final class NetworkUtil {
      * @return a socket bound to the given local port
      * @throws IOException if the new socket can't be connected to
      */
-    public static ServerSocket makeReusableServerSocket(final int local_port) throws IOException {
+    @SuppressWarnings("WeakerAccess")
+    public static ServerSocket makeReusableServerSocket(@SuppressWarnings("SameParameterValue") final int local_port) throws IOException {
 
         final ServerSocket socket = new ServerSocket();
         socket.setReuseAddress(true);
@@ -332,8 +332,8 @@ public final class NetworkUtil {
     public static ServerSocket makeReusableServerSocket(final InetAddress local_address, final int local_port) throws IOException {
 
         final ServerSocket socket = new ServerSocket();
-        socket.setReuseAddress(true);
 
+        socket.setReuseAddress(true);
         socket.bind(new InetSocketAddress(local_address, local_port));
 
         return socket;
@@ -347,18 +347,9 @@ public final class NetworkUtil {
      */
     public static synchronized int findFreeLocalTCPPort() throws IOException {
 
-        ServerSocket server_socket = null;
-        try {
+        try (ServerSocket server_socket = makeReusableServerSocket(0)) {
 
-            server_socket = makeReusableServerSocket(0);
             return server_socket.getLocalPort();
-        } finally {
-
-            try {
-                server_socket.close();
-            } catch (final IOException e) {
-                // ignore
-            }
         }
     }
 
@@ -372,11 +363,10 @@ public final class NetworkUtil {
      */
     public static InetSocketAddress getAddressFromString(final String address_in_string) throws UnknownHostException {
 
-        final String serialized_inet_socket_address = address_in_string;
-        if (serialized_inet_socket_address == null || serialized_inet_socket_address.equals("null")) {
+        if (address_in_string == null || address_in_string.equals("null")) {
             return null;
         }
-        final String[] components = serialized_inet_socket_address.split(":", -1);
+        final String[] components = address_in_string.split(":", -1);
         final String host = components[0];
         final int port = Integer.parseInt(components[1]);
         final String name = getName(host);

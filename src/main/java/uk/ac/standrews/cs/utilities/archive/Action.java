@@ -19,16 +19,7 @@
  */
 package uk.ac.standrews.cs.utilities.archive;
 
-/**
- * Insert comment explaining purpose of class here.
- *
- * @author graham
- */
 public interface Action {
 
-    /**
-     *
-     */
     void performAction();
-
 }

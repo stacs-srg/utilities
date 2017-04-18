@@ -20,7 +20,6 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -261,31 +260,21 @@ public class TimeoutExecutorTests {
                          final boolean new_thread) {
 
         if (new_thread) {
-            new Thread() {
-
-                @Override
-                public void run() {
-
-                    runTask(duration, sync_latch, wait_for_latch, task_completed_latch, timed_out_latch, interrupted_latch, result, desired_result, false);
-                }
-            }.start();
+            new Thread(() -> runTask(duration, sync_latch, wait_for_latch, task_completed_latch, timed_out_latch, interrupted_latch, result, desired_result, false)).start();
         } else {
+
             try {
                 syncOnLatch(sync_latch, wait_for_latch);
 
-                executor.executeWithTimeout(new Runnable() {
+                executor.executeWithTimeout(() -> {
 
-                    @Override
-                    public void run() {
-
-                        try {
-                            syncOnLatch(sync_latch, !wait_for_latch);
-                            duration.sleep();
-                            setResultIfNotNull(result, desired_result);
-                            countDownIfNotNull(task_completed_latch);
-                        } catch (final InterruptedException e) {
-                            countDownIfNotNull(interrupted_latch);
-                        }
+                    try {
+                        syncOnLatch(sync_latch, !wait_for_latch);
+                        duration.sleep();
+                        setResultIfNotNull(result, desired_result);
+                        countDownIfNotNull(task_completed_latch);
+                    } catch (final InterruptedException e) {
+                        countDownIfNotNull(interrupted_latch);
                     }
                 });
             } catch (final Exception e) {
@@ -301,18 +290,15 @@ public class TimeoutExecutorTests {
         try {
             syncOnLatch(sync_latch, wait_for_latch);
 
-            final int result = executor.executeWithTimeout(new Callable<Integer>() {
+            final int result = executor.executeWithTimeout(() -> {
 
-                @Override
-                public Integer call() throws Exception {
-
-                    syncOnLatch(sync_latch, !wait_for_latch);
-                    duration.sleep();
-                    return desired_result;
-                }
+                syncOnLatch(sync_latch, !wait_for_latch);
+                duration.sleep();
+                return desired_result;
             });
             countDownIfNotNull(completed_latch);
             return result;
+
         } catch (final Exception e) {
             if (e instanceof TimeoutException) {
                 countDownIfNotNull(timed_out_latch);
@@ -323,15 +309,11 @@ public class TimeoutExecutorTests {
 
     private void runCallableInThread(final Duration duration, final CountDownLatch sync_latch, final boolean wait_for_latch, final CountDownLatch completed_latch, final CountDownLatch timed_out_latch, final AtomicInteger result, final int desired_result) {
 
-        new Thread() {
+        new Thread(() -> {
 
-            @Override
-            public void run() {
-
-                final int result_value = runCallable(duration, sync_latch, wait_for_latch, completed_latch, timed_out_latch, desired_result);
-                setResultIfNotNull(result, result_value);
-            }
-        }.start();
+            final int result_value = runCallable(duration, sync_latch, wait_for_latch, completed_latch, timed_out_latch, desired_result);
+            setResultIfNotNull(result, result_value);
+        }).start();
     }
 
     private void runTwoTasksNoTimeout(final Duration first_duration, final Duration second_duration, final boolean new_threads) throws InterruptedException {
@@ -352,29 +334,30 @@ public class TimeoutExecutorTests {
         assertThat(second_location.get(), is(equalTo(1)));
     }
 
-    private void runTwoTasksWithSecondTimingOut(final Duration first_duration, final Duration second_duration, final boolean new_threads) throws InterruptedException {
+    private void runTasks(Duration first_duration, Duration second_duration, boolean new_threads, CountDownLatch latch1, CountDownLatch latch2) throws InterruptedException {
 
         final CountDownLatch sync_latch = new CountDownLatch(1);
         final CountDownLatch first_task_completed_latch = new CountDownLatch(1);
-        final CountDownLatch second_task_timed_out_latch = new CountDownLatch(1);
 
         runTask(first_duration, sync_latch, false, first_task_completed_latch, null, null, null, 0, new_threads);
-        runTask(second_duration, sync_latch, true, null, second_task_timed_out_latch, null, null, 0, new_threads);
+        runTask(second_duration, sync_latch, true, null, latch1, latch2, null, 0, new_threads);
 
         first_task_completed_latch.await();
+    }
+
+    private void runTwoTasksWithSecondTimingOut(final Duration first_duration, final Duration second_duration, @SuppressWarnings("SameParameterValue") final boolean new_threads) throws InterruptedException {
+
+        final CountDownLatch second_task_timed_out_latch = new CountDownLatch(1);
+
+        runTasks(first_duration, second_duration, new_threads, second_task_timed_out_latch, null);
         second_task_timed_out_latch.await();
     }
 
-    private void runTwoTasksWithSecondInterrupted(final Duration first_duration, final Duration second_duration, final boolean new_threads) throws InterruptedException {
+    private void runTwoTasksWithSecondInterrupted(final Duration first_duration, final Duration second_duration, @SuppressWarnings("SameParameterValue") final boolean new_threads) throws InterruptedException {
 
-        final CountDownLatch sync_latch = new CountDownLatch(1);
-        final CountDownLatch first_task_completed_latch = new CountDownLatch(1);
         final CountDownLatch second_task_interrupted_latch = new CountDownLatch(1);
 
-        runTask(first_duration, sync_latch, false, first_task_completed_latch, null, null, null, 0, new_threads);
-        runTask(second_duration, sync_latch, true, null, null, second_task_interrupted_latch, null, 0, new_threads);
-
-        first_task_completed_latch.await();
+        runTasks(first_duration, second_duration, new_threads, null, second_task_interrupted_latch);
         second_task_interrupted_latch.await();
     }
 

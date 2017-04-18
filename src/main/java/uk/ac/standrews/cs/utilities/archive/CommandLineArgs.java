@@ -24,14 +24,8 @@ import java.util.Map;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public final class CommandLineArgs {
-
-    /**
-     * Prevent instantiation of utility class.
-     */
-    private CommandLineArgs() {
-
-    }
 
     /**
      * Parses the given command line arguments into a map from flags to values.
@@ -44,9 +38,10 @@ public final class CommandLineArgs {
      * @param args the command line arguments
      * @return a map from flags to values
      */
+    @SuppressWarnings("WeakerAccess")
     public static Map<String, String> parseCommandLineArgs(final String[] args) {
 
-        final Map<String, String> map = new HashMap<String, String>();
+        final Map<String, String> map = new HashMap<>();
 
         for (final String element : args) {
             if (element.length() > 1) {
@@ -67,6 +62,7 @@ public final class CommandLineArgs {
      * @param flag the required flag
      * @return the value for the given flag, or null if not found
      */
+    @SuppressWarnings("WeakerAccess")
     public static String getArg(final String[] args, final String flag) {
 
         return parseCommandLineArgs(args).get(flag);

@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public class Duration implements Comparable<Duration>, Serializable {
 
     private static final long serialVersionUID = 2022340212281366237L;
@@ -55,7 +56,7 @@ public class Duration implements Comparable<Duration>, Serializable {
     private static final Map<TimeUnit, String> UNIT_ABBREVIATIONS;
 
     static {
-        UNIT_ABBREVIATIONS = new HashMap<TimeUnit, String>();
+        UNIT_ABBREVIATIONS = new HashMap<>();
 
         UNIT_ABBREVIATIONS.put(TimeUnit.NANOSECONDS, "ns");
         UNIT_ABBREVIATIONS.put(TimeUnit.MICROSECONDS, "micros");
@@ -71,6 +72,7 @@ public class Duration implements Comparable<Duration>, Serializable {
     /**
      * Initializes a new duration of zero length.
      */
+    @SuppressWarnings("WeakerAccess")
     public Duration() {
 
         this(0, TimeUnit.MILLISECONDS);
@@ -82,6 +84,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param length the length of the duration
      * @param unit   the time unit of the specified length
      */
+    @SuppressWarnings("WeakerAccess")
     public Duration(final long length, final TimeUnit unit) {
 
         this.length = length;
@@ -98,6 +101,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param unit  the unit
      * @return a new duration representing the difference between the specified time instants
      */
+    @SuppressWarnings("WeakerAccess")
     public static Duration elapsed(final long start, final long end, final TimeUnit unit) {
 
         return new Duration(end - start, unit);
@@ -110,6 +114,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param end   the second instant represented in milliseconds
      * @return a new duration representing the difference between the specified time instants
      */
+    @SuppressWarnings("WeakerAccess")
     public static Duration elapsed(final long start, final long end) {
 
         return elapsed(start, end, TimeUnit.MILLISECONDS);
@@ -121,6 +126,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param start the past instant represented in milliseconds as specified for {@link java.lang.System#currentTimeMillis()}
      * @return a new duration representing the difference between the specified time instant and the current time
      */
+    @SuppressWarnings("WeakerAccess")
     public static Duration elapsed(final long start) {
 
         return elapsed(start, System.currentTimeMillis());
@@ -142,6 +148,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      *
      * @return a new duration representing the difference between time zero and the current time
      */
+    @SuppressWarnings("WeakerAccess")
     public static Duration elapsed() {
 
         return elapsed(0);
@@ -165,6 +172,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param start the duration
      * @return a new duration representing the difference between the specified duration and the current time
      */
+    @SuppressWarnings("WeakerAccess")
     public static Duration elapsed(final Duration start) {
 
         return elapsed(start.getLength(TimeUnit.MILLISECONDS));
@@ -200,6 +208,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param other_time_unit the other time unit
      * @return the length of the duration expressed in the given time unit
      */
+    @SuppressWarnings("WeakerAccess")
     public long getLength(final TimeUnit other_time_unit) {
 
         return other_time_unit.convert(length, unit);
@@ -210,6 +219,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      *
      * @return the time unit of the duration
      */
+    @SuppressWarnings("WeakerAccess")
     public TimeUnit getTimeUnit() {
 
         return unit;
@@ -220,6 +230,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      *
      * @throws InterruptedException if interrupted while sleeping
      */
+    @SuppressWarnings("WeakerAccess")
     public void sleep() throws InterruptedException {
 
         unit.sleep(length);
@@ -275,6 +286,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param other the other duration
      * @return a new duration representing the result of subtracting the other duration from this duration
      */
+    @SuppressWarnings("WeakerAccess")
     public Duration subtract(final Duration other) {
 
         return new Duration(length - other.getLength(unit), unit);
@@ -298,6 +310,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param other_time_unit the other time unit
      * @return a duration representing this duration expressed in the given time unit
      */
+    @SuppressWarnings("WeakerAccess")
     public Duration convertTo(final TimeUnit other_time_unit) {
 
         if (unit.equals(other_time_unit)) {
@@ -339,21 +352,18 @@ public class Duration implements Comparable<Duration>, Serializable {
     // -------------------------------------------------------------------------------------------------------
 
     @Override
-    /** {@inheritDoc} */
     public boolean equals(final Object other) {
 
         return other instanceof Duration && compareTo((Duration) other) == 0;
     }
 
     @Override
-    /** {@inheritDoc} */
     public int hashCode() {
 
         return (int) length * unit.ordinal();
     }
 
     @Override
-    /** {@inheritDoc} */
     public int compareTo(final Duration other) {
 
         final long other_in_same_units = unit.convert(other.length, other.unit);
@@ -361,7 +371,6 @@ public class Duration implements Comparable<Duration>, Serializable {
     }
 
     @Override
-    /** {@inheritDoc} */
     public String toString() {
 
         return toString(length, unit);
@@ -373,6 +382,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      *
      * @return a string representation of this duration with largest time unit this duration can be converted to where <code>length > 0</code>
      */
+    @SuppressWarnings("WeakerAccess")
     public String toStringAsLargestTimeUnit() {
 
         return toStringAsLargestTimeUnit(length, unit);
@@ -386,6 +396,7 @@ public class Duration implements Comparable<Duration>, Serializable {
      * @param unit   the unit
      * @return a string representation of this duration with largest time unit this duration can be converted to where <code>length > 0</code>
      */
+    @SuppressWarnings("WeakerAccess")
     public static String toStringAsLargestTimeUnit(final long length, final TimeUnit unit) {
 
         if (length > 0 && !unit.equals(TimeUnit.DAYS)) {

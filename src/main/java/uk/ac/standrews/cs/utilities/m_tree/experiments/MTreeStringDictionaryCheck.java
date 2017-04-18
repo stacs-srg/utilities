@@ -25,9 +25,6 @@ import uk.ac.standrews.cs.utilities.m_tree.MTree;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- * Created by al on 27/01/2017.
- */
 public class MTreeStringDictionaryCheck {
 
     private static MTree<String> tree;
@@ -68,14 +65,14 @@ public class MTreeStringDictionaryCheck {
     /**
      * test to ensure that the correct number of words are in MTree
      */
-    public static void unixDictionarySizeTest() {
+    private static void unixDictionarySizeTest() {
         assertEquals(count, tree.size());
     }
 
     /**
      * test nearest neighbour in  a dictionary of words
      */
-    public static void nearestNeighbour() {
+    private static void nearestNeighbour() {
 
         DataDistance<String> result = tree.nearestNeighbour("absilute");
         assertEquals("absolute", result.value);
@@ -84,7 +81,7 @@ public class MTreeStringDictionaryCheck {
     /**
      * test nearest N in a dictionary of words
      */
-    public static void nearestN() {
+    private static void nearestN() {
 
         List<DataDistance<String>> results = tree.nearestN("accelerat", 5);
         List<String> values = tree.mapValues(results);
@@ -99,7 +96,7 @@ public class MTreeStringDictionaryCheck {
     /**
      * test range search in a dictionary of words
      */
-    public static void range() {
+    private static void range() {
 
         List<DataDistance<String>> results = tree.rangeSearch("tomato", 2);
         List<String> values = tree.mapValues(results);
@@ -109,8 +106,6 @@ public class MTreeStringDictionaryCheck {
         assertTrue(values.contains("pomate")); // distance 2
         assertTrue(values.contains("potato")); // distance 2
         assertTrue(values.contains("tomcat")); // distance 2
-
-        // System.out.println( "all at 2: " + result3 );
     }
 
     public static class EditDistance implements Distance<String> {

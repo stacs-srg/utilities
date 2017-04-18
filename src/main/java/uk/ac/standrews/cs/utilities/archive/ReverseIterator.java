@@ -28,6 +28,7 @@ import java.util.List;
  * @param <T> the element type
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public class ReverseIterator<T> implements Iterator<T> {
 
     private int index;

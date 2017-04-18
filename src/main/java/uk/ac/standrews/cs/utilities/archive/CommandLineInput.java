@@ -37,6 +37,7 @@ public class CommandLineInput {
 
         try {
             return reader.readLine();
+
         } catch (IOException e) {
             return "";
         }

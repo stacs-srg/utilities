@@ -16,9 +16,6 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-/**
- * Created by al on 27/01/2017.
- */
 public interface Distance<T> {
 
     float distance(T a, T b);

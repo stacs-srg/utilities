@@ -23,9 +23,6 @@ import org.simmetrics.metrics.Levenshtein;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by al on 27/01/2017.
- */
 public class MTreeStringEditDistanceTest {
 
     private MTree<String> tree;

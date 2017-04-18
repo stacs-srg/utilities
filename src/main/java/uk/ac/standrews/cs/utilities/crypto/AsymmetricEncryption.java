@@ -55,36 +55,43 @@ public class AsymmetricEncryption {
     /**
      * The name of the directory in this user's home directory in which private and public keys are stored.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String DEFAULT_KEY_DIR = ".ssh";
 
     /**
      * The name of the private key file.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String DEFAULT_PRIVATE_KEY_FILE = "private_key.pem";
 
     /**
      * The name of the public key file.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String DEFAULT_PUBLIC_KEY_FILE = "public_key.pem";
 
     /**
      * The delimiting header in the private key file.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String PRIVATE_KEY_HEADER = "-----BEGIN RSA PRIVATE KEY-----";
 
     /**
      * The delimiting footer in the private key file.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String PRIVATE_KEY_FOOTER = "-----END RSA PRIVATE KEY-----";
 
     /**
      * The delimiting header in the public key file.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String PUBLIC_KEY_HEADER = "-----BEGIN PUBLIC KEY-----";
 
     /**
      * The delimiting footer in the public key file.
      */
+    @SuppressWarnings("WeakerAccess")
     public static final String PUBLIC_KEY_FOOTER = "-----END PUBLIC KEY-----";
 
     private static final String ENCRYPTED_KEY_END_DELIMITER = "==";
@@ -115,10 +122,6 @@ public class AsymmetricEncryption {
         }
     }
 
-    private AsymmetricEncryption() {
-
-    }
-
     /**
      * Encrypts the given plain text string using the given public key, and MIME-encodes the result.
      *
@@ -127,6 +130,7 @@ public class AsymmetricEncryption {
      * @return the encrypted and MIME-encoded text
      * @throws CryptoException if the text cannot be encrypted
      */
+    @SuppressWarnings("WeakerAccess")
     public static String encrypt(PublicKey public_key, String plain_text) throws CryptoException {
 
         try (final InputStream input_stream = new ByteArrayInputStream(plain_text.getBytes());
@@ -149,6 +153,7 @@ public class AsymmetricEncryption {
      * @return the plain text
      * @throws CryptoException if the decryption cannot be completed
      */
+    @SuppressWarnings("WeakerAccess")
     public static String decrypt(PrivateKey private_key, String cipher_text) throws CryptoException {
 
         try (final InputStream input_stream = new ByteArrayInputStream(cipher_text.getBytes());
@@ -172,6 +177,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void encrypt(PublicKey public_key, final Path plain_text_path, final Path cipher_text_path) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path);
@@ -190,6 +196,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void decrypt(PrivateKey private_key, final Path cipher_text_path, final Path plain_text_path) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path);
@@ -208,6 +215,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if the plain text file cannot be accessed
      */
+    @SuppressWarnings("unused")
     public static void encrypt(PublicKey public_key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path)) {
@@ -225,6 +233,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if the encrypted file cannot be accessed
      */
+    @SuppressWarnings("unused")
     public static void decrypt(PrivateKey private_key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path)) {
@@ -241,6 +250,7 @@ public class AsymmetricEncryption {
      * @param output_stream the output stream for the resulting encrypted data
      * @throws CryptoException if the encryption cannot be completed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void encrypt(PublicKey public_key, InputStream input_stream, OutputStream output_stream) throws CryptoException {
 
         try {
@@ -265,6 +275,7 @@ public class AsymmetricEncryption {
      * @param output_stream the output stream for the resulting data
      * @throws CryptoException if the encryption cannot be completed
      */
+    @SuppressWarnings("WeakerAccess")
     public static void decrypt(PrivateKey private_key, InputStream input_stream, OutputStream output_stream) throws CryptoException {
 
         try {
@@ -289,6 +300,7 @@ public class AsymmetricEncryption {
      * @return this user's private key
      * @throws CryptoException if the private key cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKey() throws CryptoException {
 
         return getPrivateKey(DEFAULT_PRIVATE_KEY_PATH);
@@ -301,6 +313,7 @@ public class AsymmetricEncryption {
      * @return the private key
      * @throws CryptoException if the private key cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKey(Path key_path) throws CryptoException {
 
         return getPrivateKeyFromString(getKey(key_path));
@@ -314,6 +327,7 @@ public class AsymmetricEncryption {
      * @return this user's public key
      * @throws CryptoException if the public key cannot be accessed
      */
+    @SuppressWarnings("unused")
     public static PublicKey getPublicKey() throws CryptoException {
 
         return getPublicKey(DEFAULT_PUBLIC_KEY_PATH);
@@ -326,6 +340,7 @@ public class AsymmetricEncryption {
      * @return the public key
      * @throws CryptoException if the public key cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static PublicKey getPublicKey(Path key_path) throws CryptoException {
 
         return getPublicKeyFromString(getKey(key_path));
@@ -339,6 +354,7 @@ public class AsymmetricEncryption {
      * @return the private key
      * @throws CryptoException if the private key cannot be extracted
      */
+    @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKeyFromString(final String key_in_pem_format) throws CryptoException {
 
         try {
@@ -360,6 +376,7 @@ public class AsymmetricEncryption {
      * @return the public key
      * @throws CryptoException if the public key cannot be extracted
      */
+    @SuppressWarnings("WeakerAccess")
     public static PublicKey getPublicKeyFromString(final String key_in_pem_format) throws CryptoException {
 
         try {
@@ -380,6 +397,7 @@ public class AsymmetricEncryption {
      * @return a list of keys in PEM format
      * @throws IOException if the file cannot be accessed
      */
+    @SuppressWarnings("WeakerAccess")
     public static List<PublicKey> loadPublicKeys(final Path path) throws IOException, CryptoException {
 
         final List<PublicKey> key_list = new ArrayList<>();
@@ -428,6 +446,7 @@ public class AsymmetricEncryption {
      * @throws IOException     if the input stream cannot be read
      * @throws CryptoException if no key can be successfully decrypted
      */
+    @SuppressWarnings("unused")
     public static SecretKey getAESKey(Path encrypted_keys) throws IOException, CryptoException {
 
         try (final InputStream encrypted_key_stream = Files.newInputStream(encrypted_keys)) {
@@ -446,6 +465,7 @@ public class AsymmetricEncryption {
      * @throws IOException     if the input stream cannot be read
      * @throws CryptoException if no key can be successfully decrypted
      */
+    @SuppressWarnings("WeakerAccess")
     public static SecretKey getAESKey(InputStream encrypted_key_stream) throws IOException, CryptoException {
 
         // SecretKey represents a symmetric key, whereas PrivateKey represents a private asymmetric key.
@@ -477,6 +497,7 @@ public class AsymmetricEncryption {
         }
     }
 
+    @SuppressWarnings("unused")
     public static void encryptAESKey(final SecretKey AES_key, final Path authorized_keys_path, final Path destination_path) throws IOException, CryptoException {
 
         try (OutputStreamWriter writer = FileManipulation.getOutputStreamWriter(destination_path)) {

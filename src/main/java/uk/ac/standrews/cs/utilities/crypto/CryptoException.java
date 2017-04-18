@@ -23,16 +23,17 @@ package uk.ac.standrews.cs.utilities.crypto;
  */
 public class CryptoException extends Throwable {
 
-    public CryptoException(final String message) {
+    CryptoException(final String message) {
 
         super(message);
     }
 
-    public CryptoException(final Throwable cause) {
+    CryptoException(final Throwable cause) {
 
         super(cause);
     }
 
+    @SuppressWarnings("unused")
     public CryptoException(final String message, final Throwable cause) {
 
         super(message, cause);

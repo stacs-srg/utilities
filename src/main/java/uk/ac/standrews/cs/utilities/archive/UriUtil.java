@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class UriUtil {
 
     /**
@@ -45,7 +46,6 @@ public class UriUtil {
         result = result.replaceAll("%2F", "/");
 
         return result;
-
     }
 
     /**
@@ -79,21 +79,21 @@ public class UriUtil {
      */
     public static URI parentUri(URI uri) throws UnsupportedEncodingException, URISyntaxException {
 
-        String parent_path = "/";
+        StringBuilder parent_path = new StringBuilder("/");
 
         Iterator element_iterator = pathElementIterator(uri);
 
-        String previous = "";
+        String previous;
         String current = "";
 
         while (element_iterator.hasNext()) {
             previous = current;
             current = (String) element_iterator.next();
-            if (!parent_path.equals("/")) parent_path += "/";
-            parent_path += UriUtil.uriEncode(previous);
+            if (!parent_path.toString().equals("/")) parent_path.append("/");
+            parent_path.append(UriUtil.uriEncode(previous));
         }
 
-        return stringToUri(parent_path);
+        return stringToUri(parent_path.toString());
     }
 
     /**

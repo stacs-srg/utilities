@@ -26,16 +26,10 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public final class NamingThreadFactory implements ThreadFactory {
 
-    private static final UncaughtExceptionHandler PRINT_UNCAUGHT_EXCEPTIONS = new UncaughtExceptionHandler() {
-
-        @Override
-        public void uncaughtException(final Thread t, final Throwable e) {
-
-            e.printStackTrace();
-        }
-    };
+    private static final UncaughtExceptionHandler PRINT_UNCAUGHT_EXCEPTIONS = (t, e) -> e.printStackTrace();
 
     private final AtomicLong sequence_number;
     private final String naming_prefix;
@@ -57,6 +51,7 @@ public final class NamingThreadFactory implements ThreadFactory {
      * @param naming_prefix the naming prefix to be given to generated threads
      * @param debug         whether to print out the stack trace of uncaught exceptions within a created thread
      */
+    @SuppressWarnings("WeakerAccess")
     public NamingThreadFactory(final String naming_prefix, final boolean debug) {
 
         this.naming_prefix = naming_prefix;
@@ -80,9 +75,6 @@ public final class NamingThreadFactory implements ThreadFactory {
 
     private String generateName() {
 
-        final StringBuilder builder = new StringBuilder();
-        builder.append(naming_prefix);
-        builder.append(sequence_number.getAndIncrement());
-        return builder.toString();
+        return naming_prefix + sequence_number.getAndIncrement();
     }
 }

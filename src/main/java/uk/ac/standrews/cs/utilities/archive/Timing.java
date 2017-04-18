@@ -24,11 +24,8 @@ import java.util.concurrent.TimeoutException;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("WeakerAccess")
 public final class Timing {
-
-    private Timing() {
-
-    }
 
     // -------------------------------------------------------------------------------------------------------
 
@@ -44,10 +41,12 @@ public final class Timing {
      * @param reporting_level the diagnostic reporting threshold
      * @throws Exception if the thread is interrupted, or if the action throws an exception that terminates the loop
      */
+    @SuppressWarnings("WeakerAccess")
     public static void repeat(final Callable<Void> action, final Duration overall_timeout, final Duration loop_delay, final boolean delay_is_fixed, final Diagnostic reporting_level) throws Exception {
 
         try {
             generalLoop(action, overall_timeout, loop_delay, delay_is_fixed, false, reporting_level);
+
         } catch (final TimeoutException e) {
             // Timeout is normal exit reason, so don't throw.
         }

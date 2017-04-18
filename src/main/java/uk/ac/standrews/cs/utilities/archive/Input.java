@@ -31,16 +31,10 @@ import java.io.InputStreamReader;
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public final class Input {
 
     private static final BufferedReader SYSTEM_READER = new BufferedReader(new InputStreamReader(System.in));
-
-    /**
-     * Prevent instantiation of utility class.
-     */
-    private Input() {
-
-    }
 
     /**
      * Returns the next line from the console.
@@ -49,6 +43,7 @@ public final class Input {
      * @return the next line from the console
      * @throws IOException if an I/O error occurs
      */
+    @SuppressWarnings("WeakerAccess")
     public static String readLine(final String prompt) throws IOException {
 
         System.out.print(prompt);
@@ -91,6 +86,7 @@ public final class Input {
      * @return A character array containing the password or passphrase, not including any line-termination characters, or {@code null} if an end of stream has been reached.
      * @see Console#readPassword()
      */
+    @SuppressWarnings("WeakerAccess")
     public static char[] readPassword(final String prompt) {
 
         final Console console = System.console();
@@ -124,7 +120,7 @@ public final class Input {
         final JPasswordField password_field = new JPasswordField(10);
         panel.add(prompt_label, BorderLayout.NORTH);
         panel.add(password_field, BorderLayout.CENTER);
-        final JOptionPane option_pane = new JOptionPane(panel, JOptionPane.DEFAULT_OPTION);
+        final JOptionPane option_pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE);
         final JDialog dialog = option_pane.createDialog("Password");
         try {
             //Put the focus on the textfield.

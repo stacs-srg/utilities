@@ -721,7 +721,7 @@ public class MTree<T> {
             return sb.toString();
         }
 
-        public List<DataDistance<T>> values() {
+        List<DataDistance<T>> values() {
 
             return closest;
         }
