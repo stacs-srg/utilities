@@ -28,9 +28,9 @@ import java.math.BigInteger;
 @SuppressWarnings("unused")
 public class BigSquareRoot {
 
-    private static BigDecimal ZERO = new BigDecimal("0");
-    private static BigDecimal ONE = new BigDecimal("1");
-    private static BigDecimal TWO = new BigDecimal("2");
+    private static final BigDecimal ZERO = new BigDecimal("0");
+    private static final BigDecimal ONE = new BigDecimal("1");
+    private static final BigDecimal TWO = new BigDecimal("2");
     private static final int DEFAULT_MAX_ITERATIONS = 50;
     private static final int DEFAULT_SCALE = 10;
 

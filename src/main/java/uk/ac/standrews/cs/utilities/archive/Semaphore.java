@@ -25,12 +25,13 @@ package uk.ac.standrews.cs.utilities.archive;
  *
  * @author graham
  */
+@SuppressWarnings("WeakerAccess")
 public class Semaphore {
 
     /**
      * Flag that allows all synchronisation to be disabled.
      */
-    protected static boolean SYNCHRONISATION_DISABLED = false;
+    private static final boolean SYNCHRONISATION_DISABLED = false;
 
     private int semaphore_value;
 

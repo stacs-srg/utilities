@@ -30,11 +30,12 @@ import java.util.Iterator;
 /**
  * @author stuart, graham
  */
+@SuppressWarnings("unused")
 public class Network {
 
-    public static int UNDEFINED_PORT = -1;
+    private static final int UNDEFINED_PORT = -1;
 
-    public static InetSocketAddress defaultLocalHostAddress(int port) throws IllegalArgumentException, UnknownHostException {
+    private static InetSocketAddress defaultLocalHostAddress(int port) throws IllegalArgumentException, UnknownHostException {
         return new InetSocketAddress(InetAddress.getLocalHost(), port);
     }
 
@@ -72,6 +73,7 @@ public class Network {
      *
      * @param host_and_port a string of the form "host:port", "host", "host:", ":port"
      */
+    @SuppressWarnings("WeakerAccess")
     public static String extractHostName(String host_and_port) {
         if (host_and_port == null) return null;
         int sepIndex = host_and_port.indexOf(":"); //where in the ":" character
@@ -86,15 +88,15 @@ public class Network {
      *
      * @param host_and_port a string of the form "host:port", "host", "host:", ":port"
      */
+    @SuppressWarnings("WeakerAccess")
     public static String extractPortNumber(String host_and_port) {
         if (host_and_port == null) return Integer.toString(UNDEFINED_PORT);
         int sepIndex = host_and_port.indexOf(":"); //where is the ":" character
         if (sepIndex == -1) return Integer.toString(UNDEFINED_PORT);
         else {
             //check that string is not "<host>:" or ":"
-            if (sepIndex != host_and_port.length() - 1 && sepIndex != -1) {
-                String portString = host_and_port.substring(sepIndex + 1, host_and_port.length());
-                return portString;
+            if (sepIndex != host_and_port.length() - 1) {
+                return host_and_port.substring(sepIndex + 1, host_and_port.length());
             } else {
                 return Integer.toString(UNDEFINED_PORT);
             }

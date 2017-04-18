@@ -24,6 +24,7 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -46,12 +47,23 @@ public class MTreeEuclidean2DTest {
      * add a single point to the tree
      */
     @Test
+    public void addNone() {
+
+        assertEquals(0, tree.size());
+        assertFalse(tree.contains(new Point(0.0F, 0.0F)));
+    }
+
+    /**
+     * add a single point to the tree
+     */
+    @Test
     public void addOne() {
 
         tree.add(new Point(0.0F, 0.0F));
 
         assertEquals(1, tree.size());
         assertTrue(tree.contains(new Point(0.0F, 0.0F)));
+        assertFalse(tree.contains(new Point(1.0F, 1.0F)));
     }
 
     /**

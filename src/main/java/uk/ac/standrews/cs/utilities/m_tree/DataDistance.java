@@ -20,6 +20,7 @@ package uk.ac.standrews.cs.utilities.m_tree;
  * Used by MTree to return data and distance from the data.
  * Created by al on 20/02/2017.
  */
+@SuppressWarnings("WeakerAccess")
 public class DataDistance<T> {
 
     public T value;

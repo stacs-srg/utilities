@@ -31,6 +31,8 @@ public class MTree<T> {
     private final Distance<T> distance_wrapper;
 
     private Node root = null;
+
+    @SuppressWarnings("unused")
     private int num_entries = 0;
 
     public MTree(Distance<T> d) {
@@ -43,6 +45,7 @@ public class MTree<T> {
      * used to call calculateSize - may be needed in persistent version of this code?
      */
     public int size() {
+
         // return num_entries;
         return calculateSize(root); // TODO remove once working and replace with num_entries
     }
@@ -55,6 +58,7 @@ public class MTree<T> {
      * @return n neighbours (or as many as possible)
      */
     public List<DataDistance<T>> nearestN(T query, int n) {
+
         ClosestSet results = new ClosestSet(n);
         nearestN(root, n, query, results);
         return results.values();
@@ -88,8 +92,9 @@ public class MTree<T> {
      * @param data - some data for which to search
      * @return true if the tree contains the data
      */
+    @SuppressWarnings("WeakerAccess")
     public boolean contains(T data) {
-        return contains(root, root.data);
+        return root != null && contains(root, data);
     }
 
     /**
@@ -98,21 +103,13 @@ public class MTree<T> {
      * @param data the data to be added to the tree
      */
     public void add(T data) {
+
         num_entries++;
         if (root == null) {
             root = new Node(data, null);
         } else {
             add(root, data);
         }
-    }
-
-    /**
-     * Debug method primarily but may be useful
-     * Displays the tree.
-     */
-    private void showTree() {
-        showTree(root, 0);
-        System.out.println("----------------------");
     }
 
     //------------------------- Utility methods
@@ -125,7 +122,7 @@ public class MTree<T> {
      */
     public List<T> mapValues(List<DataDistance<T>> data_distances) {
 
-        ArrayList<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (DataDistance<T> dd : data_distances) {
             result.add(dd.value);
         }
@@ -138,9 +135,10 @@ public class MTree<T> {
      * @param data_distances a list of distances from which to extract values
      * @return the set of distances from the list
      */
+    @SuppressWarnings("unused")
     public List<Float> mapDistances(List<DataDistance<T>> data_distances) {
 
-        ArrayList<Float> result = new ArrayList<Float>();
+        List<Float> result = new ArrayList<>();
         for (DataDistance<T> dd : data_distances) {
             result.add(dd.distance);
         }
@@ -169,6 +167,16 @@ public class MTree<T> {
             }
             return size;
         }
+    }
+
+    /**
+     * Debug method primarily but may be useful
+     * Displays the tree.
+     */
+    @SuppressWarnings("unused")
+    private void showTree() {
+        showTree(root, 0);
+        System.out.println("----------------------");
     }
 
     /**
@@ -213,58 +221,61 @@ public class MTree<T> {
      * @param N  - the node we are searching
      * @param Q  the query data
      * @param RQ the search radius
-     * @return all those nodes within RQ of @param T.
-     * <p>
-     * Algorithm RangeSearch from https://en.wikipedia.org/wiki/M-tree
-     * Input: Node N of M-Tree MT,  Q: query object, R(Q): search radius
-     * Output: all the DB objects such that
-     * d(O,j,Q) ≤ RQ(Q)
-     * <p>
-     * <pre>
-     * {
-     *   let Op be the parent object of node N;
+     *           <p>
+     *           Algorithm RangeSearch from https://en.wikipedia.org/wiki/M-tree
+     *           Input: Node N of M-Tree MT,  Q: query object, R(Q): search radius
+     *           Output: all the DB objects such that
+     *           d(O,j,Q) ≤ RQ(Q)
+     *           <p>
+     *           <pre>
+     *           {
+     *             let Op be the parent object of node N;
      *
-     *   if N is not a leaf then {
-     *     for each entry(Or) in N do {
-     *           if |d(Op,Q) − d(Or,Op)| ≤ R(Q)+R(Or) then {
-     *             Compute d(Or,Q);
-     * 			if d(Or,Q) ≤ RQ(Q)+R(Or)} then
-     *               RangeSearch(*ptr(T(Or)),Q,R(Q));
+     *             if N is not a leaf then {
+     *               for each entry(Or) in N do {
+     *                     if |d(Op,Q) − d(Or,Op)| ≤ R(Q)+R(Or) then {
+     *                       Compute d(Or,Q);
+     *           			if d(Or,Q) ≤ RQ(Q)+R(Or)} then
+     *                         RangeSearch(*ptr(T(Or)),Q,R(Q));
+     *                     }
+     *               }
+     *             }
+     *             else { // it is leaf
+     *               for each entry(Oj) in N do {
+     *                     if |d(Op,Q) - d(Oj,Op)| ≤ R(Q) then {
+     *                       Compute d(Oj,Q);
+     *                       if d(Oj,Q) ≤ R(Q) then
+     *                         add oid(Oj) to the result;
+     *                     }
+     *               }
+     *             }
      *           }
-     *     }
-     *   }
-     *   else { // it is leaf
-     *     for each entry(Oj) in N do {
-     *           if |d(Op,Q) - d(Oj,Op)| ≤ R(Q) then {
-     *             Compute d(Oj,Q);
-     *             if d(Oj,Q) ≤ R(Q) then
-     *               add oid(Oj) to the result;
-     *           }
-     *     }
-     *   }
-     * }
-     * </pre>
+     *           </pre>
      */
     private void rangeSearch(Node N, T Q, float RQ, ArrayList<DataDistance<T>> results) {
 
         Node parent = N.parent;
 
-        if (!N.isLeaf()) {
+        if (N.isLeaf()) {
+
+            float distanceNodeToQ = distance_wrapper.distance(N.data, Q);
+            if (distanceNodeToQ <= RQ) {
+                results.add(new DataDistance<>(N.data, distanceNodeToQ));
+            }
+
+        } else {
             for (Node child : N.children) {
+
                 float distanceQtoParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(parent.data, Q);
                 float distanceChildToParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(child.data, parent.data);
+
                 if (parent == null || Math.abs(distanceQtoParent - distanceChildToParent) <= RQ + child.radius) {
+
                     float distanceChildToQ = distance_wrapper.distance(child.data, Q);
                     if (distanceChildToQ <= RQ + child.radius) {
                         rangeSearch(child, Q, RQ, results);
                     }
                 }
-            }
-        } else { // node is a leaf
-
-            float distanceNodeToQ = distance_wrapper.distance(N.data, Q);
-            if (distanceNodeToQ <= RQ) {
-                results.add(new DataDistance<T>(N.data, distanceNodeToQ));
             }
         }
     }
@@ -292,8 +303,7 @@ public class MTree<T> {
         } else { // the data may be inside this ball
             // need to check children
             for (Node child : node.children) {
-                boolean found = contains(child, query);
-                if (found) {
+                if (contains(child, query)) {
                     return true;
                 }
             }
@@ -312,17 +322,17 @@ public class MTree<T> {
     private DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
 
         if (node.data.equals(query)) {
-            return new DataDistance<T>(node.data, 0.0F);
+            return new DataDistance<>(node.data, 0.0F);
         }
 
         final float distance_to_node = distance_wrapper.distance(node.data, query);
         if (closest_thus_far == null) {
-            closest_thus_far = new DataDistance<T>(node.data, distance_to_node);
+            closest_thus_far = new DataDistance<>(node.data, distance_to_node);
         }
 
         if (node.isLeaf()) { // is not equal and we are at a leaf
             if (distance_to_node < closest_thus_far.distance) { // this node is closer
-                return new DataDistance<T>(node.data, distance_to_node);
+                return new DataDistance<>(node.data, distance_to_node);
             }
             return closest_thus_far; // we are not any closer.
         }
@@ -577,11 +587,14 @@ public class MTree<T> {
                 }
             }
         }
-        smallest_not_pivot.parent = null; // we are about to re-insert this into the tree at a new position.
+        if (smallest_not_pivot != null) {
+            smallest_not_pivot.parent = null; // we are about to re-insert this into the tree at a new position.
+        }
         return smallest_not_pivot;
     }
 
     private class PairOfNodeLists {
+
         List<Node> nl1;
         List<Node> nl2;
 
@@ -601,14 +614,14 @@ public class MTree<T> {
         public T data;
         float radius;
         float distance_to_parent;
-        public Node parent;      /// NOT SURE IF YOU NEED
-        public ArrayList<Node> children;
+        Node parent;      /// NOT SURE IF YOU NEED
+        List<Node> children;
 
         Node(T oN, Node parent) {
             data = oN;
             radius = 0.0F;
             distance_to_parent = parent == null ? 0 : distance_wrapper.distance(oN, parent.data);
-            children = new ArrayList<Node>();
+            children = new ArrayList<>();
             this.parent = parent;
         }
 
@@ -634,11 +647,11 @@ public class MTree<T> {
             return radius == 0.0F;
         }
 
-        public boolean isFull() {
+        boolean isFull() {
             return children.size() >= MTree.MAX_LEVEL_SIZE;
         }
 
-        public boolean isEmpty() {
+        boolean isEmpty() {
             return children.isEmpty();
         }
 
@@ -652,8 +665,8 @@ public class MTree<T> {
         ArrayList<DataDistance<T>> closest;
         int requested_result_set_size;
 
-        public ClosestSet(int n) {
-            closest = new ArrayList<DataDistance<T>>();
+        ClosestSet(int n) {
+            closest = new ArrayList<>();
             requested_result_set_size = n;
         }
 
@@ -665,41 +678,44 @@ public class MTree<T> {
 
             int index;
             if (closest.size() == 0) {
-                closest.add(0, new DataDistance(data, distance));
+                closest.add(0, new DataDistance<>(data, distance));
                 return;
             }
             for (index = 0; index < closest.size(); index++) {
-                DataDistance next = closest.get(index);
+                DataDistance<T> next = closest.get(index);
                 if (distance <= next.distance) { // found right point to insert
-                    closest.add(index, new DataDistance(data, distance));
+                    closest.add(index, new DataDistance<>(data, distance));
                     checkEvict();
                     return;
                 }
             }
-            closest.add(index, new DataDistance(data, distance)); // add at the end
+            closest.add(index, new DataDistance<>(data, distance)); // add at the end
             checkEvict();
             // if we get here then the new element is further than rest so should not be added.
         }
 
-        public float furthestDistance() {
+        float furthestDistance() {
+
             DataDistance furthest_element = closest.get(closest.size() - 1);
             return furthest_element.distance;
         }
 
         private void checkEvict() {
+
             if (closest.size() > requested_result_set_size) {
                 closest.remove(closest.size() - 1); // remove the last
             }
         }
 
         public String toString() {
+
             if (closest.size() == 0) {
                 return "[]";
             }
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("[");
-            for (int i = 0; i < closest.size(); i++) {
-                sb.append("\tdata: " + closest.get(i).value + "distance: " + closest.get(i).distance + "\n");
+            for (DataDistance<T> dd : closest) {
+                sb.append("\tdata: ").append(dd.value).append("distance: ").append(dd.distance).append("\n");
             }
             sb.append("\t]");
             return sb.toString();
@@ -709,6 +725,5 @@ public class MTree<T> {
 
             return closest;
         }
-
     }
 }

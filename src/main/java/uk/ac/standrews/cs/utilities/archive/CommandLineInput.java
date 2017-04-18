@@ -14,9 +14,6 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-/**
- * Created on Aug 31, 2005 at 2:58:47 PM.
- */
 package uk.ac.standrews.cs.utilities.archive;
 
 import java.io.BufferedReader;
@@ -26,14 +23,16 @@ import java.io.InputStreamReader;
 /**
  * @author graham
  */
+@SuppressWarnings("unused")
 public class CommandLineInput {
 
-    static BufferedReader reader;
+    private static final BufferedReader reader;
 
     static {
         reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
+    @SuppressWarnings("unused")
     public static String readLine() {
 
         try {

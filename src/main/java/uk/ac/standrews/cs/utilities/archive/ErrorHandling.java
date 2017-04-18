@@ -29,6 +29,7 @@ import java.util.Date;
  * @author Alan Dearle (al@cs.st-andrews.ac.uk)
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public final class ErrorHandling {
 
     private static final ErrorHandling INSTANCE = new ErrorHandling();
@@ -38,10 +39,10 @@ public final class ErrorHandling {
     private static boolean use_timestamp = false;
     private static boolean local_reporting = true;
 
-    protected static final Object SYNC = new Object(); // To allow Diagnostic calls to be synchronised with respect to these methods.
+    private static final Object SYNC = new Object(); // To allow Diagnostic calls to be synchronised with respect to these methods.
 
-    protected static final String DEFAULT_DATE_FORMAT_PATTERN = "HHmm.ss.SSS yyyy-MM-dd";
-    private static DateFormat dateformat = new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN);
+    private static final String DEFAULT_DATE_FORMAT_PATTERN = "HHmm.ss.SSS yyyy-MM-dd";
+    private static final DateFormat dateformat = new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN);
 
     // -------------------------------------------------------------------------------------------------------
 
@@ -165,6 +166,7 @@ public final class ErrorHandling {
      * @param e   the exception
      * @param msg a descriptive message
      */
+    @SuppressWarnings("WeakerAccess")
     public static void exceptionError(final Throwable e, final Object... msg) {
 
         outputError(true, false, Diagnostic.getMethodInCallChain(), e, msg);
@@ -176,6 +178,7 @@ public final class ErrorHandling {
      * @param e   the exception
      * @param msg a descriptive message
      */
+    @SuppressWarnings("WeakerAccess")
     public static void exceptionErrorNoEvent(final Throwable e, final Object... msg) {
 
         outputError(false, false, Diagnostic.getMethodInCallChain(), e, msg);
@@ -283,7 +286,7 @@ public final class ErrorHandling {
         sb.append("\n");
         final StackTraceElement[] trace = e.getStackTrace();
         for (final StackTraceElement element : trace) {
-            sb.append("\tat " + element + "\n");
+            sb.append("\tat ").append(element).append("\n");
         }
 
         return sb.toString();

@@ -16,8 +16,6 @@
  */
 package uk.ac.standrews.cs.utilities.archive;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,8 +28,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class TimeoutExecutor {
 
     private ExecutorService first_stage_executor, second_stage_executor;
-    protected Duration timeout;
+    final Duration timeout;
     private final int thread_pool_size;
+
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final String name;
     private static final AtomicInteger next_id = new AtomicInteger(0);
 
@@ -46,7 +46,8 @@ public abstract class TimeoutExecutor {
      * @param include_queued_time true if the time that an action spends queued before execution should be included when deciding timeouts
      * @return a timeout executor
      */
-    public static TimeoutExecutor makeTimeoutExecutor(final int thread_pool_size, final Duration timeout, final boolean block, final boolean include_queued_time, final String name) {
+    @SuppressWarnings("WeakerAccess")
+    public static TimeoutExecutor makeTimeoutExecutor(final int thread_pool_size, final Duration timeout, final boolean block, final boolean include_queued_time, @SuppressWarnings("SameParameterValue") final String name) {
 
         if (block) {
             if (include_queued_time) {
@@ -65,8 +66,6 @@ public abstract class TimeoutExecutor {
 
     // -------------------------------------------------------------------------------------------------------
 
-    private static Set<String> extant_executors = new HashSet<String>();
-
     private TimeoutExecutor(final int thread_pool_size, final Duration timeout, final String name) {
 
         this.thread_pool_size = thread_pool_size;
@@ -74,12 +73,6 @@ public abstract class TimeoutExecutor {
         initFirstStageExecutor(thread_pool_size);
 
         this.name = name + next_id.incrementAndGet();
-        extant_executors.add(this.name);
-        // System.out.println("\ncreated executor: " + this.name);
-        // if (this.name.equals("ProcessManager kill executor5")) {
-        // Diagnostic.printStackTrace();
-        // System.out.println();
-        // }
     }
 
     // -------------------------------------------------------------------------------------------------------
@@ -105,6 +98,7 @@ public abstract class TimeoutExecutor {
 
     // -------------------------------------------------------------------------------------------------------
 
+    @SuppressWarnings("unused")
     public Duration getTimeout() {
 
         return timeout;
@@ -113,6 +107,7 @@ public abstract class TimeoutExecutor {
     /**
      * Shuts down the executor and its thread pool(s).
      */
+    @SuppressWarnings("WeakerAccess")
     public void shutdown() {
 
         // System.out.println("shutting down executor: " + name);
@@ -123,12 +118,6 @@ public abstract class TimeoutExecutor {
             second_stage_executor.shutdownNow();
             updateThreadCount(-thread_pool_size);
         }
-        extant_executors.remove(name);
-        // System.out.println(">>>>>>>\nextant now:");
-        // for (final String s : extant_executors) {
-        // System.out.print(s + ", ");
-        // }
-        // System.out.println();
     }
 
     // -------------------------------------------------------------------------------------------------------
@@ -144,28 +133,28 @@ public abstract class TimeoutExecutor {
         updateThreadCount(thread_pool_size);
     }
 
+    @SuppressWarnings("unused")
     private static volatile int thread_count;
 
     private static synchronized void updateThreadCount(final int thread_pool_size) {
 
         thread_count += thread_pool_size;
-        // System.out.println("thread count: " + thread_count);
     }
 
-    protected void initSecondStageExecutor(final int thread_pool_size) {
+    void initSecondStageExecutor(final int thread_pool_size) {
 
         second_stage_executor = Executors.newFixedThreadPool(thread_pool_size);
         updateThreadCount(thread_pool_size);
     }
 
-    protected void executeWithTimeoutIncludingQueuedTime(final Runnable runnable) throws TimeoutException, InterruptedException {
+    void executeWithTimeoutIncludingQueuedTime(final Runnable runnable) throws TimeoutException, InterruptedException {
 
         final Callable<Object> action = Executors.callable(runnable);
 
         executeActionDerivedFromRunnable(action, true);
     }
 
-    protected <T> T executeWithTimeoutIncludingQueuedTime(final Callable<T> action) throws Exception {
+    <T> T executeWithTimeoutIncludingQueuedTime(final Callable<T> action) throws Exception {
 
         return executeWithTimeout(action, first_stage_executor, true);
     }
@@ -185,33 +174,22 @@ public abstract class TimeoutExecutor {
         }
     }
 
-    protected void executeWithTimeoutNotIncludingQueuedTime(final Runnable runnable) throws TimeoutException, InterruptedException {
+    void executeWithTimeoutNotIncludingQueuedTime(final Runnable runnable) throws TimeoutException, InterruptedException {
 
         final Callable<Object> action = Executors.callable(runnable);
 
-        final Callable<Object> action_with_timeout = new Callable<Object>() {
+        final Callable<Object> action_with_timeout = () -> {
 
-            @Override
-            public Object call() throws Exception {
-
-                executeWithTimeout(action, second_stage_executor, true);
-                return null;
-            }
+            executeWithTimeout(action, second_stage_executor, true);
+            return null;
         };
 
         executeActionDerivedFromRunnable(action_with_timeout, false);
     }
 
-    protected <T> T executeWithTimeoutNotIncludingQueuedTime(final Callable<T> action) throws Exception {
+    <T> T executeWithTimeoutNotIncludingQueuedTime(final Callable<T> action) throws Exception {
 
-        final Callable<T> action_with_timeout = new Callable<T>() {
-
-            @Override
-            public T call() throws Exception {
-
-                return executeWithTimeout(action, second_stage_executor, true);
-            }
-        };
+        final Callable<T> action_with_timeout = () -> executeWithTimeout(action, second_stage_executor, true);
 
         return executeWithTimeout(action_with_timeout, first_stage_executor, false);
     }
@@ -345,7 +323,7 @@ public abstract class TimeoutExecutor {
         }
 
         // -------------------------------------------------------------------------------------------------------
-        private static AtomicInteger overall_count = new AtomicInteger(1);
+
         private static AtomicInteger live_count = new AtomicInteger(1);
 
         @Override
@@ -354,38 +332,32 @@ public abstract class TimeoutExecutor {
             if (do_timeout) {
 
                 final CountDownLatch indirection_initialized = new CountDownLatch(1);
-                final AtomicReference<Future<T>> future_indirection = new AtomicReference<Future<T>>();
+                final AtomicReference<Future<T>> future_indirection = new AtomicReference<>();
 
-                final Callable<T> action_with_timeout_watcher = new Callable<T>() {
+                final Callable<T> action_with_timeout_watcher = () -> {
 
-                    @Override
-                    public T call() throws Exception {
+                    timeout_watch_executor.submit(() -> {
 
-                        timeout_watch_executor.submit(new Runnable() {
+                        try {
+                            indirection_initialized.await();
+                        } catch (final InterruptedException e) {
+                            Diagnostic.trace("interrupted while waiting for latch indirection to be initialized");
+                        }
 
-                            @Override
-                            public void run() {
-
-                                try {
-                                    indirection_initialized.await();
-                                } catch (final InterruptedException e) {
-                                    Diagnostic.trace("interrupted while waiting for latch indirection to be initialized");
-                                }
-
-                                Future<T> future = null;
-                                try {
-                                    future = future_indirection.get();
-                                    future.get(timeout.getLength(), timeout.getTimeUnit());
-                                } catch (final Exception e) {
-                                    // Ignore.
-                                } finally {
-                                    future.cancel(true);
-                                    live_count.decrementAndGet();
-                                }
+                        Future<T> future = null;
+                        try {
+                            future = future_indirection.get();
+                            future.get(timeout.getLength(), timeout.getTimeUnit());
+                        } catch (final Exception e) {
+                            // Ignore.
+                        } finally {
+                            if (future != null) {
+                                future.cancel(true);
                             }
-                        });
-                        return action.call();
-                    }
+                            live_count.decrementAndGet();
+                        }
+                    });
+                    return action.call();
                 };
 
                 Future<T> future = executor.submit(action_with_timeout_watcher);
@@ -441,20 +413,16 @@ public abstract class TimeoutExecutor {
             final Future<T> task = executor.submit(action);
 
             System.out.println("NonBlockingIncludingQueuedTime thread count: " + count++);
-            new Thread() {
+            new Thread(() -> {
 
-                @Override
-                public void run() {
-
-                    try {
-                        task.get(timeout.getLength(), timeout.getTimeUnit());
-                    } catch (final Exception e) {
-                        // Ignore.
-                    } finally {
-                        task.cancel(true);
-                    }
+                try {
+                    task.get(timeout.getLength(), timeout.getTimeUnit());
+                } catch (final Exception e) {
+                    // Ignore.
+                } finally {
+                    task.cancel(true);
                 }
-            }.start();
+            }).start();
 
             return null;
         }

@@ -45,38 +45,43 @@ public class Diagnostic {
     /**
      * An intermediate diagnostic level.
      */
+    @SuppressWarnings("WeakerAccess")
     public static Diagnostic INIT = new Diagnostic(1, "INIT");
 
     /**
      * An intermediate diagnostic level.
      */
+    @SuppressWarnings("unused")
     public static Diagnostic RUN = new Diagnostic(2, "RUN");
 
     /**
      * An intermediate diagnostic level.
      */
+    @SuppressWarnings("unused")
     public static Diagnostic RUNALL = new Diagnostic(3, "RUNALL");
 
     /**
      * An intermediate diagnostic level.
      */
+    @SuppressWarnings("unused")
     public static Diagnostic RESULT = new Diagnostic(4, "RESULT");
 
     /**
      * An intermediate diagnostic level.
      */
+    @SuppressWarnings("unused")
     public static Diagnostic FINAL = new Diagnostic(5, "FINAL");
 
     /**
      * The highest diagnostic level.
      */
+    @SuppressWarnings("unused")
     public static Diagnostic NONE = new Diagnostic(6, "NONE");
 
-    /********************************************************************************************************************************************/
+    // ********************************************************************************************************************************************/
 
     private static boolean local_reporting = true;
     private static Diagnostic threshold;
-    private static final Diagnostic instance = new Diagnostic();
     private static final String DIAGNOSTIC_CLASS_NAME = Diagnostic.class.getName();
     private static final String ERROR_CLASS_NAME = Error.class.getName();
 
@@ -88,6 +93,7 @@ public class Diagnostic {
      *
      * @param level the new level
      */
+    @SuppressWarnings("unused")
     public static void setLevel(Diagnostic level) {
 
         threshold = level;
@@ -98,6 +104,7 @@ public class Diagnostic {
      *
      * @return the current level
      */
+    @SuppressWarnings("unused")
     public static Diagnostic getLevel() {
 
         return threshold;
@@ -109,18 +116,20 @@ public class Diagnostic {
      * @param level a reporting level
      * @return true if the given level is greater than or equal to the current reporting threshold
      */
+    @SuppressWarnings("unused")
     public static boolean aboveTraceThreshold(Diagnostic level) {
 
         return level.level_value >= threshold.level_value;
     }
 
-    /********************************************************************************************************************************************/
+    // ********************************************************************************************************************************************/
 
     /**
      * Outputs trace information if the specified level is equal or higher to the current reporting threshold.
      *
      * @param level the trace level
      */
+    @SuppressWarnings("unused")
     public static void trace(Diagnostic level) {
 
         outputTrace(getMethodInCallChain(), level, true);
@@ -131,7 +140,8 @@ public class Diagnostic {
      *
      * @param msg a descriptive message
      */
-    public static void trace(String msg) {
+    @SuppressWarnings("WeakerAccess")
+    public static void trace(@SuppressWarnings("SameParameterValue") String msg) {
 
         outputTrace(getMethodInCallChain() + " : " + msg, true);
     }
@@ -154,6 +164,7 @@ public class Diagnostic {
      * @param msg2  another message
      * @param level the trace level
      */
+    @SuppressWarnings("unused")
     public static void trace(String msg1, String msg2, Diagnostic level) {
 
         outputTrace(getMethodInCallChain() + " : " + msg1 + msg2, level, true);
@@ -166,6 +177,7 @@ public class Diagnostic {
      * @param module the module from which this call has been made
      * @param level  the trace level
      */
+    @SuppressWarnings("unused")
     public static void traceNoLn(String module, Diagnostic level) {
 
         outputTrace(module, level, false);
@@ -178,12 +190,14 @@ public class Diagnostic {
      * @param msg   a descriptive message
      * @param level the trace level
      */
+    @SuppressWarnings("unused")
     public static void traceNoSource(String msg, Diagnostic level) {
 
         outputTrace(msg, level, true);
         outputTrace(msg, true);
     }
 
+    @SuppressWarnings("unused")
     public static void traceNoSource(String msg) {
 
         outputTrace(msg, true);
@@ -196,18 +210,20 @@ public class Diagnostic {
      * @param msg   a descriptive message
      * @param level the trace level
      */
+    @SuppressWarnings("unused")
     public static void traceNoSourceNoLn(String msg, Diagnostic level) {
 
         outputTrace(msg, level, false);
     }
 
-    /********************************************************************************************************************************************/
+    // ********************************************************************************************************************************************/
 
     /**
      * Toggles whether diagnostic messages should be output to local standard output.
      *
      * @param local_reporting true if messages should be output locally
      */
+    @SuppressWarnings("unused")
     public static void setLocalErrorReporting(boolean local_reporting) {
 
         Diagnostic.local_reporting = local_reporting;
@@ -218,6 +234,7 @@ public class Diagnostic {
      *
      * @return returns information on the most recent user method in the current call chain
      */
+    @SuppressWarnings("WeakerAccess")
     public static String getMethodInCallChain() {
 
         // Get a stack trace.
@@ -243,7 +260,8 @@ public class Diagnostic {
      * @param depth the depth in the current chain, where 1 corresponds to the method calling this one.
      * @return a string containing the class and method name of the corresponding call
      */
-    public static String getMethodInCallChain(int depth) {
+    @SuppressWarnings("WeakerAccess")
+    public static String getMethodInCallChain(@SuppressWarnings("SameParameterValue") int depth) {
 
         // Get a stack trace.
         StackTraceElement[] trace = new Exception().getStackTrace();
@@ -255,6 +273,7 @@ public class Diagnostic {
     /**
      * Prints a stack trace.
      */
+    @SuppressWarnings("unused")
     public static void printStackTrace() {
 
         // Get a stack trace.
@@ -280,13 +299,7 @@ public class Diagnostic {
         return level_description;
     }
 
-    /********************************************************************************************************************************************/
-
-    private Diagnostic() {
-
-        this(0, "");
-        threshold = NONE;
-    }
+    // ********************************************************************************************************************************************/
 
     private Diagnostic(int level_value, String level_description) {
 
@@ -294,11 +307,11 @@ public class Diagnostic {
         this.level_description = level_description;
     }
 
-    /********************************************************************************************************************************************/
+    // ********************************************************************************************************************************************/
 
     private static void outputTrace(String message, Diagnostic level, boolean new_line) {
 
-        // Synchronise with respect to the Error methods too.
+        // Synchronize with respect to the Error methods too.
         synchronized (Error.class) {
             if (level.level_value >= threshold.level_value)
                 outputTrace(message, new_line);

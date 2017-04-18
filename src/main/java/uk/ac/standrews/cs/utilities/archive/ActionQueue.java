@@ -34,37 +34,36 @@ import java.util.concurrent.TimeoutException;
  */
 public class ActionQueue {
 
-    /******************** Static Fields *********************/
-
-    // TODO general mechanism for exposing and controlling configuration parameters.
+    // ******************** Static Fields *********************/
 
     /**
      * The default capacity of the queue.
      */
-    public static final int DEFAULT_QUEUE_CAPACITY = 5;
+    private static final int DEFAULT_QUEUE_CAPACITY = 5;
 
     /**
      * The default maximum number of threads servicing the queue.
      */
-    public static final int DEFAULT_MAX_THREADS = 2;
+    private static final int DEFAULT_MAX_THREADS = 2;
 
     /**
      * The default time-out in milliseconds after which an idle thread will die.
      */
-    public static final int DEFAULT_IDLE_TIMEOUT = 5000;
+    private static final int DEFAULT_IDLE_TIMEOUT = 5000;
 
     /************************ Fields ************************/
 
-    private List action_list;
+    private List<Action> action_list;
     private int number_of_threads, max_threads, idle_timeout, queue_capacity;
 
     private Semaphore mutex, not_empty, not_full;
 
-    /********************* Constructors *********************/
+    // ********************* Constructors *********************/
 
     /**
      * Constructor with default capacity, number of service threads and idle time-out.
      */
+    @SuppressWarnings("unused")
     public ActionQueue() {
 
         this(DEFAULT_QUEUE_CAPACITY, DEFAULT_MAX_THREADS, DEFAULT_IDLE_TIMEOUT);
@@ -77,6 +76,7 @@ public class ActionQueue {
      * @param max_threads    the maximum number of service threads
      * @param idle_timeout   the time-out in milliseconds after which an idle thread will die
      */
+    @SuppressWarnings("WeakerAccess")
     public ActionQueue(int queue_capacity, int max_threads, int idle_timeout) {
 
         this.queue_capacity = queue_capacity;
@@ -97,10 +97,10 @@ public class ActionQueue {
 
         // Don't need a synchronized list (Collections.SynchronizedList()) since
         // all access to the ArrayList will be be synchronised.
-        action_list = new ArrayList();
+        action_list = new ArrayList<>();
     }
 
-    /*********************** Methods ************************/
+    // *********************** Methods ************************/
 
     /**
      * Queues the given action to be performed as soon as possible. Returns as soon as there is
@@ -108,6 +108,7 @@ public class ActionQueue {
      *
      * @param action the action to be queued
      */
+    @SuppressWarnings("WeakerAccess")
     public void enqueue(Action action) {
 
         // Wait until there is space in the queue.
@@ -145,6 +146,7 @@ public class ActionQueue {
      *
      * @return the next action
      */
+    @SuppressWarnings("WeakerAccess")
     public Action dequeue() throws TimeoutException {
 
         // Wait until there an action is available in the queue, or the timeout is exceeded.
@@ -165,7 +167,7 @@ public class ActionQueue {
         }
 
         // Get the action at the front of the list.
-        Action next_action = (Action) action_list.get(0);
+        Action next_action = action_list.get(0);
 
         // Remove it from the list.
         action_list.remove(0);
@@ -186,6 +188,7 @@ public class ActionQueue {
      *
      * @return the number of free slots
      */
+    @SuppressWarnings("unused")
     public int freeSpace() {
 
         // Wait to enter critical section.
@@ -204,7 +207,7 @@ public class ActionQueue {
         return free_space;
     }
 
-    /******************** Utility Methods *********************/
+    // ******************** Utility Methods *********************/
 
     /**
      * Creates and starts a new thread to service the action queue.
@@ -217,6 +220,8 @@ public class ActionQueue {
 
                 try {
                     // Loop indefinitely removing actions from the queue.
+
+                    //noinspection InfiniteLoopStatement
                     while (true) dequeue().performAction();
 
                 } catch (TimeoutException e) {
