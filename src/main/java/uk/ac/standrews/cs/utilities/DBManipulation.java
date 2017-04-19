@@ -23,6 +23,7 @@ import java.sql.*;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public class DBManipulation {
 
     private static final String CREATE_DB_SYNTAX = "CREATE DATABASE IF NOT EXISTS ";
@@ -33,8 +34,7 @@ public class DBManipulation {
     private static final String SELECT_TABLE_SYNTAX1 = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '";
     private static final String SELECT_TABLE_SYNTAX2 = "' AND TABLE_NAME = '";
 
-
-    public static final Object NULL_DATE = new Object();
+    private static final Object NULL_DATE = new Object();
 
     /**
      * Configures the parameters for a given prepared statement.
@@ -68,6 +68,7 @@ public class DBManipulation {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static void executeStatement(final Connection connection, final String query) throws SQLException {
 
         try (Statement statement = connection.createStatement()) {

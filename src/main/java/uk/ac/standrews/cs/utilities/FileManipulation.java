@@ -38,6 +38,7 @@ import static org.junit.Assert.assertNull;
  */
 public class FileManipulation {
 
+    @SuppressWarnings("WeakerAccess")
     public static final Charset FILE_CHARSET = StandardCharsets.UTF_8;
     private static final String URL_ENCODING = FILE_CHARSET.name();
 
@@ -71,11 +72,13 @@ public class FileManipulation {
      * @return the number of lines
      * @throws IOException if the file cannot be read
      */
+    @SuppressWarnings("unused")
     public static int countLines(final Path path) throws IOException {
 
         return countLines(getInputStream(path));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static int countLines(final InputStream input_stream) throws IOException {
 
         return readAllLines(input_stream).size();
@@ -106,7 +109,6 @@ public class FileManipulation {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input_stream))) {
 
-            int count = 0;
             String line;
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
@@ -134,6 +136,7 @@ public class FileManipulation {
      * @param resource_name the name of the resource
      * @return the path of the resource
      */
+    @SuppressWarnings("unused")
     public static Path getResourcePath(Class the_class, String resource_name) {
 
         URL resource = getResource(the_class, resource_name);
@@ -151,6 +154,7 @@ public class FileManipulation {
      * @param resource_name the name of the resource
      * @return the input stream reader
      */
+    @SuppressWarnings("unused")
     public static InputStreamReader getInputStreamReaderForResource(Class the_class, String resource_name) {
 
         return new InputStreamReader(getInputStreamForResource(the_class, resource_name));
@@ -163,6 +167,7 @@ public class FileManipulation {
      * @param resource_name the name of the resource
      * @return the input stream
      */
+    @SuppressWarnings("WeakerAccess")
     public static InputStream getInputStreamForResource(Class the_class, String resource_name) {
 
         // First try to get resource from the real file system.
@@ -178,6 +183,7 @@ public class FileManipulation {
      * @param directory_path the path of the directory
      * @throws IOException if the directory cannot be deleted
      */
+    @SuppressWarnings("WeakerAccess")
     public static void deleteDirectory(final String directory_path) throws IOException {
 
         deleteDirectory(Paths.get(directory_path));
@@ -189,6 +195,7 @@ public class FileManipulation {
      * @param directory_path the path of the directory
      * @throws IOException if the directory cannot be deleted
      */
+    @SuppressWarnings("WeakerAccess")
     public static void deleteDirectory(final Path directory_path) throws IOException {
 
         Files.walkFileTree(directory_path, new SimpleFileVisitor<Path>() {
@@ -215,6 +222,7 @@ public class FileManipulation {
      * @param path the path of the file
      * @throws IOException if the file cannot be created
      */
+    @SuppressWarnings("unused")
     public static void createFileIfDoesNotExist(final Path path) throws IOException {
 
         if (!Files.exists(path)) {
@@ -228,6 +236,7 @@ public class FileManipulation {
      * @param directory of the directory to be created
      * @throws IOException if one is thrown by Java IO layer
      */
+    @SuppressWarnings("unused")
     public static void createDirectoryIfDoesNotExist(final File directory) throws IOException {
 
         createDirectoryIfDoesNotExist(Paths.get(directory.getAbsolutePath()));
@@ -237,6 +246,7 @@ public class FileManipulation {
      * @param path of the directory to be created
      * @throws IOException if one is thrown by Java IO layer
      */
+    @SuppressWarnings("WeakerAccess")
     public static void createDirectoryIfDoesNotExist(final Path path) throws IOException {
 
         Files.createDirectories(path);
@@ -248,6 +258,7 @@ public class FileManipulation {
      * @param path the path of the file
      * @throws IOException if the parent directory cannot be created
      */
+    @SuppressWarnings("WeakerAccess")
     public static void createParentDirectoryIfDoesNotExist(final Path path) throws IOException {
 
         Path parent_dir = path.getParent();
@@ -264,6 +275,7 @@ public class FileManipulation {
      * @return a list of entry paths
      * @throws IOException if the directory cannot be accessed
      */
+    @SuppressWarnings("unused")
     public static List<Path> getDirectoryEntries(final Path directory) throws IOException {
 
         List<Path> result = new ArrayList<>();
@@ -305,6 +317,7 @@ public class FileManipulation {
      * @return a list of entries
      * @throws IOException if the directory cannot be read
      */
+    @SuppressWarnings("WeakerAccess")
     public static List<String> getResourceDirectoryEntries(String resource_directory_path, ClassLoader class_loader) throws IOException {
 
         final String relative_path = getRelativePath(resource_directory_path);
@@ -334,6 +347,7 @@ public class FileManipulation {
      * @return a list of entries
      * @throws IOException if the directory cannot be read
      */
+    @SuppressWarnings("unused")
     public static List<String> getResourceDirectoryEntries(Path resource_directory_path, ClassLoader class_loader) throws IOException {
 
         return getResourceDirectoryEntries(resource_directory_path.toString(), class_loader);

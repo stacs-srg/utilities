@@ -26,6 +26,7 @@ import static org.junit.Assert.assertThat;
 
 public class DurationTest {
 
+    @SuppressWarnings("EqualsWithItself")
     @Test
     public void durationOrdering() {
 

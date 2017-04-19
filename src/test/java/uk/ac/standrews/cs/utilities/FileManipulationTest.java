@@ -31,12 +31,13 @@ import java.util.Random;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FileManipulationTest {
 
     private static final int DIRECTORY_COUNT = 10;
     private static final int FILE_PER_DIRECTORY_COUNT = 50;
-    public static final String TEMP_FILE_TREE_ROOT = "src/test/resources/temp_file_tree";
+    private static final String TEMP_FILE_TREE_ROOT = "src/test/resources/temp_file_tree";
     private static final Random RANDOM = new Random(42);
 
     private String temp_file_tree_root;
@@ -96,7 +97,7 @@ public class FileManipulationTest {
 
     private void createSubDirectory(File sub_directory) {
 
-        sub_directory.mkdirs();
+        assertTrue(sub_directory.mkdirs());
         assertExists(sub_directory);
     }
 

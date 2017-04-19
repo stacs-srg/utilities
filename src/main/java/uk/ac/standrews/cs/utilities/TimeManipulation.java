@@ -18,6 +18,7 @@ package uk.ac.standrews.cs.utilities;
 
 import static java.util.concurrent.TimeUnit.*;
 
+@SuppressWarnings("unused")
 public class TimeManipulation {
 
     public static void reportElapsedTime(final long start_time) {
@@ -25,6 +26,7 @@ public class TimeManipulation {
         System.out.println("Elapsed time: " + formatMillis(System.currentTimeMillis() - start_time));
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static String formatMillis(final long millis) {
 
         final long hours = MILLISECONDS.toHours(millis);

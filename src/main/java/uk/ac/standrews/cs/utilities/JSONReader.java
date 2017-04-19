@@ -27,6 +27,7 @@ import java.io.Reader;
  *
  * @author Alan Dearle al@st-andrews.ac.uk
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class JSONReader {
 
     /**
@@ -409,14 +410,14 @@ public class JSONReader {
          * formatting character.
          */
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder builder = new StringBuilder();
         while (c >= ' ' && ",:]}/\\\"[{;=#".indexOf(c) < 0) {
-            sb.append(c);
+            builder.append(c);
             c = tokenizer.next();
         }
         tokenizer.back();
 
-        s = sb.toString().trim();
+        s = builder.toString().trim();
         if (s.equals("")) {
             throw new JSONException("No data available");
         }
@@ -509,7 +510,7 @@ public class JSONReader {
     }
 
     /**
-     * Try to convert a string into a number, boolean, or null. If the string can't be converted, return the string.
+     * Try to convert a string into a number, boolean, or null.
      *
      * @param s a String. Copied and adapted from JSONObject
      */
@@ -561,7 +562,7 @@ public class JSONReader {
                 }
 
                 final Long myLong = new Long(s);
-                if (myLong.longValue() == myLong.intValue()) {
+                if (myLong == myLong.intValue()) {
                     theInteger = myLong.intValue();
                     setNextSymbol(INTEGER);
                     return;

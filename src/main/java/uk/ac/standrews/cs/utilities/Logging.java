@@ -32,6 +32,7 @@ public class Logging {
      *
      * @return the current logging level
      */
+    @SuppressWarnings("unused")
     public static LoggingLevel getLoggingLevel() {
 
         return logging_level;
@@ -42,6 +43,7 @@ public class Logging {
      *
      * @param logging_level the new logging level
      */
+    @SuppressWarnings("unused")
     public static void setLoggingLevel(LoggingLevel logging_level) {
 
         Logging.logging_level = logging_level;
@@ -67,6 +69,7 @@ public class Logging {
      * @param format    the format string
      * @param values    the values to be formatted
      */
+    @SuppressWarnings("unused")
     public static void output(LoggingLevel threshold, String format, String... values) {
 
         if (logging_level.compareTo(threshold) >= 0) {
@@ -79,6 +82,7 @@ public class Logging {
      *
      * @param number_of_steps the number of steps that represent completion
      */
+    @SuppressWarnings("unused")
     public static void initialiseProgressIndicator(int number_of_steps) {
 
         progress_indicator = new PercentageProgressIndicator(NUMBER_OF_PROGRESS_UPDATES);
@@ -88,6 +92,7 @@ public class Logging {
     /**
      * Records another progress step if the current logging level is greater than or equal to the given threshold level.
      */
+    @SuppressWarnings("unused")
     public static void progressStep(LoggingLevel threshold) {
 
         if (logging_level.compareTo(threshold) >= 0) {

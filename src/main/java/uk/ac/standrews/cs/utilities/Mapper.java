@@ -16,9 +16,6 @@
  */
 package uk.ac.standrews.cs.utilities;
 
-/**
- * Created by graham on 02/05/2014.
- */
 public interface Mapper<T1, T2> {
 
     T2 map(T1 t);

@@ -25,6 +25,7 @@ import java.util.List;
  * @author Alan Dearle (alan.dearle@st-andrews.ac.uk)
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public class ArrayManipulation {
 
     /**
@@ -42,6 +43,7 @@ public class ArrayManipulation {
         return count;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static <T> int binarySplit(final List<T> array, final SplitComparator<T> comparator) {
 
         int low = 0;

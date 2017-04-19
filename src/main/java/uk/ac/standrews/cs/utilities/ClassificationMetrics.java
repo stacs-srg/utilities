@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities;
 
+@SuppressWarnings("unused")
 public class ClassificationMetrics {
 
     public static double precision(int true_positives, int false_positives) {

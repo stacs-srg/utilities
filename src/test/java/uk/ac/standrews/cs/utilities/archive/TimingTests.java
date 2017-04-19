@@ -103,14 +103,7 @@ public class TimingTests {
         final Duration delay_between_repetitions = new Duration(1, TimeUnit.SECONDS);
         final boolean delay_is_fixed = true;
 
-        final Callable<Void> action = new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-
-                return null;
-            }
-        };
+        final Callable<Void> action = () -> null;
 
         Timing.repeat(action, overall_timeout, delay_between_repetitions, delay_is_fixed, Diagnostic.FULL);
     }
@@ -212,14 +205,7 @@ public class TimingTests {
         final Duration delay_between_repetitions = new Duration(1, TimeUnit.SECONDS);
         final boolean delay_is_fixed = true;
 
-        final Callable<Integer> action = new Callable<Integer>() {
-
-            @Override
-            public Integer call() throws Exception {
-
-                return -7;
-            }
-        };
+        final Callable<Integer> action = () -> -7;
 
         final int result = Timing.retry(action, overall_timeout, delay_between_repetitions, delay_is_fixed, Diagnostic.FULL);
         assertThat(result, is(equalTo(-7)));
@@ -268,13 +254,9 @@ public class TimingTests {
         final Duration delay_between_repetitions = new Duration(1, TimeUnit.SECONDS);
         final boolean delay_is_fixed = true;
 
-        final Callable<Integer> action = new Callable<Integer>() {
+        final Callable<Integer> action = () -> {
 
-            @Override
-            public Integer call() throws Exception {
-
-                throw new UndefinedDiagnosticLevelException();
-            }
+            throw new UndefinedDiagnosticLevelException();
         };
 
         Timing.retry(action, overall_timeout, delay_between_repetitions, delay_is_fixed, Diagnostic.FULL);

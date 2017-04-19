@@ -25,9 +25,6 @@ import java.util.function.Predicate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-/**
- * Created by graham on 02/05/2014.
- */
 public class FilteredIteratorTest {
 
     @Test

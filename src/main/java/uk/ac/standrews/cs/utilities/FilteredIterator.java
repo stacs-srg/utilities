@@ -19,9 +19,6 @@ package uk.ac.standrews.cs.utilities;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
-/**
- * Created by graham on 02/05/2014.
- */
 public class FilteredIterator<T> implements Iterator<T> {
 
     private final Iterator<T> iterator;
@@ -29,6 +26,7 @@ public class FilteredIterator<T> implements Iterator<T> {
 
     private T next = null;
 
+    @SuppressWarnings("WeakerAccess")
     public FilteredIterator(final Iterator<T> iterator, final Predicate<T> Predicate) {
 
         this.iterator = iterator;

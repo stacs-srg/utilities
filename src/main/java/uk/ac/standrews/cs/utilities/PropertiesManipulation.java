@@ -27,6 +27,7 @@ import java.util.Set;
  * @author Angus Macdonald (angus AT cs.st-andrews.ac.uk)
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@SuppressWarnings("unused")
 public class PropertiesManipulation {
 
     private final Properties properties;

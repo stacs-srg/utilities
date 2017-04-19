@@ -38,6 +38,7 @@ public abstract class ProgressIndicator {
      *
      * @param number_of_updates the number of progress updates to be indicated
      */
+    @SuppressWarnings("WeakerAccess")
     public ProgressIndicator(final int number_of_updates) {
 
         this.number_of_updates.set(number_of_updates);
@@ -77,6 +78,7 @@ public abstract class ProgressIndicator {
      *
      * @return the proportion of completion, between 0 and 1
      */
+    @SuppressWarnings("unused")
     public double getProportionComplete() {
 
         return proportion_complete;
