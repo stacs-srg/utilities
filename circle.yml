@@ -1,3 +1,4 @@
-general:
-  artifacts:
-    - "target" # relative to the build directory
+test:
+  post:
+    - mv target/apidocs $CIRCLE_ARTIFACTS
+    - mv target/*.jar $CIRCLE_ARTIFACTS
