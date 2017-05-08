@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.security.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AsymmetricEncryptionTest {
 
@@ -78,5 +79,32 @@ public class AsymmetricEncryptionTest {
         AsymmetricEncryption.decrypt(private_key, encrypted_text_file_path, decrypted_text_file_path);
 
         FileManipulation.assertThatFilesHaveSameContent(plain_text_file_path, decrypted_text_file_path);
+    }
+
+    @Test
+    public void generateDefaultKeys() throws CryptoException {
+
+        assertNotNull(AsymmetricEncryption.generateKeys());
+    }
+
+    @Test
+    public void generateKeys() throws CryptoException {
+
+        assertNotNull(AsymmetricEncryption.generateKeys(512));
+        assertNotNull(AsymmetricEncryption.generateKeys(1024));
+        assertNotNull(AsymmetricEncryption.generateKeys(2048));
+        assertNotNull(AsymmetricEncryption.generateKeys(4096));
+    }
+
+    @Test (expected = CryptoException.class)
+    public void generateKeysFailShort() throws CryptoException {
+
+        assertNotNull(AsymmetricEncryption.generateKeys(511));
+    }
+
+    @Test (expected = CryptoException.class)
+    public void generateKeysFailLong() throws CryptoException {
+
+        assertNotNull(AsymmetricEncryption.generateKeys(4097));
     }
 }

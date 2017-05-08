@@ -99,6 +99,10 @@ public class AsymmetricEncryption {
     private static final String TRANSFORMATION = "RSA";
     private static final String ALGORITHM = "RSA";
 
+    private static final int DEFAULT_KEY_LENGTH_IN_BITS = 2048;
+    private static final int MIN_KEY_LENGTH_IN_BITS = 512;
+    private static final int MAX_KEY_LENGTH_IN_BITS = 4096;
+
     private static final Cipher CIPHER;
     private static final KeyFactory KEY_FACTORY;
 
@@ -119,6 +123,40 @@ public class AsymmetricEncryption {
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new RuntimeException("error loading cipher " + TRANSFORMATION + " or algorithm " + ALGORITHM);
+        }
+    }
+
+    /**
+     * Generate a set of keys using RSA and with length 2048 bits
+     *
+     * @return the keys generated
+     * @throws CryptoException if the keys cannot be generated
+     */
+    public static KeyPair generateKeys() throws CryptoException {
+        return generateKeys(DEFAULT_KEY_LENGTH_IN_BITS);
+    }
+
+    /**
+     * Generate a set of keys using RSA and with an arbitrary length
+     * The key length should be within 512 and 4096 bits
+     *
+     * @param key_length the length of the keys in bits
+     * @return the keys generated
+     * @throws CryptoException if the keys cannot be generated
+     */
+    public static KeyPair generateKeys(int key_length) throws CryptoException {
+
+        // RSA keys must be at least 512 bits long
+        // Keys longer than 4096 bits can take too long to generate
+        if (key_length < MIN_KEY_LENGTH_IN_BITS || key_length > MAX_KEY_LENGTH_IN_BITS) throw new CryptoException("Length of key is invalid");
+
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM);
+            generator.initialize(key_length);
+            return generator.generateKeyPair();
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new CryptoException(e);
         }
     }
 
