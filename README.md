@@ -16,6 +16,10 @@ A collection of utility code.
 
 [![CircleCI](https://circleci.com/gh/stacs-srg/utilities.svg?style=svg)](https://circleci.com/gh/stacs-srg/utilities)
 
+### Code coverage status
+
+[![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
+
 ## See also
 
 * [relevant Maven goals](https://github.com/stacs-srg/hub/tree/master/maven) (private)
