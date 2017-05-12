@@ -531,8 +531,22 @@ public class AsymmetricEncryption {
                 }
             }
 
-            throw new CryptoException("no valid encrypted key");
+            throw new CryptoException("No valid encrypted key");
         }
+    }
+
+    /**
+     * Encrypts the AES key with the given public key
+     *
+     * @param public_key the key used to perform the encryption
+     * @param AES_key the key to encrypt
+     * @return the encrypted key as a String
+     * @throws CryptoException if the AES key could not be encrypted
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static String encryptAESKey(final PublicKey public_key, final SecretKey AES_key) throws CryptoException {
+
+        return AsymmetricEncryption.encrypt(public_key, SymmetricEncryption.keyToString(AES_key)) + "\n";
     }
 
     @SuppressWarnings("unused")
@@ -552,7 +566,7 @@ public class AsymmetricEncryption {
 
     private static void writeEncryptedAESKey(final PublicKey public_key, final SecretKey AES_key, final OutputStreamWriter writer) throws IOException, CryptoException {
 
-        writer.append(AsymmetricEncryption.encrypt(public_key, SymmetricEncryption.keyToString(AES_key)));
+        writer.append(encryptAESKey(public_key, AES_key));
         writer.append("\n");
     }
 
@@ -572,7 +586,7 @@ public class AsymmetricEncryption {
             return new String(Files.readAllBytes(key_path));
 
         } catch (IOException e) {
-            throw new CryptoException("can't access key file: " + key_path);
+            throw new CryptoException("Can't access key file: " + key_path);
         }
     }
 }
