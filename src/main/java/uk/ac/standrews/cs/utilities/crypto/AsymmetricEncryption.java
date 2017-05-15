@@ -31,6 +31,8 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>A utility class that encrypts or decrypts data using RSA public key encryption.
@@ -113,6 +115,8 @@ public class AsymmetricEncryption {
     private static final Path DEFAULT_PRIVATE_KEY_PATH = DEFAULT_KEY_PATH.resolve(Paths.get(DEFAULT_PRIVATE_KEY_FILE));
     private static final Path DEFAULT_PUBLIC_KEY_PATH = DEFAULT_KEY_PATH.resolve(Paths.get(DEFAULT_PUBLIC_KEY_FILE));
 
+    private static final Pattern COMPILE = Pattern.compile(PRIVATE_KEY_HEADER + "\n", Pattern.LITERAL);
+
     static {
         try {
             // Code compiles without using Bouncy Castle library, but key loading doesn't work with default provider.
@@ -132,7 +136,9 @@ public class AsymmetricEncryption {
      * @return the keys generated
      * @throws CryptoException if the keys cannot be generated
      */
+    @SuppressWarnings("WeakerAccess")
     public static KeyPair generateKeys() throws CryptoException {
+
         return generateKeys(DEFAULT_KEY_LENGTH_IN_BITS);
     }
 
@@ -144,18 +150,19 @@ public class AsymmetricEncryption {
      * @return the keys generated
      * @throws CryptoException if the keys cannot be generated
      */
-    public static KeyPair generateKeys(int key_length) throws CryptoException {
+    @SuppressWarnings("WeakerAccess")
+    public static KeyPair generateKeys(final int key_length) throws CryptoException {
 
         // RSA keys must be at least 512 bits long
         // Keys longer than 4096 bits can take too long to generate
         if (key_length < MIN_KEY_LENGTH_IN_BITS || key_length > MAX_KEY_LENGTH_IN_BITS) throw new CryptoException("Length of key is invalid");
 
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM);
+            final KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM);
             generator.initialize(key_length);
             return generator.generateKeyPair();
 
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
             throw new CryptoException(e);
         }
     }
@@ -169,7 +176,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the text cannot be encrypted
      */
     @SuppressWarnings("WeakerAccess")
-    public static String encrypt(PublicKey public_key, String plain_text) throws CryptoException {
+    public static String encrypt(final PublicKey public_key, final String plain_text) throws CryptoException {
 
         try (final InputStream input_stream = new ByteArrayInputStream(plain_text.getBytes());
              final ByteArrayOutputStream output_stream = new ByteArrayOutputStream()) {
@@ -178,7 +185,7 @@ public class AsymmetricEncryption {
 
             return new String(output_stream.toByteArray());
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new CryptoException(e);
         }
     }
@@ -192,7 +199,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the decryption cannot be completed
      */
     @SuppressWarnings("WeakerAccess")
-    public static String decrypt(PrivateKey private_key, String cipher_text) throws CryptoException {
+    public static String decrypt(final PrivateKey private_key, final String cipher_text) throws CryptoException {
 
         try (final InputStream input_stream = new ByteArrayInputStream(cipher_text.getBytes());
              final ByteArrayOutputStream output_stream = new ByteArrayOutputStream()) {
@@ -201,7 +208,7 @@ public class AsymmetricEncryption {
 
             return new String(output_stream.toByteArray());
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new CryptoException(e);
         }
     }
@@ -216,7 +223,7 @@ public class AsymmetricEncryption {
      * @throws IOException     if a file cannot be accessed
      */
     @SuppressWarnings("WeakerAccess")
-    public static void encrypt(PublicKey public_key, final Path plain_text_path, final Path cipher_text_path) throws CryptoException, IOException {
+    public static void encrypt(final PublicKey public_key, final Path plain_text_path, final Path cipher_text_path) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path);
              final OutputStream output_stream = Files.newOutputStream(cipher_text_path)) {
@@ -235,7 +242,7 @@ public class AsymmetricEncryption {
      * @throws IOException     if a file cannot be accessed
      */
     @SuppressWarnings("WeakerAccess")
-    public static void decrypt(PrivateKey private_key, final Path cipher_text_path, final Path plain_text_path) throws CryptoException, IOException {
+    public static void decrypt(final PrivateKey private_key, final Path cipher_text_path, final Path plain_text_path) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path);
              final OutputStream output_stream = Files.newOutputStream(plain_text_path)) {
@@ -254,7 +261,7 @@ public class AsymmetricEncryption {
      * @throws IOException     if the plain text file cannot be accessed
      */
     @SuppressWarnings("unused")
-    public static void encrypt(PublicKey public_key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
+    public static void encrypt(final PublicKey public_key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path)) {
 
@@ -272,7 +279,7 @@ public class AsymmetricEncryption {
      * @throws IOException     if the encrypted file cannot be accessed
      */
     @SuppressWarnings("unused")
-    public static void decrypt(PrivateKey private_key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
+    public static void decrypt(final PrivateKey private_key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path)) {
 
@@ -289,7 +296,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      */
     @SuppressWarnings("WeakerAccess")
-    public static void encrypt(PublicKey public_key, InputStream input_stream, OutputStream output_stream) throws CryptoException {
+    public static void encrypt(final PublicKey public_key, final InputStream input_stream, final OutputStream output_stream) throws CryptoException {
 
         try {
             CIPHER.init(Cipher.ENCRYPT_MODE, public_key);
@@ -314,7 +321,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      */
     @SuppressWarnings("WeakerAccess")
-    public static void decrypt(PrivateKey private_key, InputStream input_stream, OutputStream output_stream) throws CryptoException {
+    public static void decrypt(final PrivateKey private_key, final InputStream input_stream, final OutputStream output_stream) throws CryptoException {
 
         try {
             CIPHER.init(Cipher.DECRYPT_MODE, private_key);
@@ -352,7 +359,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the private key cannot be accessed
      */
     @SuppressWarnings("WeakerAccess")
-    public static PrivateKey getPrivateKey(Path key_path) throws CryptoException {
+    public static PrivateKey getPrivateKey(final Path key_path) throws CryptoException {
 
         return getPrivateKeyFromString(getKey(key_path));
     }
@@ -379,7 +386,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the public key cannot be accessed
      */
     @SuppressWarnings("WeakerAccess")
-    public static PublicKey getPublicKey(Path key_path) throws CryptoException {
+    public static PublicKey getPublicKey(final Path key_path) throws CryptoException {
 
         return getPublicKeyFromString(getKey(key_path));
     }
@@ -401,7 +408,7 @@ public class AsymmetricEncryption {
 
             return KEY_FACTORY.generatePrivate(new PKCS8EncodedKeySpec(private_key));
 
-        } catch (InvalidKeySpecException e) {
+        } catch (final InvalidKeySpecException e) {
             throw new CryptoException(e);
         }
     }
@@ -423,7 +430,7 @@ public class AsymmetricEncryption {
 
             return KEY_FACTORY.generatePublic(new X509EncodedKeySpec(public_key));
 
-        } catch (InvalidKeySpecException e) {
+        } catch (final InvalidKeySpecException e) {
             throw new CryptoException(e);
         }
     }
@@ -485,7 +492,7 @@ public class AsymmetricEncryption {
      * @throws CryptoException if no key can be successfully decrypted
      */
     @SuppressWarnings("unused")
-    public static SecretKey getAESKey(Path encrypted_keys) throws IOException, CryptoException {
+    public static SecretKey getAESKey(final Path encrypted_keys) throws IOException, CryptoException {
 
         try (final InputStream encrypted_key_stream = Files.newInputStream(encrypted_keys)) {
             return getAESKey(encrypted_key_stream);
@@ -504,11 +511,11 @@ public class AsymmetricEncryption {
      * @throws CryptoException if no key can be successfully decrypted
      */
     @SuppressWarnings("WeakerAccess")
-    public static SecretKey getAESKey(InputStream encrypted_key_stream) throws IOException, CryptoException {
+    public static SecretKey getAESKey(final InputStream encrypted_key_stream) throws IOException, CryptoException {
 
         // SecretKey represents a symmetric key, whereas PrivateKey represents a private asymmetric key.
 
-        PrivateKey private_key = getPrivateKey();
+        final PrivateKey private_key = getPrivateKey();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(encrypted_key_stream))) {
 
@@ -524,7 +531,7 @@ public class AsymmetricEncryption {
                     try {
                         return SymmetricEncryption.getKey(decrypt(private_key, builder.toString()));
 
-                    } catch (CryptoException e) {
+                    } catch (final CryptoException e) {
                         // Couldn't decrypt, try the next one.
                         builder = new StringBuilder();
                     }
@@ -556,7 +563,7 @@ public class AsymmetricEncryption {
 
             final List<PublicKey> public_keys = AsymmetricEncryption.loadPublicKeys(authorized_keys_path);
 
-            for (PublicKey public_key : public_keys) {
+            for (final PublicKey public_key : public_keys) {
                 writeEncryptedAESKey(public_key, AES_key, writer);
             }
 
@@ -572,7 +579,7 @@ public class AsymmetricEncryption {
 
     private static String stripPrivateKeyDelimiters(final String key_in_pem_format) {
 
-        return key_in_pem_format.replace(PRIVATE_KEY_HEADER + "\n", "").replace(PRIVATE_KEY_FOOTER, "");
+        return COMPILE.matcher(key_in_pem_format).replaceAll(Matcher.quoteReplacement("")).replace(PRIVATE_KEY_FOOTER, "");
     }
 
     private static String stripPublicKeyDelimiters(final String key_in_pem_format) {
@@ -580,12 +587,12 @@ public class AsymmetricEncryption {
         return key_in_pem_format.replace(PUBLIC_KEY_HEADER + "\n", "").replace(PUBLIC_KEY_FOOTER, "");
     }
 
-    private static String getKey(Path key_path) throws CryptoException {
+    private static String getKey(final Path key_path) throws CryptoException {
 
         try {
             return new String(Files.readAllBytes(key_path));
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new CryptoException("Can't access key file: " + key_path);
         }
     }

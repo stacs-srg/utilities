@@ -81,7 +81,7 @@ public class Diagnostic {
     // ********************************************************************************************************************************************/
 
     private static boolean local_reporting = true;
-    private static Diagnostic threshold;
+    private static Diagnostic threshold = NONE;
     private static final String DIAGNOSTIC_CLASS_NAME = Diagnostic.class.getName();
     private static final String ERROR_CLASS_NAME = Error.class.getName();
 

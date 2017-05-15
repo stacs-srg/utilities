@@ -55,12 +55,12 @@ public class FileManipulation {
      * @return the input stream reader
      * @throws IOException if the file cannot be read
      */
-    public static InputStreamReader getInputStreamReader(Path path) throws IOException {
+    public static InputStreamReader getInputStreamReader(final Path path) throws IOException {
 
         return new InputStreamReader(getInputStream(path), FILE_CHARSET);
     }
 
-    public static InputStream getInputStream(Path path) throws IOException {
+    public static InputStream getInputStream(final Path path) throws IOException {
 
         return Files.newInputStream(path);
     }
@@ -93,19 +93,21 @@ public class FileManipulation {
      */
     public static byte[] readAllBytes(final InputStream inputStream) throws IOException {
 
-        ByteArrayOutputStream temporary_byte_array_stream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[INPUT_BUFFER_SIZE_IN_BYTES];
+        try (ByteArrayOutputStream temporary_byte_array_stream = new ByteArrayOutputStream()) {
 
-        int i;
-        while ((i = inputStream.read(buffer)) != -1) {
-            temporary_byte_array_stream.write(buffer, 0, i);
+            final byte[] buffer = new byte[INPUT_BUFFER_SIZE_IN_BYTES];
+
+            int i;
+            while ((i = inputStream.read(buffer)) != -1) {
+                temporary_byte_array_stream.write(buffer, 0, i);
+            }
+            return temporary_byte_array_stream.toByteArray();
         }
-        return temporary_byte_array_stream.toByteArray();
     }
 
     public static List<String> readAllLines(final InputStream input_stream) throws IOException {
 
-        List<String> lines = new ArrayList<>();
+        final List<String> lines = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input_stream))) {
 
@@ -124,7 +126,7 @@ public class FileManipulation {
      * @return the output stream writer
      * @throws IOException if the file cannot be written
      */
-    public static OutputStreamWriter getOutputStreamWriter(Path path) throws IOException {
+    public static OutputStreamWriter getOutputStreamWriter(final Path path) throws IOException {
 
         return new OutputStreamWriter(Files.newOutputStream(path), FILE_CHARSET);
     }
@@ -137,12 +139,12 @@ public class FileManipulation {
      * @return the path of the resource
      */
     @SuppressWarnings("unused")
-    public static Path getResourcePath(Class the_class, String resource_name) {
+    public static Path getResourcePath(final Class the_class, final String resource_name) {
 
-        URL resource = getResource(the_class, resource_name);
+        final URL resource = getResource(the_class, resource_name);
         try {
             return Paths.get(resource.toURI());
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new RuntimeException("invalid URI for resource path: " + e.getMessage());
         }
     }
@@ -155,7 +157,7 @@ public class FileManipulation {
      * @return the input stream reader
      */
     @SuppressWarnings("unused")
-    public static InputStreamReader getInputStreamReaderForResource(Class the_class, String resource_name) {
+    public static InputStreamReader getInputStreamReaderForResource(final Class the_class, final String resource_name) {
 
         return new InputStreamReader(getInputStreamForResource(the_class, resource_name));
     }
@@ -168,10 +170,10 @@ public class FileManipulation {
      * @return the input stream
      */
     @SuppressWarnings("WeakerAccess")
-    public static InputStream getInputStreamForResource(Class the_class, String resource_name) {
+    public static InputStream getInputStreamForResource(final Class the_class, final String resource_name) {
 
         // First try to get resource from the real file system.
-        InputStream stream_from_file_system = the_class.getResourceAsStream(resource_name);
+        final InputStream stream_from_file_system = the_class.getResourceAsStream(resource_name);
 
         // If that doesn't work, try to get resource from jar file, in which case resource needs to be prepended with full class name.
         return stream_from_file_system != null ? stream_from_file_system : the_class.getResourceAsStream(getResourceNamePrefixedWithClass(the_class, resource_name));
@@ -261,7 +263,7 @@ public class FileManipulation {
     @SuppressWarnings("WeakerAccess")
     public static void createParentDirectoryIfDoesNotExist(final Path path) throws IOException {
 
-        Path parent_dir = path.getParent();
+        final Path parent_dir = path.getParent();
         if (parent_dir != null) {
 
             Files.createDirectories(parent_dir);
@@ -278,12 +280,12 @@ public class FileManipulation {
     @SuppressWarnings("unused")
     public static List<Path> getDirectoryEntries(final Path directory) throws IOException {
 
-        List<Path> result = new ArrayList<>();
+        final List<Path> result = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
-            for (Path entry : stream) {
+            for (final Path entry : stream) {
                 result.add(entry);
             }
-        } catch (DirectoryIteratorException e) {
+        } catch (final DirectoryIteratorException e) {
             throw e.getCause();
         }
         return result;
@@ -318,7 +320,7 @@ public class FileManipulation {
      * @throws IOException if the directory cannot be read
      */
     @SuppressWarnings("WeakerAccess")
-    public static List<String> getResourceDirectoryEntries(String resource_directory_path, ClassLoader class_loader) throws IOException {
+    public static List<String> getResourceDirectoryEntries(final String resource_directory_path, final ClassLoader class_loader) throws IOException {
 
         final String relative_path = getRelativePath(resource_directory_path);
         final URL path_url = class_loader.getResource(relative_path);
@@ -348,7 +350,7 @@ public class FileManipulation {
      * @throws IOException if the directory cannot be read
      */
     @SuppressWarnings("unused")
-    public static List<String> getResourceDirectoryEntries(Path resource_directory_path, ClassLoader class_loader) throws IOException {
+    public static List<String> getResourceDirectoryEntries(final Path resource_directory_path, final ClassLoader class_loader) throws IOException {
 
         return getResourceDirectoryEntries(resource_directory_path.toString(), class_loader);
     }
@@ -363,29 +365,30 @@ public class FileManipulation {
      */
     private static List<String> getResourceDirectoryEntriesFromJar(final String relative_directory_path, final URL resource_directory_url) throws IOException {
 
-        JarFile jar_file = getJarFile(resource_directory_url);
+        try (JarFile jar_file = getJarFile(resource_directory_url)) {
 
-        // Gets all entries in the jar file, including sub-directories and files.
-        Enumeration<JarEntry> jar_entries = jar_file.entries();
+            // Gets all entries in the jar file, including sub-directories and files.
+            final Enumeration<JarEntry> jar_entries = jar_file.entries();
 
-        Set<String> entries = new HashSet<>();
+            final Set<String> entries = new HashSet<>();
 
-        while (jar_entries.hasMoreElements()) {
+            while (jar_entries.hasMoreElements()) {
 
-            // The path of this entry relative to the resource root.
-            final String entry_path = jar_entries.nextElement().getName();
+                // The path of this entry relative to the resource root.
+                final String entry_path = jar_entries.nextElement().getName();
 
-            // Check whether this entry is a child of the specified resource directory.
-            if (entry_path.startsWith(relative_directory_path) && !entry_path.equals(relative_directory_path)) {
+                // Check whether this entry is a child of the specified resource directory.
+                if (entry_path.startsWith(relative_directory_path) && !entry_path.equals(relative_directory_path)) {
 
-                entries.add(getChildName(entry_path, relative_directory_path));
+                    entries.add(getChildName(entry_path, relative_directory_path));
+                }
             }
-        }
 
-        return setToList(entries);
+            return setToList(entries);
+        }
     }
 
-    private static List<String> setToList(Set<String> entries) {
+    private static List<String> setToList(final Set<String> entries) {
 
         return Arrays.asList(entries.toArray(new String[entries.size()]));
     }
@@ -395,14 +398,14 @@ public class FileManipulation {
      * @param relative_directory_path e.g. "a/b/c"
      * @return the name of the element that is a child of the relative directory e.g. "d"
      */
-    private static String getChildName(String entry_path, String relative_directory_path) {
+    private static String getChildName(final String entry_path, final String relative_directory_path) {
 
         return firstPartOfPath(remainingPathAfter(entry_path, relative_directory_path.length()));
     }
 
-    private static String firstPartOfPath(String path) {
+    private static String firstPartOfPath(final String path) {
 
-        int i = path.indexOf("/");
+        final int i = path.indexOf("/");
 
         return i == -1 ? path : path.substring(0, i);
     }
@@ -410,7 +413,7 @@ public class FileManipulation {
     /**
      * @param resource_directory_url the URL for the directory, in the form "file:/absolute/path/of/jar!/directory/path/"
      */
-    private static JarFile getJarFile(URL resource_directory_url) throws IOException {
+    private static JarFile getJarFile(final URL resource_directory_url) throws IOException {
 
         // String representation of the full path including absolute path of jar file and path to directory relative to resource root within jar.
         final String path = resource_directory_url.getPath();
@@ -421,7 +424,7 @@ public class FileManipulation {
         return new JarFile(URLDecoder.decode(absolute_path_of_jar_file, URL_ENCODING));
     }
 
-    private static List<String> getResourceDirectoryEntriesFromFileSystem(URL path_url) throws IOException {
+    private static List<String> getResourceDirectoryEntriesFromFileSystem(final URL path_url) throws IOException {
 
         try {
             final String[] directory_entries = new File(path_url.toURI()).list();
@@ -429,27 +432,27 @@ public class FileManipulation {
                 return new ArrayList<>();
             }
             return Arrays.asList(directory_entries);
-        } catch (URISyntaxException e) {
+        } catch (final URISyntaxException e) {
             throw new IOException("can't access resource URL: " + path_url + " - " + e.getMessage());
         }
     }
 
-    private static String getRelativePath(String resource_directory_path) {
+    private static String getRelativePath(final String resource_directory_path) {
 
         return resource_directory_path.startsWith("/") ? remainingPathAfter(resource_directory_path, 1) : resource_directory_path;
     }
 
-    private static String remainingPathAfter(String resource_directory_path, int start_index) {
+    private static String remainingPathAfter(final String resource_directory_path, final int start_index) {
 
         return resource_directory_path.substring(start_index);
     }
 
-    private static URL getResource(Class the_class, String resource_name) {
+    private static URL getResource(final Class the_class, final String resource_name) {
 
         return the_class.getResource(getResourceNamePrefixedWithClass(the_class, resource_name));
     }
 
-    private static String getResourceNamePrefixedWithClass(Class the_class, String resource_name) {
+    private static String getResourceNamePrefixedWithClass(final Class the_class, final String resource_name) {
 
         return the_class.getSimpleName() + "/" + resource_name;
     }

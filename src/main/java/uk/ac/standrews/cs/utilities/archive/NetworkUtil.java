@@ -33,7 +33,8 @@ public final class NetworkUtil {
     /**
      * The undefined port.
      */
-    private static final int UNDEFINED_PORT = -1;
+    @SuppressWarnings("WeakerAccess")
+    public static final int UNDEFINED_PORT = -1;
 
     /**
      * Returns the first non-loopback IPv4 address (Inet4Address) that can be found for an interface on the local host.
