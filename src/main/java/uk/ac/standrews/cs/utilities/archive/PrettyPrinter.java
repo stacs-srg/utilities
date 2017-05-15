@@ -29,7 +29,8 @@ import java.util.Map.Entry;
 @SuppressWarnings("unused")
 public final class PrettyPrinter {
 
-    private static final String DEFAULT_SEPARATOR_CHAR = ", ";
+    @SuppressWarnings("WeakerAccess")
+    public static final String DEFAULT_SEPARATOR_CHAR = ", ";
 
     /**
      * Concatenates representations of the full contents of a collection. Calls {@link #toString()} on each element.
