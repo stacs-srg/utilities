@@ -12,13 +12,9 @@ A collection of utility code.
 </dependency>
 ```
 
-## Build status
+## Build and coverage status
 
-[![CircleCI](https://circleci.com/gh/stacs-srg/utilities.svg?style=svg)](https://circleci.com/gh/stacs-srg/utilities)
-
-### Code coverage status
-
-[![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
+[![CircleCI](https://circleci.com/gh/stacs-srg/utilities.svg?style=svg)](https://circleci.com/gh/stacs-srg/utilities) [![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
 
 ## See also
 
