@@ -355,6 +355,23 @@ public class FileManipulation {
         return getResourceDirectoryEntries(resource_directory_path.toString(), class_loader);
     }
 
+    public static void concatenateFiles(File[] files, File outFile) throws IOException {
+
+        try (OutputStream out = new FileOutputStream(outFile)) {
+
+            byte[] buf = new byte[INPUT_BUFFER_SIZE_IN_BYTES];
+            for (File file : files) {
+                InputStream in = new FileInputStream(file);
+                int b;
+                while ((b = in.read(buf)) >= 0) {
+                    out.write(buf, 0, b);
+                    out.flush();
+                }
+            }
+        }
+
+    }
+
     /**
      * Returns the top-level entries in the given resource directory.
      *

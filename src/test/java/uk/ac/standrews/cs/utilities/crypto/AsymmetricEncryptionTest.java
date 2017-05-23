@@ -16,20 +16,26 @@
  */
 package uk.ac.standrews.cs.utilities.crypto;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class AsymmetricEncryptionTest {
+
+    private static final String TEST_RESOURCES_PATH = "src/test/resources/crypto/";
 
     private KeyPairGenerator generator;
     private PrivateKey private_key;
@@ -44,6 +50,13 @@ public class AsymmetricEncryptionTest {
 
         private_key = key_pair.getPrivate();
         public_key = key_pair.getPublic();
+
+        new File(TEST_RESOURCES_PATH).mkdirs();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        FileManipulation.deleteDirectory(TEST_RESOURCES_PATH);
     }
 
     @Test
@@ -106,5 +119,21 @@ public class AsymmetricEncryptionTest {
     public void generateKeysFailLong() throws CryptoException {
 
         assertNotNull(AsymmetricEncryption.generateKeys(4097));
+    }
+
+    @Test
+    public void loadMultipleKeys() throws CryptoException, IOException {
+
+        KeyPair keys_1 = AsymmetricEncryption.generateKeys();
+        AsymmetricEncryption.persist(keys_1, Paths.get(TEST_RESOURCES_PATH + "private_1"), Paths.get(TEST_RESOURCES_PATH + "public_1"));
+
+        KeyPair keys_2 = AsymmetricEncryption.generateKeys();
+        AsymmetricEncryption.persist(keys_2, Paths.get(TEST_RESOURCES_PATH + "private_2"), Paths.get(TEST_RESOURCES_PATH + "public_2"));
+
+        File[] files = new File[]{new File(TEST_RESOURCES_PATH + "public_1.pem"), new File(TEST_RESOURCES_PATH + "public_2.pem")};
+        FileManipulation.concatenateFiles(files, new File(TEST_RESOURCES_PATH + "unified.pem"));
+
+        List<PublicKey> keys = AsymmetricEncryption.loadPublicKeys(Paths.get(TEST_RESOURCES_PATH + "unified.pem"));
+        assertEquals(keys.size(), 2);
     }
 }

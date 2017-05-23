@@ -31,8 +31,10 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static uk.ac.standrews.cs.utilities.crypto.PemFile.stripKeyDelimiters;
+import static uk.ac.standrews.cs.utilities.crypto.PemFile.writePemFile;
+import static uk.ac.standrews.cs.utilities.crypto.Utils.extension;
 
 /**
  * <p>A utility class that encrypts or decrypts data using RSA public key encryption.
@@ -61,40 +63,34 @@ public class AsymmetricEncryption {
     public static final String DEFAULT_KEY_DIR = ".ssh";
 
     /**
+     * This is the file extension used for both the private and the public key file
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static final String KEY_EXTENSION = ".pem";
+
+    /**
      * The name of the private key file.
      */
     @SuppressWarnings("WeakerAccess")
-    public static final String DEFAULT_PRIVATE_KEY_FILE = "private_key.pem";
+    public static final String DEFAULT_PRIVATE_KEY_FILE = "private_key" + KEY_EXTENSION;
 
     /**
      * The name of the public key file.
      */
     @SuppressWarnings("WeakerAccess")
-    public static final String DEFAULT_PUBLIC_KEY_FILE = "public_key.pem";
+    public static final String DEFAULT_PUBLIC_KEY_FILE = "public_key" + KEY_EXTENSION;
 
     /**
      * The delimiting header in the private key file.
      */
     @SuppressWarnings("WeakerAccess")
-    public static final String PRIVATE_KEY_HEADER = "-----BEGIN RSA PRIVATE KEY-----";
-
-    /**
-     * The delimiting footer in the private key file.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final String PRIVATE_KEY_FOOTER = "-----END RSA PRIVATE KEY-----";
+    public static final String PRIVATE_KEY_HEADER = "RSA PRIVATE KEY";
 
     /**
      * The delimiting header in the public key file.
      */
     @SuppressWarnings("WeakerAccess")
-    public static final String PUBLIC_KEY_HEADER = "-----BEGIN PUBLIC KEY-----";
-
-    /**
-     * The delimiting footer in the public key file.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final String PUBLIC_KEY_FOOTER = "-----END PUBLIC KEY-----";
+    public static final String PUBLIC_KEY_HEADER = "PUBLIC KEY";
 
     private static final String ENCRYPTED_KEY_END_DELIMITER = "==";
 
@@ -114,8 +110,6 @@ public class AsymmetricEncryption {
     private static final Path DEFAULT_KEY_PATH = USER_HOME_PATH.resolve(Paths.get(DEFAULT_KEY_DIR));
     private static final Path DEFAULT_PRIVATE_KEY_PATH = DEFAULT_KEY_PATH.resolve(Paths.get(DEFAULT_PRIVATE_KEY_FILE));
     private static final Path DEFAULT_PUBLIC_KEY_PATH = DEFAULT_KEY_PATH.resolve(Paths.get(DEFAULT_PUBLIC_KEY_FILE));
-
-    private static final Pattern COMPILE = Pattern.compile(PRIVATE_KEY_HEADER + "\n", Pattern.LITERAL);
 
     static {
         try {
@@ -392,8 +386,7 @@ public class AsymmetricEncryption {
     }
 
     /**
-     * Gets a private key from a string. The string is assumed to be in PEM format, with delimiters {@value #PRIVATE_KEY_HEADER} and
-     * {@value #PRIVATE_KEY_FOOTER}.
+     * Gets a private key from a string. The string is assumed to be in PEM format, with BEGIN and END delimiters {@value #PRIVATE_KEY_HEADER}
      *
      * @param key_in_pem_format the private key in PEM format
      * @return the private key
@@ -403,7 +396,7 @@ public class AsymmetricEncryption {
     public static PrivateKey getPrivateKeyFromString(final String key_in_pem_format) throws CryptoException {
 
         try {
-            final String base64_encoded_private_key = stripPrivateKeyDelimiters(key_in_pem_format);
+            final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADER);
             final byte[] private_key = Base64.getMimeDecoder().decode(base64_encoded_private_key);
 
             return KEY_FACTORY.generatePrivate(new PKCS8EncodedKeySpec(private_key));
@@ -414,8 +407,7 @@ public class AsymmetricEncryption {
     }
 
     /**
-     * Gets a public key from a string. The string is assumed to be in PEM format, with delimiters {@value #PUBLIC_KEY_HEADER} and
-     * {@value #PUBLIC_KEY_FOOTER}.
+     * Gets a public key from a string. The string is assumed to be in PEM format, with BEGIN and END delimiters {@value #PUBLIC_KEY_HEADER}
      *
      * @param key_in_pem_format the public key in PEM format
      * @return the public key
@@ -425,7 +417,7 @@ public class AsymmetricEncryption {
     public static PublicKey getPublicKeyFromString(final String key_in_pem_format) throws CryptoException {
 
         try {
-            final String base64_encoded_public_key = stripPublicKeyDelimiters(key_in_pem_format);
+            final String base64_encoded_public_key = stripKeyDelimiters(key_in_pem_format, PUBLIC_KEY_HEADER);
             final byte[] public_key = Base64.getMimeDecoder().decode(base64_encoded_public_key);
 
             return KEY_FACTORY.generatePublic(new X509EncodedKeySpec(public_key));
@@ -454,30 +446,51 @@ public class AsymmetricEncryption {
             String line;
             while ((line = reader.readLine()) != null) {
 
-                if (line.equals(PUBLIC_KEY_HEADER)) {
+                if (line.contains(PUBLIC_KEY_HEADER)) {
 
-                    builder = new StringBuilder();
-                    builder.append(line);
-                    builder.append("\n");
-                } else {
-                    if (line.equals(PUBLIC_KEY_FOOTER)) {
-
-                        if (builder != null) {
-                            builder.append(line);
-                            key_list.add(getPublicKeyFromString(builder.toString()));
-                            builder = null;
-                        }
-                    } else {
-                        if (builder != null) {
-                            builder.append(line);
-                            builder.append("\n");
-                        }
+                    if (builder != null) { // Finished to read the key
+                        builder.append(line);
+                        key_list.add(getPublicKeyFromString(builder.toString()));
+                        builder = null;
+                    } else { // Starting to read a new key
+                        builder = new StringBuilder();
+                        builder.append(line);
+                        builder.append("\n");
                     }
+
+                } else {
+
+                    if (builder != null) {
+                        builder.append(line);
+                        builder.append("\n");
+                    }
+
                 }
             }
         }
 
         return key_list;
+    }
+
+    /**
+     * Persist a key pair to the specified paths for the private and the public key
+     *
+     * @param key_pair to be persisted
+     * @param private_key_filename the path for the private key
+     * @param public_key_filename the path for the public key
+     * @throws CryptoException if the keys could not be persisted
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static void persist(final KeyPair key_pair, final Path private_key_filename, final Path public_key_filename) throws CryptoException {
+
+        try {
+
+            writePemFile(key_pair.getPrivate(), PRIVATE_KEY_HEADER, extension(private_key_filename, KEY_EXTENSION));
+            writePemFile(key_pair.getPublic(), PUBLIC_KEY_HEADER, extension(public_key_filename, KEY_EXTENSION));
+
+        } catch (final IOException e) {
+            throw new CryptoException(e);
+        }
     }
 
     /**
@@ -575,16 +588,6 @@ public class AsymmetricEncryption {
 
         writer.append(encryptAESKey(public_key, AES_key));
         writer.append("\n");
-    }
-
-    private static String stripPrivateKeyDelimiters(final String key_in_pem_format) {
-
-        return COMPILE.matcher(key_in_pem_format).replaceAll(Matcher.quoteReplacement("")).replace(PRIVATE_KEY_FOOTER, "");
-    }
-
-    private static String stripPublicKeyDelimiters(final String key_in_pem_format) {
-
-        return key_in_pem_format.replace(PUBLIC_KEY_HEADER + "\n", "").replace(PUBLIC_KEY_FOOTER, "");
     }
 
     private static String getKey(final Path key_path) throws CryptoException {

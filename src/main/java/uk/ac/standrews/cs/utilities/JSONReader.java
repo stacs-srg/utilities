@@ -86,9 +86,11 @@ public class JSONReader {
      * The Constant COMMA.
      */
     public static final int COMMA = 11;
+
     private static final char BACKSLASH_CHAR = '\'';
     private static final char QUOTE_CHAR = '"';
     private static final int INT_RADIX = 16;
+
     /**
      * The tokenizer.
      */
