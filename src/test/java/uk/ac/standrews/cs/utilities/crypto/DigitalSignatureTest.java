@@ -176,4 +176,18 @@ public class DigitalSignatureTest {
         boolean verified = DigitalSignature.verify64(publicKey, "hello", signed);
         assertTrue(verified);
     }
+
+    @Test
+    public void testDigitalSignatureToStringParser() throws CryptoException {
+
+        KeyPair keys = DigitalSignature.generateKeys();
+        String signed = DigitalSignature.sign64(keys.getPrivate(), "hello");
+
+        String certificateString = DigitalSignature.getCertificateString(keys.getPublic());
+
+        PublicKey certificate = DigitalSignature.getCertificate(certificateString);
+        boolean verified = DigitalSignature.verify64(certificate, "hello", signed);
+        assertTrue(verified);
+
+    }
 }

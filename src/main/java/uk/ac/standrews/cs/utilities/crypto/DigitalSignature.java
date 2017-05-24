@@ -256,6 +256,44 @@ public class DigitalSignature {
     }
 
     /**
+     * Get a certificate given its string representation.
+     * The string representation has not headers.
+     *
+     * @param certificate to be cast in base64
+     * @return the certificate as a key
+     * @throws CryptoException if the certificate cannot be cast
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static PublicKey getCertificate(final String certificate) throws CryptoException {
+
+        try {
+            byte[] data = Base64.decodeBase64(certificate.getBytes());
+
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(data);
+            KeyFactory kf = KeyFactory.getInstance(RSA_ALGORITHM);
+            return  kf.generatePublic(keySpec);
+
+        } catch (final NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new CryptoException(e);
+        }
+
+    }
+
+    /**
+     * Get the string representation, in base64, of a given certificate
+     *
+     * @param certificate to be cast
+     * @return the certificate as a string in base64
+     * @throws CryptoException if the certificate cannot be cast to a string
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static String getCertificateString(final PublicKey certificate) throws CryptoException {
+
+        byte[] encodedBytes = Base64.encodeBase64(certificate.getEncoded());
+        return new String(encodedBytes);
+    }
+
+    /**
      * Persist a key pair to the specified paths for the private and the public key
      *
      * @param key_pair to be persisted
