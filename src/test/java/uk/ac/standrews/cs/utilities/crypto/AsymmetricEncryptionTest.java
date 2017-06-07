@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 
+import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -135,5 +136,18 @@ public class AsymmetricEncryptionTest {
 
         List<PublicKey> keys = AsymmetricEncryption.loadPublicKeys(Paths.get(TEST_RESOURCES_PATH + "unified.pem"));
         assertEquals(keys.size(), 2);
+    }
+
+    @Test
+    public void encryptDecryptAESKeys() throws CryptoException {
+
+        SecretKey test_key = SymmetricEncryption.generateRandomKey();
+
+        String encrypted_key = AsymmetricEncryption.encryptAESKey(public_key, test_key);
+        assertNotNull(encrypted_key);
+
+        SecretKey decrypted_test_key = AsymmetricEncryption.decryptAESKey(private_key, encrypted_key);
+        assertNotNull(decrypted_test_key);
+        assertEquals(test_key, decrypted_test_key);
     }
 }

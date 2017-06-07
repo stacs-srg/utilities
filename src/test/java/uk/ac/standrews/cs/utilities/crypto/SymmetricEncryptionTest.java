@@ -41,9 +41,7 @@ public class SymmetricEncryptionTest {
     @Test(expected = CryptoException.class)
     public void encryptionWithShortKeyThrowsException() throws CryptoException {
 
-        final SecretKey SHORT_KEY = SymmetricEncryption.getKey("too short".getBytes());
-
-        SymmetricEncryption.encrypt(SHORT_KEY, "plain text");
+        SymmetricEncryption.getKey("too short".getBytes());
     }
 
     @Test

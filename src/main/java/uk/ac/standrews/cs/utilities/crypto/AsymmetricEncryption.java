@@ -584,6 +584,20 @@ public class AsymmetricEncryption {
         }
     }
 
+    /**
+     * Decrypts the AES key with the given private key
+     *
+     * @param private_key used to decrypt the key
+     * @param encrypted_key the AES key that was encrypted using the matching public key
+     * @return the AES key
+     * @throws CryptoException if the AES key could not be decrypted
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static SecretKey decryptAESKey(final PrivateKey private_key, final String encrypted_key) throws CryptoException {
+
+        return SymmetricEncryption.getKey(decrypt(private_key, encrypted_key));
+    }
+
     private static void writeEncryptedAESKey(final PublicKey public_key, final SecretKey AES_key, final OutputStreamWriter writer) throws IOException, CryptoException {
 
         writer.append(encryptAESKey(public_key, AES_key));
