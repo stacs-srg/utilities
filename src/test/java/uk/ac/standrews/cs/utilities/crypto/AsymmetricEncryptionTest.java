@@ -117,7 +117,7 @@ public class AsymmetricEncryptionTest {
     }
 
     @Test (expected = CryptoException.class)
-    public void generateKeysFailLong() throws CryptoException {
+    public void generateLongKeysFail() throws CryptoException {
 
         assertNotNull(AsymmetricEncryption.generateKeys(4097));
     }
@@ -149,5 +149,27 @@ public class AsymmetricEncryptionTest {
         SecretKey decrypted_test_key = AsymmetricEncryption.decryptAESKey(private_key, encrypted_key);
         assertNotNull(decrypted_test_key);
         assertEquals(test_key, decrypted_test_key);
+    }
+
+    @Test
+    public void getPublicKeyFromString() throws CryptoException {
+
+        KeyPair keys = AsymmetricEncryption.generateKeys();
+
+        String pub = AsymmetricEncryption.keyToBase64(keys.getPublic());
+        PublicKey publicKey = AsymmetricEncryption.getPublicKeyFromString(pub);
+
+        assertEquals(keys.getPublic(), publicKey);
+    }
+
+    @Test
+    public void getPrivateKeyFromString() throws CryptoException {
+
+        KeyPair keys = AsymmetricEncryption.generateKeys();
+
+        String priv = AsymmetricEncryption.keyToBase64(keys.getPrivate());
+        PrivateKey privateKey = AsymmetricEncryption.getPrivateKeyFromString(priv);
+
+        assertEquals(keys.getPrivate(), privateKey);
     }
 }

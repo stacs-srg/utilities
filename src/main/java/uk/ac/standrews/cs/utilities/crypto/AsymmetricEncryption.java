@@ -355,7 +355,7 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKey(final Path key_path) throws CryptoException {
 
-        return getPrivateKeyFromString(getKey(key_path));
+        return getPrivateKeyFromPEMString(getKey(key_path));
     }
 
     /**
@@ -382,7 +382,7 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static PublicKey getPublicKey(final Path key_path) throws CryptoException {
 
-        return getPublicKeyFromString(getKey(key_path));
+        return getPublicKeyFromPEMString(getKey(key_path));
     }
 
     /**
@@ -393,11 +393,24 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the private key cannot be extracted
      */
     @SuppressWarnings("WeakerAccess")
-    public static PrivateKey getPrivateKeyFromString(final String key_in_pem_format) throws CryptoException {
+    public static PrivateKey getPrivateKeyFromPEMString(final String key_in_pem_format) throws CryptoException {
+
+        final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADER);
+        return getPrivateKeyFromString(base64_encoded_private_key);
+    }
+
+    /**
+     * Gets a private key from a string. The string is assumed to be in base64.
+     *
+     * @param key_base64 the private key in PEM format
+     * @return the private key
+     * @throws CryptoException if the private key cannot be extracted
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static PrivateKey getPrivateKeyFromString(final String key_base64) throws CryptoException {
 
         try {
-            final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADER);
-            final byte[] private_key = Base64.getMimeDecoder().decode(base64_encoded_private_key);
+            final byte[] private_key = Base64.getMimeDecoder().decode(key_base64);
 
             return KEY_FACTORY.generatePrivate(new PKCS8EncodedKeySpec(private_key));
 
@@ -414,17 +427,42 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the public key cannot be extracted
      */
     @SuppressWarnings("WeakerAccess")
-    public static PublicKey getPublicKeyFromString(final String key_in_pem_format) throws CryptoException {
+    public static PublicKey getPublicKeyFromPEMString(final String key_in_pem_format) throws CryptoException {
+
+        final String base64_encoded_public_key = stripKeyDelimiters(key_in_pem_format, PUBLIC_KEY_HEADER);
+        return getPublicKeyFromString(base64_encoded_public_key);
+    }
+
+    /**
+     * Gets a public key from a string. The string is assumed to be in base64.
+     *
+     * @param key_base64 the public key in base64
+     * @return the public key
+     * @throws CryptoException if the public key cannot be extracted
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static PublicKey getPublicKeyFromString(final String key_base64) throws CryptoException {
 
         try {
-            final String base64_encoded_public_key = stripKeyDelimiters(key_in_pem_format, PUBLIC_KEY_HEADER);
-            final byte[] public_key = Base64.getMimeDecoder().decode(base64_encoded_public_key);
+            final byte[] public_key = Base64.getMimeDecoder().decode(key_base64);
 
             return KEY_FACTORY.generatePublic(new X509EncodedKeySpec(public_key));
 
         } catch (final InvalidKeySpecException e) {
             throw new CryptoException(e);
         }
+    }
+
+    /**
+     * Convert a given key to its string representation in base64
+     *
+     * @param key to be converted
+     * @return the string version of the key in base64
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static String keyToBase64(Key key) {
+
+        return Base64.getMimeEncoder().encodeToString(key.getEncoded());
     }
 
     /**
@@ -450,7 +488,8 @@ public class AsymmetricEncryption {
 
                     if (builder != null) { // Finished to read the key
                         builder.append(line);
-                        key_list.add(getPublicKeyFromString(builder.toString()));
+                        PublicKey publicKey = getPublicKeyFromPEMString(builder.toString());
+                        key_list.add(publicKey);
                         builder = null;
                     } else { // Starting to read a new key
                         builder = new StringBuilder();

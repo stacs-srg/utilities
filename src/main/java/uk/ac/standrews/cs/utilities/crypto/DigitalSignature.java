@@ -77,12 +77,14 @@ public class DigitalSignature {
     /**
      * The extension for the private key
      */
-    private static final String PRIVATE_KEY_EXTENSION = ".key";
+    @SuppressWarnings("WeakerAccess")
+    public static final String PRIVATE_KEY_EXTENSION = ".key";
 
     /**
      * The extension for the certificate of the signature
      */
-    private static final String CERTIFICATE_EXTENSION = ".crt";
+    @SuppressWarnings("WeakerAccess")
+    public static final String CERTIFICATE_EXTENSION = ".crt";
 
     static {
         // Code compiles without using Bouncy Castle library, but key loading doesn't work with default provider.
