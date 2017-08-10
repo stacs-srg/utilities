@@ -31,8 +31,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class AsymmetricEncryptionTest {
 
@@ -171,5 +170,27 @@ public class AsymmetricEncryptionTest {
         PrivateKey privateKey = AsymmetricEncryption.getPrivateKeyFromString(priv);
 
         assertEquals(keys.getPrivate(), privateKey);
+    }
+
+    @Test
+    public void verifyKeyPair() throws CryptoException {
+
+        KeyPair keys = AsymmetricEncryption.generateKeys();
+
+        boolean valid = AsymmetricEncryption.verifyKeyPair(keys.getPublic(), keys.getPrivate());
+        assertTrue(valid);
+    }
+
+    @Test
+    public void verifyKeyPairFails() throws CryptoException {
+
+        KeyPair keys = AsymmetricEncryption.generateKeys();
+        KeyPair otherKeys = AsymmetricEncryption.generateKeys();
+
+        boolean valid = AsymmetricEncryption.verifyKeyPair(keys.getPublic(), otherKeys.getPrivate());
+        assertFalse(valid);
+
+        boolean valid_1 = AsymmetricEncryption.verifyKeyPair(otherKeys.getPublic(), keys.getPrivate());
+        assertFalse(valid_1);
     }
 }

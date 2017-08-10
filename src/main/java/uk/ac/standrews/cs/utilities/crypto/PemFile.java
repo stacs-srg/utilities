@@ -19,6 +19,7 @@ package uk.ac.standrews.cs.utilities.crypto;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
@@ -55,6 +56,11 @@ class PemFile {
      * @throws IOException if the file could not be created
      */
     static void writePemFile(Key key, String header, Path filename) throws IOException {
+
+        // Make sure that the path exists
+        File file = filename.toFile();
+        file.getParentFile().mkdirs();
+
         PemFile pemFile = new PemFile(key, header);
         pemFile.write(filename);
     }

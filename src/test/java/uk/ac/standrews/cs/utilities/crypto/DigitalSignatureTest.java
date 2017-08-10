@@ -190,4 +190,26 @@ public class DigitalSignatureTest {
         assertTrue(verified);
 
     }
+
+    @Test
+    public void verifyKeyPair() throws CryptoException {
+
+        KeyPair keys = DigitalSignature.generateKeys();
+
+        boolean valid = DigitalSignature.verifyKeyPair(keys.getPublic(), keys.getPrivate());
+        assertTrue(valid);
+    }
+
+    @Test
+    public void verifyKeyPairFails() throws CryptoException {
+
+        KeyPair keys = DigitalSignature.generateKeys();
+        KeyPair otherKeys = DigitalSignature.generateKeys();
+
+        boolean valid = DigitalSignature.verifyKeyPair(keys.getPublic(), otherKeys.getPrivate());
+        assertFalse(valid);
+
+        boolean valid_1 = DigitalSignature.verifyKeyPair(otherKeys.getPublic(), keys.getPrivate());
+        assertFalse(valid_1);
+    }
 }

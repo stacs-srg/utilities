@@ -16,13 +16,14 @@
  */
 package uk.ac.standrews.cs.utilities.crypto;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -87,10 +88,44 @@ public class SymmetricEncryptionTest {
         assertEquals(key, SymmetricEncryption.getKey(SymmetricEncryption.keyToString(key)));
     }
 
+    @Test
+    public void encryptionOverStreams() throws IOException, CryptoException {
+
+        InputStream originalData = stringToInputStream("TEST");
+
+        try (ByteArrayOutputStream outEncr = new ByteArrayOutputStream();
+             ByteArrayOutputStream outDecr = new ByteArrayOutputStream()) {
+
+            SecretKey key = SymmetricEncryption.generateRandomKey();
+
+            SymmetricEncryption.encrypt(key, originalData, outEncr);
+            InputStream encryptedStream = outputStreamToInputStream(outEncr);
+
+            SymmetricEncryption.decrypt(key, encryptedStream, outDecr);
+            InputStream decryptedStream = outputStreamToInputStream(outDecr);
+
+            String decryptedData = inputStreamToString(decryptedStream);
+            assertEquals(decryptedData, "TEST");
+        }
+    }
+
     private SecretKey corruptKey(SecretKey valid_key) throws CryptoException {
 
         final byte[] encoded = valid_key.getEncoded();
         encoded[0] = 37;
         return SymmetricEncryption.getKey(encoded);
     }
+
+    public InputStream stringToInputStream(String input) throws UnsupportedEncodingException {
+        return new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public InputStream outputStreamToInputStream(ByteArrayOutputStream out) throws IOException {
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public String inputStreamToString(InputStream string) throws IOException {
+        return IOUtils.toString(string, StandardCharsets.UTF_8);
+    }
+
 }

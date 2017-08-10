@@ -20,6 +20,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -207,6 +208,25 @@ public class DigitalSignature {
 
         byte[] decodedBytes = Base64.decodeBase64(signature64_to_verify);
         return verify(public_key, plain_text, decodedBytes);
+    }
+
+    /**
+     * Verifies that the pair of Public and Private keys is valid
+     *
+     * @param public_key of the key pair
+     * @param private_key of the key pair
+     * @return true if the key pair is valid
+     * @throws CryptoException if unable to verify the key pair
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static boolean verifyKeyPair(final PublicKey public_key, final PrivateKey private_key) throws CryptoException {
+
+        SecureRandom random = new SecureRandom();
+        String randomChallenge = new BigInteger(130, random).toString(32);
+
+        byte[] signatue = sign(private_key, randomChallenge);
+        return verify(public_key, randomChallenge, signatue);
+
     }
 
     /**

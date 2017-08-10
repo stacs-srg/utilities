@@ -21,6 +21,7 @@ import uk.ac.standrews.cs.utilities.FileManipulation;
 
 import javax.crypto.*;
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -332,6 +333,36 @@ public class AsymmetricEncryption {
     }
 
     /**
+     * Verifies that the pair of Public and Private keys is valid
+     *
+     * @param public_key of the key pair
+     * @param private_key of the key pair
+     * @return true if the key pair is valid
+     * @throws CryptoException if unable to verify the key pair
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static boolean verifyKeyPair(final PublicKey public_key, final PrivateKey private_key) throws CryptoException {
+
+        SecureRandom random = new SecureRandom();
+        String randomChallenge = new BigInteger(130, random).toString(32);
+
+        String encryptedChallenge = encrypt(public_key, randomChallenge);
+
+        try {
+            String decryptedChallenge = decrypt(private_key, encryptedChallenge);
+
+            // Checking the result of the challenge is not strictly needed, as a not-valid key pair will result in a
+            // CryptoException.
+            // Checking the challenge however provides a more rigid and clean key-pair verification.
+            return decryptedChallenge.equals(randomChallenge);
+
+        } catch (CryptoException e) {
+            return false;
+        }
+
+    }
+
+    /**
      * Gets this user's private key.
      * The key is assumed to be stored in the file {@value #DEFAULT_PRIVATE_KEY_FILE} in the directory {@value #DEFAULT_KEY_DIR} in
      * this user's home directory.
@@ -462,7 +493,9 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static String keyToBase64(Key key) {
 
-        return Base64.getMimeEncoder().encodeToString(key.getEncoded());
+        return Base64.getMimeEncoder().encodeToString(key.getEncoded())
+                .replace("\n", "")
+                .replace("\r", "");
     }
 
     /**
