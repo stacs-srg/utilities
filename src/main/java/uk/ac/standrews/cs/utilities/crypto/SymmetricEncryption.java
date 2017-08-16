@@ -44,7 +44,7 @@ public class SymmetricEncryption {
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES";
 
-    private static final int KEY_LENGTH_IN_BYTES = 16;
+    private static final int KEY_LENGTH_IN_BYTES = 16; // Only 128bit keys are supported with the default Java. AES should support 192 and 256 bit keys too.
     private static final String CIPHER_TEXT_HEADER = "uk.ac.standrews.cs.util.dataset.encrypted\n";
 
     private static final Cipher CIPHER;
