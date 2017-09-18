@@ -20,27 +20,38 @@ package uk.ac.standrews.cs.utilities.lsh;
 import java.util.*;
 
 /**
+ * Implementation of MinHash
  * Created by al on 04/09/2017.
  */
-public class MinHash {
+public class MinHash<Data> {
 
     private final static int someprime = 1190699; // this is a fine prime to use from https://primes.utm.edu/lists/small/small2.html
     private final static int bigprime = 2147483647; // the biggest 32 bit prime integer?
     private final static int anotherprime = 16777619;
 
-    public final static int DEFAULTSIGNATURESIZE = 50; // TODO No idea what size to make this!
+    public final static int DEFAULTSIGNATURESIZE = 50; // No idea what size to make this!
     private static final int DEFAULTBANDSIZE = 5;
 
     private int signature_size = DEFAULTSIGNATURESIZE;
     private int band_size = DEFAULTBANDSIZE;
 
-    private HashMap<Band, Set<String>> lsh_map = new HashMap<>();
+    private HashMap<Band, Set<Data>> lsh_map = new HashMap<>();
+
+    /**
+     * Create a min hash map using default values of specified sizes
+     * @param signature_size - the size of the min hash signature to use (number of entries)
+     * @param band_size - the size of the bands to use when placing into the min hash
+     */
 
     public MinHash(int signature_size, int band_size) {
         this.signature_size = signature_size;
         this.band_size = band_size;
     }
 
+    /**
+     * Create a min hash map using default values of
+     * DEFAULTSIGNATURESIZE and DEFAULTBANDSIZE
+     */
     public MinHash() {
         this(DEFAULTSIGNATURESIZE, DEFAULTBANDSIZE);
     }
@@ -52,7 +63,7 @@ public class MinHash {
      * @param source - the string from which the ngrams are created
      * @return the ngrams of the input string
      */
-    static Set<String> ngrams(String source, int n) {
+    public static Set<String> ngrams(String source, int n) {
         HashSet<String> ngrams = new HashSet<String>();
         for (int i = 0; i < source.length() - n + 1; i++)
             ngrams.add(source.substring(i, i + n));
@@ -78,7 +89,6 @@ public class MinHash {
 
     /**
      * Creates a minhash signature for the source string
-     *
      * @param src      the string from which a minhash signature will be created
      * @param sig_size the size of the signature created
      * @return the minhash signature
@@ -111,37 +121,46 @@ public class MinHash {
     }
 
 
-    public void addMinHashToLSHashMap(String source) {
-        int[] minHashSignature = createMinHashSignature(source, signature_size);
+    /**
+     * Put the value into a LSH Map with key key.
+     * @param key - the key to which the data should be mapped
+     * @param value - the value to put in the map.
+     */
+    public void put(String key, Data value) {
+        int[] minHashSignature = createMinHashSignature(key, signature_size);
 
-//      System.out.println( "Source = " + source );
+//      System.out.println( "Source = " + key );
 //      System.out.println( "Signature = " + minHashSignature );
 
         for (int band_number = 0; band_number * band_size < minHashSignature.length; band_number++) {
 
             Band b = new Band(minHashSignature, band_number, band_size);
 
-            Set<String> entries = lsh_map.get(b);
+            Set<Data> entries = lsh_map.get(b);
             if (entries == null) {
-                entries = new HashSet<String>();   // create a new set of entries,
-                entries.add(source);               // add the string to it,
-                lsh_map.put(b, entries);         // and add the new entry to the map.
+                entries = new HashSet<Data>();   // create a new set of entries,
+                entries.add(value);               // add the string to it,
+                lsh_map.put(b,entries);         // and add the new entry to the map.
             } else {
-                entries.add(source); // add the string to the existing map bucket.
+                entries.add(value); // add the string to the existing map bucket.
             }
         }
     }
 
-    public Set<String> getClosest(String source) {
+    /**
+     * @param key - the key of teh data to be searched.
+     * @return the set of data that are mapped by the key
+     */
+    public Set<Data> getClosest(String key) {
 
-        Set<String> result = new HashSet<>();
+        Set<Data> result = new HashSet<>();
 
-        int[] minHashSignature = createMinHashSignature(source, signature_size);
+        int[] minHashSignature = createMinHashSignature(key, signature_size);
 
         for (int band_number = 0; band_number * band_size < minHashSignature.length; band_number++) {
 
             Band b = new Band(minHashSignature, band_number, band_size);
-            Set<String> found = lsh_map.get(b);
+            Set<Data> found = lsh_map.get(b);
             if (found != null) {
                 result.addAll(found);
             }
@@ -149,10 +168,13 @@ public class MinHash {
         return result;
     }
 
+    /**
+     * A debug/diagnostic method to inspect the size of the rhs of the mappings
+     */
     public void printMap() {
 
-        for( Map.Entry<Band, Set<String>> me : lsh_map.entrySet() ) {
-            Set<String> entries = me.getValue();
+        for( Map.Entry<Band, Set<Data>> me : lsh_map.entrySet() ) {
+            Set<Data> entries = me.getValue();
             System.out.println( entries.size() );
 
         }

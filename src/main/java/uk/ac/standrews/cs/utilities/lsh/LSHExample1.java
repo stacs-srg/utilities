@@ -80,7 +80,7 @@ public class LSHExample1 {
     public static void loadupdata( MinHash mh ) {
 
         for( int i = 0; i < ozs_words.length; i++ ) {
-            mh.addMinHashToLSHashMap(ozs_words[i]);
+            mh.put(ozs_words[i],ozs_words[i]);          // for test just map string to itself.
         }
     }
 
@@ -96,7 +96,7 @@ public class LSHExample1 {
 
     public static void main( String[] args ) {
 
-        MinHash minhash = new MinHash(40,5);
+        MinHash minhash = new MinHash<String>(40,5);
         loadupdata( minhash );
         //minhash.printMap();
         lookupdata( minhash );

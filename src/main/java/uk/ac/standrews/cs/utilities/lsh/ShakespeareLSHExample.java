@@ -43,7 +43,7 @@ public class ShakespeareLSHExample {
         int count = 0;
 
         while ((readLine = b.readLine()) != null) {
-            mh.addMinHashToLSHashMap( strip(readLine) );
+            mh.put( strip(readLine),readLine );         // map stripped string to original (not used)
             count++;
         }
         System.out.println( "Read in " + count + " lines" );
