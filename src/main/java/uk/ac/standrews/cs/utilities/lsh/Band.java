@@ -22,21 +22,38 @@ package uk.ac.standrews.cs.utilities.lsh;
  */
 public class Band {
 
-    private final int bigprime = 2147483647;
+    private static final int bigprime = 2147483647;
+    private static final int someprime = 16777619;
     private int the_hash;
+
+//    Band( int[] signature, int band_number, int band_size ) {
+//
+//        int offset = band_number * band_size;
+//
+//        the_hash = bigprime;
+//
+//        for( int index = offset; index < offset + band_size; index++ ) {
+//
+//                the_hash = the_hash * signature[index];
+//        }
+//    }
 
     Band( int[] signature, int band_number, int band_size ) {
 
         int offset = band_number * band_size;
 
-        the_hash = bigprime;
+        the_hash = salt_hash( bigprime, band_number );  // seed the hash function with the band - every band hashes differently.
 
         for( int index = offset; index < offset + band_size; index++ ) {
-
-                the_hash = the_hash * signature[index];
+                the_hash = salt_hash( the_hash,signature[index] ); // use all the integers in the nad to calculate the hash code for this band,
         }
     }
 
+    private static int salt_hash(int salt, int value ) {
+            return (salt * someprime ) ^ value;
+    }
+
+    @Override
     public int hashCode() {
         return the_hash;
     }
