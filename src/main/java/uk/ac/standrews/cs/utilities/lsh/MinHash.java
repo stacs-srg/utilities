@@ -95,10 +95,10 @@ public class MinHash<Data> {
      * @param sig_size the size of the signature created
      * @return the minhash signature
      */
-    public static int[] createMinHashSignature(String src, int sig_size) {
+    public static int[] createMinHashSignature(String src, int sig_size, int shingle_size) {
 //        String stripped = src.replaceAll( "\\s","" ). // replace all whitespace with nothing.
 //                replaceAll("[.,~{}()!\\\\]", ""); // replace other punctuation stops with nothing
-        Set<String> set_ngrams = ngrams(src, 2);
+        Set<String> set_ngrams = ngrams(src, shingle_size);
 
         //Create a min hash array initialized to all int max values
         int[] signature = new int[sig_size];
@@ -129,7 +129,7 @@ public class MinHash<Data> {
      * @param value - the value to put in the map.
      */
     public void put(String key, Data value) {
-        int[] minHashSignature = createMinHashSignature(key, signature_size);
+        int[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
 
 //      System.out.println( "Source = " + key );
 //      System.out.println( "Signature = " + minHashSignature );
@@ -157,7 +157,7 @@ public class MinHash<Data> {
 
         Set<Data> result = new HashSet<>();
 
-        int[] minHashSignature = createMinHashSignature(key, signature_size);
+        int[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
 
         for (int band_number = 0; band_number * band_size < minHashSignature.length; band_number++) {
 

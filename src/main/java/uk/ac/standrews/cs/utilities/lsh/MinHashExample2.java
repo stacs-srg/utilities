@@ -91,7 +91,7 @@ public class MinHashExample2 {
 
         for( int i = 0; i < ozs_words.length; i++ ) {
             String sentence = ozs_words[i];
-            int[] hash = mh.createMinHashSignature( sentence, mh.DEFAULTSIGNATURESIZE);
+            int[] hash = mh.createMinHashSignature( sentence, mh.DEFAULTSIGNATURESIZE, mh.DEFAULTSHINGLESIZE);
             map.put( sentence,hash );
         }
     }
@@ -101,14 +101,14 @@ public class MinHashExample2 {
         for( int i = 0; i < ozs_words.length; i++ ) {
             String sentence = ozs_words[i];
 
-            int[] hash = mh.createMinHashSignature( sentence, mh.DEFAULTSIGNATURESIZE);
+            int[] hash = mh.createMinHashSignature( sentence, mh.DEFAULTSIGNATURESIZE, 2);
             for( String key : map.keySet() ) {
 
                 Set<String> sentence_2grams = MinHash.ngrams(sentence,2);
                 Set<String> key_2grams = MinHash.ngrams(key,2);
 
-                int[] sentence_minHashSignature = MinHash.createMinHashSignature( sentence,MinHash.DEFAULTSIGNATURESIZE );
-                int[] key_minHashSignature = MinHash.createMinHashSignature( key,MinHash.DEFAULTSIGNATURESIZE );
+                int[] sentence_minHashSignature = MinHash.createMinHashSignature( sentence,MinHash.DEFAULTSIGNATURESIZE, 2 );
+                int[] key_minHashSignature = MinHash.createMinHashSignature( key,MinHash.DEFAULTSIGNATURESIZE, 2 );
 
                 System.out.println( "Sentence 1 = " + sentence );
                 System.out.println( "Sentence 2 = " + key );

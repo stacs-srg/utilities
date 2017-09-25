@@ -61,8 +61,8 @@ public class MinHashTest {
         float jacquard_ngrams = Jacquard.jacquard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
         float jacquard_minhash = Jacquard.jacquard(
-                toCollection(MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE )),
-                toCollection(MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE )));
+                toCollection(MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE, 2 )),
+                toCollection(MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE, 2)));
 
         System.out.println( "Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
 
@@ -82,8 +82,8 @@ public class MinHashTest {
         float jacquard_ngrams = Jacquard.jacquard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
         float jacquard_minhash = Jacquard.jacquard(
-                toCollection(MinHash.createMinHashSignature( input1,20 )), // MinHash.DEFAULTSIGNATURESIZE )),
-                toCollection(MinHash.createMinHashSignature( input2,20 ))); // MinHash.DEFAULTSIGNATURESIZE )));
+                toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
+                toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 
         System.out.println( jacquard_ngrams + " " + jacquard_minhash+ " Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
 
@@ -103,8 +103,8 @@ public class MinHashTest {
         float jacquard_ngrams = Jacquard.jacquard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
         float jacquard_minhash = Jacquard.jacquard(
-                toCollection(MinHash.createMinHashSignature( input1,20 )), // MinHash.DEFAULTSIGNATURESIZE )),
-                toCollection(MinHash.createMinHashSignature( input2,20 ))); // MinHash.DEFAULTSIGNATURESIZE )));
+                toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
+                toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 
         System.out.println( jacquard_ngrams + " " + jacquard_minhash+ " Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
 

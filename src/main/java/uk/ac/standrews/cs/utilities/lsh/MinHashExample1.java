@@ -47,8 +47,8 @@ public class MinHashExample1 {
         Set<String> input1_2grams = MinHash.ngrams(input1,2);
         Set<String> input2_2grams = MinHash.ngrams(input2,2);
 
-        int[] input1_minHashSignature = MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE );
-        int[] input2_minHashSignature = MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE );
+        int[] input1_minHashSignature = MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE, MinHash.DEFAULTSIGNATURESIZE );
+        int[] input2_minHashSignature = MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE, MinHash.DEFAULTSIGNATURESIZE );
 
         System.out.println( "Input 1 = " + input1 );
         System.out.println( "Input 2 = " + input2 );
