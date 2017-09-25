@@ -79,7 +79,7 @@ public class ShakespeareLSHExample {
 
     public static void main( String[] args ) throws IOException {
 
-        MinHash minhash = new MinHash(50,5);
+        MinHash minhash = new MinHash(2,10,5);
         loadupdata( minhash,FILENAME );
 //        minhash.printMap();
 

@@ -96,7 +96,7 @@ public class LSHExample1 {
 
     public static void main( String[] args ) {
 
-        MinHash minhash = new MinHash<String>(40,5);
+        MinHash minhash = new MinHash<String>(2,8,5);
         loadupdata( minhash );
         //minhash.printMap();
         lookupdata( minhash );

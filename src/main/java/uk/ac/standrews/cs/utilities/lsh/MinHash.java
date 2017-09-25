@@ -41,17 +41,13 @@ public class MinHash<Data> {
 
     /**
      * Create a min hash map using default values of specified sizes
-     * @param signature_size - the size of the min hash signature to use (number of entries)
+     * @param num_bands - the number of bands to use in the final hash
      * @param band_size - the size of the bands to use when placing into the min hash
      */
-    public MinHash(int shingle_size, int signature_size, int band_size) {
+    public MinHash(int shingle_size, int num_bands, int band_size) {
         this.shingle_size = shingle_size;
-        this.signature_size = signature_size;
+        this.signature_size = num_bands * band_size;
         this.band_size = band_size;
-    }
-
-    public MinHash(int signature_size, int band_size) {
-        this( DEFAULTSHINGLESIZE,signature_size, band_size );
     }
 
     /**
