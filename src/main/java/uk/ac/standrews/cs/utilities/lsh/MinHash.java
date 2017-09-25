@@ -29,9 +29,11 @@ public class MinHash<Data> {
     private final static int bigprime = 2147483647; // the biggest 32 bit prime integer?
     private final static int anotherprime = 16777619;
 
+    public final static int DEFAULTSHINGLESIZE = 2; // size of q-grams
     public final static int DEFAULTSIGNATURESIZE = 50; // No idea what size to make this!
     private static final int DEFAULTBANDSIZE = 5;
 
+    private int shingle_size = DEFAULTSHINGLESIZE;
     private int signature_size = DEFAULTSIGNATURESIZE;
     private int band_size = DEFAULTBANDSIZE;
 
@@ -42,18 +44,22 @@ public class MinHash<Data> {
      * @param signature_size - the size of the min hash signature to use (number of entries)
      * @param band_size - the size of the bands to use when placing into the min hash
      */
-
-    public MinHash(int signature_size, int band_size) {
+    public MinHash(int shingle_size, int signature_size, int band_size) {
+        this.shingle_size = shingle_size;
         this.signature_size = signature_size;
         this.band_size = band_size;
     }
 
+    public MinHash(int signature_size, int band_size) {
+        this( DEFAULTSHINGLESIZE,signature_size, band_size );
+    }
+
     /**
      * Create a min hash map using default values of
-     * DEFAULTSIGNATURESIZE and DEFAULTBANDSIZE
+     * DEFAULTSHINGLESIZE, DEFAULTSIGNATURESIZE and DEFAULTBANDSIZE
      */
     public MinHash() {
-        this(DEFAULTSIGNATURESIZE, DEFAULTBANDSIZE);
+        this(DEFAULTSHINGLESIZE,DEFAULTSIGNATURESIZE, DEFAULTBANDSIZE);
     }
 
     /**
