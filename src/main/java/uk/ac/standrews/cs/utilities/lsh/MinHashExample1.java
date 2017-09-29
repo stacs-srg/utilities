@@ -55,13 +55,13 @@ public class MinHashExample1 {
 
         System.out.println();
 
-        System.out.println( "2grams intersection = " + Jacquard.intersection( input1_2grams, input2_2grams ).size() + ", union = " + Jacquard.union( input1_2grams, input2_2grams ).size() );
-        System.out.println( "Jacquard (ngrams) = " + Jacquard.jacquard(input1_2grams,input2_2grams ) );
+        System.out.println( "2grams intersection = " + Jaccard.intersection( input1_2grams, input2_2grams ).size() + ", union = " + Jaccard.union( input1_2grams, input2_2grams ).size() );
+        System.out.println( "Jaccard (ngrams) = " + Jaccard.jaccard(input1_2grams,input2_2grams ) );
 
         System.out.println();
 
-        System.out.println( "minhash intersection = " + Jacquard.intersection( toCollection(input1_minHashSignature), toCollection(input2_minHashSignature) ).size() + ", union = " + Jacquard.union( toCollection(input1_minHashSignature), toCollection(input2_minHashSignature) ).size() );
-        System.out.println( "Jacquard (minhash) = " + Jacquard.jacquard(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)) );
+        System.out.println( "minhash intersection = " + Jaccard.intersection( toCollection(input1_minHashSignature), toCollection(input2_minHashSignature) ).size() + ", union = " + Jaccard.union( toCollection(input1_minHashSignature), toCollection(input2_minHashSignature) ).size() );
+        System.out.println( "Jaccard (minhash) = " + Jaccard.jaccard(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)) );
 
     }
 }

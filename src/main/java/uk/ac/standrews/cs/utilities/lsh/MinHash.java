@@ -141,10 +141,10 @@ public class MinHash<Data> {
             Set<Data> entries = lsh_map.get(b);
             if (entries == null) {
                 entries = new HashSet<Data>();   // create a new set of entries,
-                entries.add(value);               // add the string to it,
-                lsh_map.put(b,entries);         // and add the new entry to the map.
+                entries.add(value);               // add_worker the string to it,
+                lsh_map.put(b,entries);         // and add_worker the new entry to the map.
             } else {
-                entries.add(value); // add the string to the existing map bucket.
+                entries.add(value); // add_worker the string to the existing map bucket.
             }
         }
     }

@@ -245,7 +245,7 @@ public final class ErrorHandling {
             }
 
             if (use_timestamp) {
-                //add current time to the error message
+                //add_worker current time to the error message
                 sb.append("[");
                 final Date now = new Date();
                 final String formatted_date = dateformat.format(now);

@@ -22,13 +22,13 @@ import java.util.*;
 /**
  * Created by al on 06/09/2017.
  */
-public class Jacquard {
+public class Jaccard {
 
-    public static float jacquard (Collection A, Collection B ) {
+    public static float jaccard(Collection A, Collection B ) {
         return ( (float) ( intersection( A,B ).size() ) ) / union( A, B ).size();
     }
 
-    public static float jacquard (String A, String B ) {
+    public static float jaccard(String A, String B ) {
         Collection agrams = MinHash.ngrams(A,2);
         Collection bgrams = MinHash.ngrams(B,2);
         return ( (float) ( intersection( agrams,bgrams ).size() ) ) / union( agrams, bgrams ).size();

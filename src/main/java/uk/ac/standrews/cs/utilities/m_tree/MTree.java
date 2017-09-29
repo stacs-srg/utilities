@@ -28,12 +28,12 @@ import java.util.List;
 public class MTree<T> {
 
     private static final int MAX_LEVEL_SIZE = 20;
-    private final Distance<T> distance_wrapper;
+    final Distance<T> distance_wrapper;
 
-    private Node root = null;
+    Node root = null;
 
-    @SuppressWarnings("unused")
-    private int num_entries = 0;
+
+    int num_entries = 0;
 
     public MTree(Distance<T> d) {
 
@@ -42,12 +42,11 @@ public class MTree<T> {
 
     /**
      * @return the number of nodes in the tree
-     * used to call calculateSize - may be needed in persistent version of this code?
      */
     public int size() {
 
-        // return num_entries;
-        return calculateSize(root); // TODO remove once working and replace with num_entries
+        //return num_entries;
+        return calculateSize(root);
     }
 
     /**
@@ -319,7 +318,7 @@ public class MTree<T> {
      * @param query            - some data for which to find the nearest neighbour
      * @return the nearest neighbour of T.
      */
-    private DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
+    DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
 
         if (node.data.equals(query)) {
             return new DataDistance<>(node.data, 0.0F);
@@ -391,16 +390,20 @@ public class MTree<T> {
      * @param node - the parent of the current node.
      * @param data - the data to add into the children
      */
-    private void leafInsert(Node node, T data) {
+    private Node leafInsert(Node node, T data) {
 
         if ((node.isFull())) {
-            split(node, new Node(data, null));
+            return split(node, new Node(data, null));
 
         } else {
             if (node.isEmpty()) {
-                node.addChild(new Node(node.data, node)); // we making a leaf into an intermediate node - add Node to its own children
+                Node newnode = new Node(node.data, node);
+                node.addChild(newnode); // we making a leaf into an intermediate node - add Node to its own children
+                return newnode;
             }
-            node.addChild(new Node(data, node)); // children is not yet full - put the data into the children
+            Node newnode = new Node(data, node);
+            node.addChild(newnode); // children is not yet full - put the data into the children
+            return newnode;
         }
     }
 
@@ -412,7 +415,7 @@ public class MTree<T> {
      * @param node - the node into which we are inserting the data
      * @param data the new data.
      */
-    private void add(Node node, T data) {
+     Node add(Node node, T data) {
 
         Node enclosing_pivot = null;
         Node closest_pivot = null;
@@ -446,11 +449,11 @@ public class MTree<T> {
         if (enclosing_pivot == null) { // didn't find an enclosing pivot - put it in the closest.
 
             if (closest_pivot == null || distance_wrapper.distance(node.data, data) <= smallest_distance) { // this node is closer to the new data
-                leafInsert(node, data);
+                return leafInsert(node, data);
 
             } else { // one of the children is closer
                 float old_radius = closest_pivot.radius;
-                add(closest_pivot, data);
+                Node newnode = add(closest_pivot, data);
                 // now check to see if the radius has changed
                 float new_radius = closest_pivot.radius;
 
@@ -462,9 +465,10 @@ public class MTree<T> {
                         node.radius = new_distance_to_pivot + new_radius;
                     }
                 }
+                return newnode;
             }
         } else { // we found an enclosing pivot - no need to make the radius bigger
-            add(enclosing_pivot, data);
+            return add(enclosing_pivot, data);
         }
     }
 
@@ -474,7 +478,7 @@ public class MTree<T> {
      * @param N  the node which is being split
      * @param oN a new node being added
      */
-    private void split(Node N, Node oN) {
+    private Node split(Node N, Node oN) {
 
         // Insertion into a leaf may cause the node to overflow.
         // The overflow of a node N is resolved by allocating a new node new_pivot at the same level and
@@ -536,6 +540,7 @@ public class MTree<T> {
                 Np.addChild(new_pivot);
             }
         }
+        return new_pivot;
     }
 
     /**
@@ -579,7 +584,7 @@ public class MTree<T> {
         Node smallest_not_pivot = null;
 
         for (Node child : candidates) {
-            if (child.data != pivot.data) { // not identical since we are looking at children
+            if (child.data != pivot.data) { // not identical since we are looking at children - // TODO should be equals?
                 if (smallest_not_pivot == null) {
                     smallest_not_pivot = child;
                 } else if (child.radius < smallest_not_pivot.radius) {
@@ -609,7 +614,7 @@ public class MTree<T> {
     /**
      * This is the class used to build the M-tree.
      */
-    private class Node {
+    protected class Node {
 
         public T data;
         float radius;

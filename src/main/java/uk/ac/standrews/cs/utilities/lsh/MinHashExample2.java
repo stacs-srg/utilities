@@ -112,11 +112,11 @@ public class MinHashExample2 {
 
                 System.out.println( "Sentence 1 = " + sentence );
                 System.out.println( "Sentence 2 = " + key );
-                Set intersection = Jacquard.intersection(sentence_2grams, key_2grams);
-                System.out.println( "2grams intersection = " + intersection + " size = " + intersection.size() + ", union = " + Jacquard.union( sentence_2grams, key_2grams ).size() );
-                System.out.println( "Jacquard (ngrams) = " + Jacquard.jacquard(sentence_2grams,key_2grams ) );
-                System.out.println( "minhash intersection = " + Jacquard.intersection( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() + ", union = " + Jacquard.union( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() );
-                System.out.println( "Jacquard (minhash) = " + Jacquard.jacquard(toCollection(sentence_minHashSignature), toCollection(key_minHashSignature)) );
+                Set intersection = Jaccard.intersection(sentence_2grams, key_2grams);
+                System.out.println( "2grams intersection = " + intersection + " size = " + intersection.size() + ", union = " + Jaccard.union( sentence_2grams, key_2grams ).size() );
+                System.out.println( "Jaccard (ngrams) = " + Jaccard.jaccard(sentence_2grams,key_2grams ) );
+                System.out.println( "minhash intersection = " + Jaccard.intersection( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() + ", union = " + Jaccard.union( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() );
+                System.out.println( "Jaccard (minhash) = " + Jaccard.jaccard(toCollection(sentence_minHashSignature), toCollection(key_minHashSignature)) );
                 System.out.println( "----" );
 
             }

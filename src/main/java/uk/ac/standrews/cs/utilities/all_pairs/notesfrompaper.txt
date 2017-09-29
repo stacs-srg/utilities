@@ -1,0 +1,148 @@
+====
+    Copyright 2017 Systems Research Group, University of St Andrews:
+    <https://github.com/stacs-srg>
+
+    This file is part of the module utilities.
+
+    utilities is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+    License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+    version.
+
+    utilities is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with utilities. If not, see
+    <http://www.gnu.org/licenses/>.
+====
+
+From Scaling Up All Pairs Similarity Search
+Roberto J. Bayardo Google, Inc. bayardo@alum.mit.edu
+Yiming Ma* U. California, Irvine maym@ics.uci.edu
+Ramakrishnan Srikant Google, Inc. srikant@google.com
+Appears in Proc. of the 16th Int’l Conf. on World Wide Web, Banff, Alberta, Canada, 131-140, 2007.
+(Revised May 21, 2007. This version contains some minor clarifications not present in the original.)
+
+Naive version of all pairs:
+
+Results in a map from features to pairs documents that have those features and their similarity.
+
+ALL-PAIRS( SetofVectors V , threshold t ) { //  scans the dataset and incrementally builds the inverted lists
+
+	O = Map from feature to pairs of documents and their similarity.
+	MapI I1,I2,...,Im ← ∅ // from feature-index to Set of (doc, feature) pairs
+
+	foreach vector x ∈ V do {
+		O ← O ∪ FIND-MATCHES(x, MapI, t)
+		for each i s.t. x[i] > 0 do {
+			Ii ← Ii ∪ {(x, x[i])
+		}
+	}
+	return O
+}
+
+
+FIND-MATCHES(vector x, Map I,  threshold t ) { // scans the inverted lists to perform score accumulation - returns a set of doc pairs and their similarity.
+
+	A ← empty map from vector id to weight - the weight accumulation map.
+	M←∅
+	for each i s.t. x[i] > 0 do  // for each feature in x
+		foreach( document y, feature y[i] ) ∈ Map do   // for each document y with that feature
+			A[y] ← A[y] + x[i] ⋅ y[i]                       // increment the weight accumulation map with the cosine similarity for document x and y
+	for each document y with non-zero weight in A do
+		if A[y] ≥ t then				// add the two docs and their similarity if above threshold.
+				M ← M ∪ {(x, y, A[y])}
+	return M
+}
+
+/-----------------
+
+ALL-PAIRS-1( SetofVectors V , threshold t ) { //  scans the dataset and incrementally builds the inverted lists
+    // Reorder the dimensions 1...m such that dimensions with the most non-zero entries in V appear first.
+    // Denote the max. of x[i] over all x ∈ V as maxweighti(V) .
+
+    O = Map from feature to pairs of documents and their similarity.
+	MapI I1,I2,...,Im ← ∅ // from feature-index to Set of (doc, feature) pairs
+
+    foreach vector x ∈ V do {
+        O ← O ∪ FIND-MATCHES(x, MapI, t)
+        b←0
+        for each i s.t. x[i] > 0 in increasing order of i do {
+            b ← b + maxweighti(V) ⋅ x[i]
+            if b ≥ t then
+                Ii ← Ii ∪ {(x, x[i])}
+                x[i] ← 0 ;; create x'
+         }
+    }
+    return O
+}
+
+
+FIND-MATCHES-1( vector x, Map I,  threshold t ) { // scans the inverted lists to perform score accumulation - returns a set of doc pairs and their similarity.
+
+    A ← empty map from vector id to weight
+    M←∅
+    for each i s.t. x[i] > 0 do
+        foreach(y,y[i])∈Ii do
+                A[y] ← A[y] + x[i] ⋅ y[i]
+    for each y with non-zero weight in A do
+        // Recall that y' is the unindexed portion of y s ← A[y] + dot(x, y')
+        if s ≥ t then
+            M ← M ∪ {(x, y, s)}
+    return M
+}
+
+
+/-----------------
+
+
+Figure 3a provides our refinement of the All-Pairs procedure that exploits a particular dataset sort order to further minimize the number of indexed features. The ordering over the vectors guarantees any vector x that is produced after a vector y has a lower maximum weight.
+
+ALL-PAIRS-2( V , t ) {
+	//Reorder the dimensions 1...m such that dimensions with
+	//the most non-zero entries in V appear first.
+	maxweighti(V) = max( x[i] over all x ∈ V )
+	maxweight(x) = max( of x[i] for i = 1...m )
+
+	Sort V in decreasing order of maxweight(x)
+	O = Map from feature to pairs of documents and their similarity.
+	MapI I1,I2,...,Im ←∅
+
+	foreach vector x ∈ V do {
+		 O ← O ∪ FIND-MATCHES-2(x, MapI, t)
+		 b ← 0
+		 for each i s.t. x[i] > 0 in increasing order of i do {
+		 	b ← b + min( maxweighti(V), maxweight(x)) ⋅ x[i]
+			if b ≥ t then
+				Ii ← Ii ∪ {(x, x[i])}
+				x[i] ← 0
+		}
+	}
+	return O
+}
+
+
+
+FIND-MATCHES-2(x, I1,...,Im ,t) {
+	A ← empty map from vector id to weight 2
+	M←∅
+	remscore ← sum( x[i]  ⋅ maxweighti(V))
+	minsize ← t ⁄ maxweight(x)
+	for each i s.t. x[i] > 0 in decreasing order of i do {
+		// Iteratively remove (y, w) from the front of Ii while y < minsize.
+		foreach(y,y[i])∈Ii do {
+			if A[y] ≠ 0 or remscore ≥ t then
+				A[y] ← A[y] + x[i] ⋅ y[i]
+		}
+		remscore ← remscore – x[i] ⋅ maxweighti(V)
+	}
+	for each y with non-zero weight in A do {
+		if A[y] + min( y' , x ) ⋅ maxweight(x) ⋅ maxweight(y') ≥ t then {
+			s ← A[y] + dot(x, y')
+			if s ≥ t then
+				M ← M ∪ {(x, y, s)}}
+		}
+	}
+	return M
+}
+
+
