@@ -399,7 +399,6 @@ public class MTree<T> {
             if (node.isEmpty()) {
                 Node newnode = new Node(node.data, node);
                 node.addChild(newnode); // we making a leaf into an intermediate node - add Node to its own children
-                return newnode;
             }
             Node newnode = new Node(data, node);
             node.addChild(newnode); // children is not yet full - put the data into the children
