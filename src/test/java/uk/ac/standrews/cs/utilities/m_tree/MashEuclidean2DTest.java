@@ -268,9 +268,10 @@ public class MashEuclidean2DTest {
 
         addSquares();
         Point p = new Point(20.6F, 20.6F);
+
         DataDistance<Point> result = tree.nearestNeighbour(p);
 
-        assertEquals(result.value, new Point(21.0F, 21.0F)); // closest point to 20.6,20.6 - TODO better tests?
+        assertEquals(new Point(21.0F, 21.0F),result.value); // closest point to 20.6,20.6 - TODO better tests?
     }
 
 //    /**

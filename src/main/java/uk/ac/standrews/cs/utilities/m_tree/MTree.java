@@ -173,7 +173,7 @@ public class MTree<T> {
      * Displays the tree.
      */
     @SuppressWarnings("unused")
-    private void showTree() {
+    public void showTree() {
         showTree(root, 0);
         System.out.println("----------------------");
     }
@@ -251,7 +251,7 @@ public class MTree<T> {
      *           }
      *           </pre>
      */
-    private void rangeSearch(Node N, T Q, float RQ, ArrayList<DataDistance<T>> results) {
+    void rangeSearch(Node N, T Q, float RQ, ArrayList<DataDistance<T>> results) {
 
         Node parent = N.parent;
 
@@ -335,8 +335,18 @@ public class MTree<T> {
             }
             return closest_thus_far; // we are not any closer.
         }
+        return search_children( node, closest_thus_far, query );
+    }
 
-        // see if we need to check out the children;
+    /**
+     * Search the children of a node for results
+     * @param node
+     * @param closest_thus_far
+     * @param query
+     * @return
+     */
+    DataDistance<T> search_children( Node node, DataDistance<T> closest_thus_far,T query ) {
+        float distance_to_node = closest_thus_far.distance;
         if (distance_to_node - node.radius < closest_thus_far.distance) {
             // may be interesting results in the children
             for (Node child : node.children) {
@@ -356,7 +366,7 @@ public class MTree<T> {
      * @param query   - some data for which to find the closest N neighbours
      * @param results the nearest nodes found thus far
      */
-    private void nearestN(Node node, int n, T query, ClosestSet results) {
+    void nearestN(Node node, int n, T query, ClosestSet results) {
 
         if (node.isLeaf()) { // we are at a leaf - see if ths is closer than other nodes in results
 
@@ -583,7 +593,7 @@ public class MTree<T> {
         Node smallest_not_pivot = null;
 
         for (Node child : candidates) {
-            if (child.data != pivot.data) { // not identical since we are looking at children - // TODO should be equals?
+            if ( ! child.data.equals( pivot.data ) ){ // not identical since we are looking at children - // TODO should be equals?
                 if (smallest_not_pivot == null) {
                     smallest_not_pivot = child;
                 } else if (child.radius < smallest_not_pivot.radius) {
@@ -618,7 +628,7 @@ public class MTree<T> {
         public T data;
         float radius;
         float distance_to_parent;
-        Node parent;      /// NOT SURE IF YOU NEED
+        Node parent;  
         List<Node> children;
 
         Node(T oN, Node parent) {
@@ -664,7 +674,7 @@ public class MTree<T> {
         }
     }
 
-    private class ClosestSet {
+    class ClosestSet {
 
         ArrayList<DataDistance<T>> closest;
         int requested_result_set_size;

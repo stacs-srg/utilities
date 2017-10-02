@@ -20,31 +20,32 @@ import org.simmetrics.metrics.Levenshtein;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
-import uk.ac.standrews.cs.utilities.m_tree.MTree;
+import uk.ac.standrews.cs.utilities.m_tree.KeyMaker;
+import uk.ac.standrews.cs.utilities.m_tree.Mash;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class MTreeStringDictionaryCheck {
+public class MashStringDictionaryCheck {
 
-    private static MTree<String> tree;
+    private static Mash<String> tree;
     private static int count;
 
     private static String dict_file = "/usr/share/dict/words";
 
     public static void main(String[] args) throws Exception {
 
-
         long starttime = System.currentTimeMillis();
-        tree = new MTree<>(new EditDistance());
+        tree = new Mash<>(new EditDistance(),new StringKeyMaker() );
+
         readin_data();
 
-        //unixDictionarySizeTest();
+        // unixDictionarySizeTest();
         allNearestNeighbours();
         // nearestN();
         // range();
-        System.out.println( "MTree time taken = " + ( System.currentTimeMillis() - starttime ) / 1000.0 );
+        System.out.println( "Mash time taken = " + ( System.currentTimeMillis() - starttime ) / 1000.0 );
     }
 
     public static void readin_data() throws Exception {
@@ -85,6 +86,7 @@ public class MTreeStringDictionaryCheck {
     private static void allNearestNeighbours() throws IOException {
         for (String line : FileManipulation.readAllLines(FileManipulation.getInputStream(Paths.get(dict_file)))) {  // file has one word per line
             DataDistance<String> result = tree.nearestNeighbour(line);
+            System.out.println( "Checking >" + line + "< against expected >" + result.value + "<");
             assertEquals(line, result.value);
         }
     }
@@ -127,6 +129,13 @@ public class MTreeStringDictionaryCheck {
         public float distance(String s1, String s2) {
 
             return levenshtein.distance(s1, s2);
+        }
+    }
+
+    public static class StringKeyMaker implements KeyMaker<String> {
+        @Override
+        public String makeKey(String s) {
+            return s;
         }
     }
 }
