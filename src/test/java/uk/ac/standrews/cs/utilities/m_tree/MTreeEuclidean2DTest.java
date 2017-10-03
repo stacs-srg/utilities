@@ -183,16 +183,19 @@ public class MTreeEuclidean2DTest {
         for (int i = 0; i < 20; i++) {
             tree.add(new Point((float) i * 10, 0.0F));
             //t.showTree();
+            //tree.check_invariants();
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 20; i++) {
             tree.add(new Point((float) (i * 10) + 4.0F, 0.0F));
             //t.showTree();
+            //tree.check_invariants();
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 20; i++) {
             tree.add(new Point((float) (i * 10) + 4.5F, 0.0F));
             //t.showTree();
+            //tree.check_invariants();
         }
     }
 
@@ -227,6 +230,9 @@ public class MTreeEuclidean2DTest {
     public void findClosestFrom60() {
 
         addNestedPoints();
+
+        // tree.showTree();
+
         Point p = new Point(15.0F, 0.0F);
         List<DataDistance<Point>> result = tree.rangeSearch(p, 10.0F);
         List<Point> values = tree.mapValues(result);

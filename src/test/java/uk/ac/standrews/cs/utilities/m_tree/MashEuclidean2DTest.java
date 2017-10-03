@@ -22,6 +22,8 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistan
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanKeyMaker;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 
@@ -218,47 +220,47 @@ public class MashEuclidean2DTest {
         }
     }
 
-//    /**
-//     * test rangeSearch - performing range search on nested nodes - simple version.
-//     */
-//    @Test
-//    public void findClosestFrom60() {
-//
-//        addNestedPoints();
-//        Point p = new Point(15.0F, 0.0F);
-//        List<DataDistance<Point>> result = tree.rangeSearch(p, 10.0F);
-//        List<Point> values = tree.mapValues(result);
-//
-//        assertEquals(result.size(), 6);
-//
-//        for (Point pp : values) {
-//            assertTrue(tree.contains(pp));                 // point added to the tree
-//            assertTrue(distance.distance(pp, p) <= 10.0F);    // and it is in range.
-//        }
-//    }
+    /**
+     * test rangeSearch - performing range search on nested nodes - simple version.
+     */
+    @Test
+    public void findClosestFrom60() {
 
-//    /**
-//     * test rangeSearch - finding nested nodes in nested squares - more complex version.
-//     */
-//    @Test
-//    public void findClosestFromSquares() {
-//
-//        addSquares();
-//
-//        Point p = new Point(0.0F, 0.0F);
-//
-//        // test search in ever increasing circles.
-//        for (float i = 1.0F; i < 50.0F; i++) {
-//            float search_circle = (float) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid float errors
-//            List<DataDistance<Point>> result = tree.rangeSearch(p, search_circle);
-//            List<Point> values = tree.mapValues(result);
-//
-//            for (Point pp : values) {
-//                assertTrue(tree.contains(pp));
-//                assertTrue(distance.distance(pp, p) <= search_circle);    // and it is in range.
-//            }
-//        }
-//    }
+        addNestedPoints();
+        Point p = new Point(15.0F, 0.0F);
+        List<DataDistance<Point>> result = tree.rangeSearch(p, 10.0F);
+        List<Point> values = tree.mapValues(result);
+
+        assertEquals(result.size(), 6);
+
+        for (Point pp : values) {
+            assertTrue(tree.contains(pp));                 // point added to the tree
+            assertTrue(distance.distance(pp, p) <= 10.0F);    // and it is in range.
+        }
+    }
+
+    /**
+     * test rangeSearch - finding nested nodes in nested squares - more complex version.
+     */
+    @Test
+    public void findClosestFromSquares() {
+
+        addSquares();
+
+        Point p = new Point(0.0F, 0.0F);
+
+        // test search in ever increasing circles.
+        for (float i = 1.0F; i < 50.0F; i++) {
+            float search_circle = (float) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid float errors
+            List<DataDistance<Point>> result = tree.rangeSearch(p, search_circle);
+            List<Point> values = tree.mapValues(result);
+
+            for (Point pp : values) {
+                assertTrue(tree.contains(pp));
+                assertTrue(distance.distance(pp, p) <= search_circle);    // and it is in range.
+            }
+        }
+    }
 
     /**
      * test simple nearest neighbour search
@@ -271,25 +273,27 @@ public class MashEuclidean2DTest {
 
         DataDistance<Point> result = tree.nearestNeighbour(p);
 
+
+
         assertEquals(new Point(21.0F, 21.0F),result.value); // closest point to 20.6,20.6 - TODO better tests?
     }
 
-//    /**
-//     * test simple nearest neighbour search
-//     */
-//    @Test
-//    public void findClosestN() {
-//
-//        addSquares();
-//        Point p = new Point(0.0F, 0.0F);
-//        for (int i = 4; i < 50; i += 4) {
-//            // move out in squares of size 4, each loop should include 4 more nodes
-//            List<DataDistance<Point>> result = tree.nearestN(p, i);
-//            List<Point> values = tree.mapValues(result);
-//            assertTrue(result.size() == i);
-//            for (Point pp : values) {
-//                assertTrue(tree.contains(pp));   // TODO How to check that they are the right ones????
-//            }
-//        }
-//    }
+    /**
+     * test simple nearest neighbour search
+     */
+    @Test
+    public void findClosestN() {
+
+        addSquares();
+        Point p = new Point(0.0F, 0.0F);
+        for (int i = 4; i < 50; i += 4) {
+            // move out in squares of size 4, each loop should include 4 more nodes
+            List<DataDistance<Point>> result = tree.nearestN(p, i);
+            List<Point> values = tree.mapValues(result);
+            assertTrue(result.size() == i);
+            for (Point pp : values) {
+                assertTrue(tree.contains(pp));   // TODO How to check that they are the right ones????
+            }
+        }
+    }
 }

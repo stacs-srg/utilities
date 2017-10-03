@@ -18,6 +18,7 @@ package uk.ac.standrews.cs.utilities.m_tree;
 
 import uk.ac.standrews.cs.utilities.lsh.MinHash;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -63,6 +64,33 @@ public class Mash<T> extends MTree<T> {
         String key = km.makeKey(query);
         Set<Node> nodes = minHash.getClosest(key);
         return nnWithHint( query, nodes );
+    }
+
+    /**
+     * Find the closest N nodes to @param query.
+     *
+     * @param query - some data for which to find the nearest N neighbours
+     * @param n     the number of neighbours to return
+     * @return n neighbours (or as many as possible)
+     */
+    @Override
+    public List<DataDistance<T>> nearestN(T query, int n) {
+        String key = km.makeKey(query);
+        Set<Node> node_hints = minHash.getClosest(key);
+
+        if( node_hints.isEmpty() ) { // just add normally                       // copied from nearestNeighbour above
+            return super.nearestN( query,n );
+        }
+
+        // We have some help so try and jump to the right place.
+        // TODO Problem: how to choose the best from the Set?
+        // TODO for now just choose the first
+        // TODO could have a look see and choose a good one here!
+        Node node = node_hints.iterator().next();
+        node = refineCandidate(node,query);
+        ClosestSet results = new ClosestSet(n);
+        super.nearestN( node, n, query, results );
+        return results.values();
     }
 
     //---------------------------------------------------------------------------------------
@@ -153,7 +181,7 @@ public class Mash<T> extends MTree<T> {
 
         // Case 2 we are outside the covering radius, so move up the tree till we are inside.
         if( distance_to_target > candidate.radius ) {
-            while( candidate.parent != null && distance_to_target > candidate.radius ) {
+            while( candidate.parent != null && distance_to_target >= candidate.radius ) {
                 // same code as while loop above but different condition.
                 candidate = candidate.parent; // move back up the tree.
                 distance_to_target = distance_wrapper.distance(candidate.data, query);
@@ -173,6 +201,41 @@ public class Mash<T> extends MTree<T> {
         return super.nearestNeighbour(candidate, null , query); // new DataDistance(candidate.data, distance_to_target)
     }
 
+    private Node refineCandidate(Node candidate, T query) {
+        // There are THREE possibilities:
+        //  1. We are at the root - search at the root.
+        //  2. We are outside of the circle - need to move back up the tree until we are inside the first found.
+
+        //  3. We are inside the circle - need to move back up tree to highest enclosing node
+
+        if( candidate == root ) {   // Case 1 easy.
+            return root;
+        }
+
+        float distance_to_target = distance_wrapper.distance(candidate.data, query);
+
+        // Case 2 we are outside the covering radius, so move up the tree till we are inside.
+        if( distance_to_target > candidate.radius ) {
+            while( candidate.parent != null && distance_to_target >= candidate.radius ) {
+                // same code as while loop above but different condition.
+                candidate = candidate.parent; // move back up the tree.
+                distance_to_target = distance_wrapper.distance(candidate.data, query);
+            }
+            return candidate;
+        }
+
+        // if (distance_to_node - node.radius < closest_thus_far.distance)
+        // By definition the parent also satisfies this condition (nesting of radii).
+        // Need to see if parent is closer.
+
+        while(parent_closer(candidate,distance_to_target,query)) {
+            // this look moves us up the tree and stops at root or largest covering radius.
+            candidate = candidate.parent; // move back up the tree.
+            distance_to_target = distance_wrapper.distance(candidate.data, query);
+        }
+        return candidate;
+    }
+
     /**
      * @param node - a node to examine to see if the parent if closer to a query
      * @param distance_to_node - the distance from the node to the query
@@ -185,7 +248,7 @@ public class Mash<T> extends MTree<T> {
             return false;
         }
         float parent_distance = distance_wrapper.distance(parent.data, query);
-        return parent_distance < distance_to_node && parent_distance < parent.radius;
+        return parent_distance <= distance_to_node && parent_distance < parent.radius;
     }
 
 

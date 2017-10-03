@@ -19,18 +19,19 @@ package uk.ac.standrews.cs.utilities.m_tree;
 import org.junit.Before;
 import org.junit.Test;
 import org.simmetrics.metrics.Levenshtein;
+import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.StringKeyMaker;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MTreeStringEditDistanceTest {
+public class MashStringEditDistanceTest {
 
-    private MTree<String> tree;
+    private Mash<String> tree;
 
     @Before
     public void setUp() throws Exception {
 
-        tree = new MTree<>(new EditDistance());
+        tree = new Mash<>(new EditDistance(),new StringKeyMaker());
     }
 
     /**
@@ -56,6 +57,7 @@ public class MTreeStringEditDistanceTest {
         for (String word : words) {
             tree.add(word);
         }
+
         // tree.showTree();
 
         assertEquals("crash", tree.nearestNeighbour("brash").value);

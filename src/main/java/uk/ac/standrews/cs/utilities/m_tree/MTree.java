@@ -214,6 +214,29 @@ public class MTree<T> {
         }
     }
 
+    public void check_invariants() {
+        check_invariants(root, 0 );
+        System.out.println( "------" );
+
+    }
+
+    public void check_invariants( Node node, int indent ) {
+        for( int i = 0; i < indent; i++ ) { System.out.print( "\t" ); };
+        System.out.println( "checking node: " + node.data + "radius: " + node.radius + " is leaf: " + node.isLeaf() + " count children: " + node.children.size());
+        if( node.isLeaf() ) { assert node.children.size() == 0; }
+        if( node.children.size() == 0 ) { assert node.isLeaf(); }
+        for( Node child : node.children ) {
+            for( int i = 0; i < indent + 1; i++ ) { System.out.print( "\t" ); };
+            System.out.println( "child: " + child.data + "radius: " + child.radius + " is leaf: " + child.isLeaf() + " count children: " + child.children.size() + " parent: " + node.data);
+            assert child.distance_to_parent <= node.radius;
+            assert distance_wrapper.distance( child.data,node.data ) == child.distance_to_parent;
+            assert child.parent == node;
+            assert child.radius <= node.radius;
+            assert distance_wrapper.distance( child.data, node.data ) <= node.radius;
+            if( ! child.isLeaf() ) { check_invariants( child, indent + 1); }
+        }
+    }
+
     /**
      * Find the nodes withing @param RQ of @param T.
      *
@@ -262,7 +285,7 @@ public class MTree<T> {
                 results.add(new DataDistance<>(N.data, distanceNodeToQ));
             }
 
-        } else {
+        } else {  //****** AL IS HERE - THIS LOOKS WRONG TO ME...
             for (Node child : N.children) {
 
                 float distanceQtoParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(parent.data, Q);
@@ -481,6 +504,20 @@ public class MTree<T> {
         }
     }
 
+    /**
+     * @param children - the children to inspect
+     * @return the largest radius of the children
+     */
+    private float maxR( List<Node> children ) {
+        float result = 0.0F;
+        for( Node child : children ) {
+            if( child.radius > result ) {
+                result = child.radius;
+            }
+        }
+        return result;
+
+    }
     /**
      * Helper method for splitting levels (children) of node in the tree
      *
