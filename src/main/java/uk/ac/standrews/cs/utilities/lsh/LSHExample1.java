@@ -1,4 +1,4 @@
-package uk.ac.standrews.cs.utilities.lsh;/*
+/*
  * Copyright 2017 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
@@ -14,6 +14,7 @@ package uk.ac.standrews.cs.utilities.lsh;/*
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+package uk.ac.standrews.cs.utilities.lsh;
 
 import java.util.Set;
 
