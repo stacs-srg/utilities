@@ -14,39 +14,37 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
+package uk.ac.standrews.cs.utilities.mi_file;
 
-public class Point implements Comparable<Point> {
+/**
+ *
+ * @author Amato
+ */
+public class PostingListEntry<T> implements Comparable<PostingListEntry<T>> {
 
-    float x;
-    float y;
+    private final T object;
+    private final int score;
 
-    public Point(float x, float y) {
-        this.x = x;
-        this.y = y;
+    public PostingListEntry(T o, int s) {
+        object = o;
+        score = s;
+    }
+
+    public T getObject() {
+        return object;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public String toString() {
-        return "[" + x + "," + y + "]";
+        return "object: " + object + " score: " + score;
     }
 
-    public boolean equals(Object o) {
-
-        if (o instanceof Point) {
-            Point p = (Point) o;
-            return x == p.x && y == p.y;
-
-        } else return false;
-    }
 
     @Override
-    public int compareTo(Point o) {
-        return this.magnitude() > o.magnitude() ? +1 : this.magnitude() < o.magnitude() ? -1 : 0;
+    public int compareTo(PostingListEntry<T> o) {
+        return this.score > o.score ? +1 : this.score < o.score ? -1 : 0;
     }
-
-    private double magnitude() {
-        return Math.sqrt( ( x * x ) + ( y * y ) );
-    }
-
-
 }
