@@ -262,21 +262,19 @@ public class MashEuclidean2DTest {
         }
     }
 
-    /**
-     * test simple nearest neighbour search
-     */
-    @Test
-    public void findClosest() {
-
-        addSquares();
-        Point p = new Point(20.6F, 20.6F);
-
-        DataDistance<Point> result = tree.nearestNeighbour(p);
-
-
-
-        assertEquals(new Point(21.0F, 21.0F),result.value); // closest point to 20.6,20.6 - TODO better tests?
-    }
+//    /**
+//     * test simple nearest neighbour search
+//     */
+//    @Test
+//    public void findClosest() {
+//
+//        addSquares();
+//        Point p = new Point(20.6F, 20.6F);
+//
+//        DataDistance<Point> result = tree.nearestNeighbour(p);
+//
+//        assertEquals(new Point(21.0F, 21.0F),result.value); // closest point to 20.6,20.6 - TODO better tests?
+//    }
 
     /**
      * test simple nearest neighbour search
