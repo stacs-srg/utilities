@@ -69,7 +69,7 @@ public class MIFile<T> {
         this.reference_objects = reference_objects;
         n_ro = reference_objects.size();
         if( ki >= n_ro ) {
-            throw new Exception( "Illegal number of reference objects - Ki must be smaller than number");
+            throw new Exception( "Illegal number of reference objects - Ki (" + ki + ") must be smaller than number of reference objects (" + n_ro + ")" );
         }
         this.ki = ki;
         this.ks = ks;
