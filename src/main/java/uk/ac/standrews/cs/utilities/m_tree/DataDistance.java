@@ -24,9 +24,9 @@ package uk.ac.standrews.cs.utilities.m_tree;
 public class DataDistance<T> {
 
     public T value;
-    public double distance;
+    public float distance;
 
-    public DataDistance(T data, double distance) {
+    public DataDistance(T data, float distance) {
         this.value = data;
         this.distance = distance;
     }

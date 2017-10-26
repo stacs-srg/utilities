@@ -143,9 +143,9 @@ public class MTree<T> {
      * @return the set of distances from the list
      */
     @SuppressWarnings("unused")
-    public List<Double> mapDistances(List<DataDistance<T>> data_distances) {
+    public List<Float> mapDistances(List<DataDistance<T>> data_distances) {
 
-        List<Double> result = new ArrayList<>();
+        List<Float> result = new ArrayList<>();
         for (DataDistance<T> dd : data_distances) {
             result.add(dd.distance);
         }
@@ -288,9 +288,9 @@ public class MTree<T> {
 
         if (N.isLeaf()) {
 
-            double distanceNodeToQ = distance_wrapper.distance(N.data, Q);
+            float distanceNodeToQ = distance_wrapper.distance(N.data, Q);
             if (distanceNodeToQ <= RQ) {
-                results.add(new DataDistance<>(N.data, distanceNodeToQ));
+                results.add(new DataDistance<T>(N.data, distanceNodeToQ));
             }
 
         } else {
@@ -354,17 +354,17 @@ public class MTree<T> {
     DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
 
         if (node.data.equals(query)) {
-            return new DataDistance<>(node.data, 0.0);
+            return new DataDistance<T>(node.data, 0.0f);
         }
 
-        final double distance_to_node = distance_wrapper.distance(node.data, query);
+        final float distance_to_node = distance_wrapper.distance(node.data, query);
         if (closest_thus_far == null) {
-            closest_thus_far = new DataDistance<>(node.data, distance_to_node);
+            closest_thus_far = new DataDistance<T>(node.data, distance_to_node);
         }
 
         if (node.isLeaf()) { // is not equal and we are at a leaf
             if (distance_to_node < closest_thus_far.distance) { // this node is closer
-                return new DataDistance<>(node.data, distance_to_node);
+                return new DataDistance<T>(node.data, distance_to_node);
             }
             return closest_thus_far; // we are not any closer.
         }
@@ -403,7 +403,7 @@ public class MTree<T> {
 
         if (node.isLeaf()) { // we are at a leaf - see if ths is closer than other nodes in results
 
-            double node_distance = distance_wrapper.distance(node.data, query);
+            float node_distance = distance_wrapper.distance(node.data, query);
             if (results.size() < n) { // fill up the list without checking until at capacity
                 results.addInDistanceOrder(node.data, node_distance);
 
@@ -733,11 +733,11 @@ public class MTree<T> {
             return closest.size();
         }
 
-        private void addInDistanceOrder(T data, double distance) {
+        private void addInDistanceOrder(T data, float distance) {
 
             int index;
             if (closest.size() == 0) {
-                closest.add(0, new DataDistance<>(data, distance));
+                closest.add(0, new DataDistance<T>(data, distance));
                 return;
             }
             for (index = 0; index < closest.size(); index++) {
@@ -748,7 +748,7 @@ public class MTree<T> {
                     return;
                 }
             }
-            closest.add(index, new DataDistance<>(data, distance)); // add at the end
+            closest.add(index, new DataDistance<T>(data, distance)); // add at the end
             checkEvict();
             // if we get here then the new element is further than rest so should not be added.
         }
