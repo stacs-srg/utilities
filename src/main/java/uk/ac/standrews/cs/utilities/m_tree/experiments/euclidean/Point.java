@@ -18,10 +18,10 @@ package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
 
 public class Point implements Comparable<Point> {
 
-    double x;
-    double y;
+    float x;
+    float y;
 
-    public Point(double x, double y) {
+    public Point(float x, float y) {
         this.x = x;
         this.y = y;
     }

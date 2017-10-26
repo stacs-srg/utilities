@@ -20,15 +20,12 @@ import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 public class EuclideanDistance implements Distance<Point> {
 
-    public double distance(Point p1, Point p2) {
+    public float distance(Point p1, Point p2) {
 
-        double xdistance = p1.x - p2.x;
-        double ydistance = p1.y - p2.y;
+        float xdistance = p1.x - p2.x;
+        float ydistance = p1.y - p2.y;
 
-        double dist = Math.sqrt((xdistance * xdistance) + (ydistance * ydistance));
-    double coerced = (double)dist;
-    boolean stop = (p1.x == 42.0f || p2.x == 42.0f)&& xdistance==7.0f;
-        return (double) Math.sqrt((xdistance * xdistance) + (ydistance * ydistance));
+        return (float) Math.sqrt((xdistance * xdistance) + (ydistance * ydistance));
     }
 }
 

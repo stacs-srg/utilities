@@ -29,7 +29,7 @@ public class MTree<T> {
 
     private static final int DEFAULT_MAX_LEVEL_SIZE = 20;
     private final int level_size; // size of a level
-    private static final double EPSILON = 0.0000001; // A small Double to avoid checking with zero.
+    private static final float EPSILON = 0.00001f; // A small float to avoid checking with zero.
     final Distance<T> distance_wrapper;
 
     Node root = null;

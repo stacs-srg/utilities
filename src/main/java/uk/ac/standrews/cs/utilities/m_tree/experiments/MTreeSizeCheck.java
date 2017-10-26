@@ -60,7 +60,7 @@ public class MTreeSizeCheck {
 
         Random random = new Random();
         for (int count = 0; count < size; count++) {
-            tree.add(new Point(random.nextDouble(), random.nextDouble()));
+            tree.add(new Point(random.nextFloat(), random.nextFloat()));
             indicator.progressStep();
         }
         long elapsed = (System.currentTimeMillis() - time) / 1000;
