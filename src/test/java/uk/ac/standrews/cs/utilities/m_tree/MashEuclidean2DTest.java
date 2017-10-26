@@ -86,13 +86,13 @@ public class MashEuclidean2DTest {
     public void addLinear15() {
 
         for (int i = 0; i < 15; i++) {
-            tree.add(new Point((float) i, 0.0F));
+            tree.add(new Point((double) i, 0.0F));
         }
 
         assertEquals(15, tree.size());
 
         for (int i = 0; i < 15; i++) {
-            assertTrue(tree.contains(new Point((float) i, 0.0F)));
+            assertTrue(tree.contains(new Point((double) i, 0.0F)));
         }
     }
 
@@ -105,29 +105,29 @@ public class MashEuclidean2DTest {
 
         // lay down 20 points in a line
         for (int i = 0; i < 3; i++) {
-            tree.add(new Point((float) i * 10, 0.0F));
+            tree.add(new Point((double) i * 10, 0.0F));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 3; i++) {
-            tree.add(new Point((float) (i * 10) + 4.0F, 0.0F));
+            tree.add(new Point((double) (i * 10) + 4.0F, 0.0F));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 3; i++) {
-            tree.add(new Point((float) (i * 10) + 4.5F, 0.0F));
+            tree.add(new Point((double) (i * 10) + 4.5F, 0.0F));
         }
 
         assertEquals(9, tree.size());
 
         for (int i = 0; i < 3; i++) {
-            assertTrue(tree.contains(new Point((float) i * 10, 0.0F)));
+            assertTrue(tree.contains(new Point((double) i * 10, 0.0F)));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 3; i++) {
-            assertTrue(tree.contains(new Point((float) (i * 10) + 4.0F, 0.0F)));
+            assertTrue(tree.contains(new Point((double) (i * 10) + 4.0F, 0.0F)));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 3; i++) {
-            assertTrue(tree.contains(new Point((float) (i * 10) + 4.5F, 0.0F)));
+            assertTrue(tree.contains(new Point((double) (i * 10) + 4.5F, 0.0F)));
         }
     }
 
@@ -139,7 +139,7 @@ public class MashEuclidean2DTest {
 
         int count = 0;
 
-        for (float step = 1.0F; step < 50.0F; step++) {
+        for (double step = 1.0F; step < 50.0F; step++) {
 
             tree.add(new Point(+step, +step));
             count++;
@@ -164,7 +164,7 @@ public class MashEuclidean2DTest {
         int count = addSquares();
         assertEquals(count, tree.size());
 
-        for (float step = 1.0F; step < 50.0F; step++) {
+        for (double step = 1.0F; step < 50.0F; step++) {
 
             assertTrue(tree.contains(new Point(+step, +step)));
             assertTrue(tree.contains(new Point(-step, +step)));
@@ -181,17 +181,17 @@ public class MashEuclidean2DTest {
 
         // lay down 20 points in a line
         for (int i = 0; i < 20; i++) {
-            tree.add(new Point((float) i * 10, 0.0F));
+            tree.add(new Point((double) i * 10, 0.0F));
             //t.showTree();
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 20; i++) {
-            tree.add(new Point((float) (i * 10) + 4.0F, 0.0F));
+            tree.add(new Point((double) (i * 10) + 4.0F, 0.0F));
             //t.showTree();
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 20; i++) {
-            tree.add(new Point((float) (i * 10) + 4.5F, 0.0F));
+            tree.add(new Point((double) (i * 10) + 4.5F, 0.0F));
             //t.showTree();
         }
     }
@@ -208,15 +208,15 @@ public class MashEuclidean2DTest {
         assertEquals(60, tree.size());
 
         for (int i = 0; i < 20; i++) {
-            assertTrue(tree.contains(new Point((float) i * 10, 0.0F)));
+            assertTrue(tree.contains(new Point((double) i * 10, 0.0F)));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 20; i++) {
-            assertTrue(tree.contains(new Point((float) (i * 10) + 4.0F, 0.0F)));
+            assertTrue(tree.contains(new Point((double) (i * 10) + 4.0F, 0.0F)));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 20; i++) {
-            assertTrue(tree.contains(new Point((float) (i * 10) + 4.5F, 0.0F)));
+            assertTrue(tree.contains(new Point((double) (i * 10) + 4.5F, 0.0F)));
         }
     }
 
@@ -250,8 +250,8 @@ public class MashEuclidean2DTest {
         Point p = new Point(0.0F, 0.0F);
 
         // test search in ever increasing circles.
-        for (float i = 1.0F; i < 50.0F; i++) {
-            float search_circle = (float) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid float errors
+        for (double i = 1.0F; i < 50.0F; i++) {
+            double search_circle = (double) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid double errors
             List<DataDistance<Point>> result = tree.rangeSearch(p, search_circle);
             List<Point> values = tree.mapValues(result);
 

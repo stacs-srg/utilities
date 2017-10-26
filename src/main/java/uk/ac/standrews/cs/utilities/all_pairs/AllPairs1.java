@@ -27,7 +27,7 @@ import java.util.List;
 public class AllPairs1 {
 
 
-    private final float similarity_threshold;
+    private final double similarity_threshold;
     private final List<String> corpus;
     private int shingle_size = 2;
 
@@ -39,7 +39,7 @@ public class AllPairs1 {
     private HashMap<String,Integer> max_weights = new HashMap<>();    // the maximum weights for each feature (qgram)
     private HashMap<String,FeatureVector> feature_vectors = new HashMap<>();   // the feature associated with each document in the corpus.
 
-    private AllPairs1(float similarity, List<String> corpus ) {
+    private AllPairs1(double similarity, List<String> corpus ) {
         this.corpus = corpus;
         this.similarity_threshold = similarity;
         initialise( corpus );

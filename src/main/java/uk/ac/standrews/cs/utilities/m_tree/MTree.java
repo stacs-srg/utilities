@@ -27,17 +27,25 @@ import java.util.List;
  */
 public class MTree<T> {
 
-    private static final int MAX_LEVEL_SIZE = 20;
+    private static final int DEFAULT_MAX_LEVEL_SIZE = 20;
+    private final int level_size; // size of a level
+    private static final double EPSILON = 0.0000001; // A small Double to avoid checking with zero.
     final Distance<T> distance_wrapper;
 
     Node root = null;
 
-
     int num_entries = 0;
 
-    public MTree(Distance<T> d) {
+    public MTree(Distance<T> d, int level_size ) {
 
         distance_wrapper = d;
+        this.level_size = level_size;
+    }
+
+    public MTree(Distance<T> d ) {
+
+        this( d, DEFAULT_MAX_LEVEL_SIZE );
+
     }
 
     /**
@@ -70,7 +78,7 @@ public class MTree<T> {
      * @param r     the distance from query over which to search
      * @return all those nodes within r of @param T.
      */
-    public List<DataDistance<T>> rangeSearch(T query, float r) {
+    public List<DataDistance<T>> rangeSearch(T query, double r) {
 
         ArrayList<DataDistance<T>> results = new ArrayList<>();
         rangeSearch(root, query, r, results);
@@ -105,7 +113,7 @@ public class MTree<T> {
 
         num_entries++;
         if (root == null) {
-            root = new Node(data, null);
+            root = new Node(data, null, 0.0f);
         } else {
             add(root, data);
         }
@@ -135,9 +143,9 @@ public class MTree<T> {
      * @return the set of distances from the list
      */
     @SuppressWarnings("unused")
-    public List<Float> mapDistances(List<DataDistance<T>> data_distances) {
+    public List<Double> mapDistances(List<DataDistance<T>> data_distances) {
 
-        List<Float> result = new ArrayList<>();
+        List<Double> result = new ArrayList<>();
         for (DataDistance<T> dd : data_distances) {
             result.add(dd.distance);
         }
@@ -238,7 +246,7 @@ public class MTree<T> {
     }
 
     /**
-     * Find the nodes withing @param RQ of @param T.
+     * Find the nodes withing @param RQ of @param Q.
      *
      * @param N  - the node we are searching
      * @param Q  the query data
@@ -274,26 +282,26 @@ public class MTree<T> {
      *           }
      *           </pre>
      */
-    void rangeSearch(Node N, T Q, float RQ, ArrayList<DataDistance<T>> results) {
+    void rangeSearch(Node N, T Q, double RQ, ArrayList<DataDistance<T>> results) {
 
         Node parent = N.parent;
 
         if (N.isLeaf()) {
 
-            float distanceNodeToQ = distance_wrapper.distance(N.data, Q);
+            double distanceNodeToQ = distance_wrapper.distance(N.data, Q);
             if (distanceNodeToQ <= RQ) {
                 results.add(new DataDistance<>(N.data, distanceNodeToQ));
             }
 
-        } else {  //****** AL IS HERE - THIS LOOKS WRONG TO ME...
+        } else {
             for (Node child : N.children) {
 
-                float distanceQtoParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(parent.data, Q);
-                float distanceChildToParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(child.data, parent.data);
+                double distanceQtoParent = parent == null ? Double.MAX_VALUE : distance_wrapper.distance(parent.data, Q);
+                double distanceChildToParent = parent == null ? Double.MAX_VALUE : distance_wrapper.distance(parent.data,child.data);
 
                 if (parent == null || Math.abs(distanceQtoParent - distanceChildToParent) <= RQ + child.radius) {
 
-                    float distanceChildToQ = distance_wrapper.distance(child.data, Q);
+                    double distanceChildToQ = distance_wrapper.distance(child.data, Q);
                     if (distanceChildToQ <= RQ + child.radius) {
                         rangeSearch(child, Q, RQ, results);
                     }
@@ -318,15 +326,17 @@ public class MTree<T> {
 
         // node has children and is not equal itself.
         // see if the data is within range of node
-        if (Math.abs(distance_wrapper.distance(node.data, query) - node.radius + Float.MIN_VALUE) < Float.MIN_VALUE) {
+            if (distance_wrapper.distance(node.data, query) - node.radius > EPSILON ) { // no optimisation possible here
             // search data is outside of range
             return false;
 
         } else { // the data may be inside this ball
             // need to check children
             for (Node child : node.children) {
-                if (contains(child, query)) {
-                    return true;
+                if( ! child.data.equals(node.data)) { // first child holds the same data as the node
+                    if (contains(child, query)) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -344,10 +354,10 @@ public class MTree<T> {
     DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
 
         if (node.data.equals(query)) {
-            return new DataDistance<>(node.data, 0.0F);
+            return new DataDistance<>(node.data, 0.0);
         }
 
-        final float distance_to_node = distance_wrapper.distance(node.data, query);
+        final double distance_to_node = distance_wrapper.distance(node.data, query);
         if (closest_thus_far == null) {
             closest_thus_far = new DataDistance<>(node.data, distance_to_node);
         }
@@ -369,7 +379,7 @@ public class MTree<T> {
      * @return
      */
     DataDistance<T> search_children( Node node, DataDistance<T> closest_thus_far,T query ) {
-        float distance_to_node = closest_thus_far.distance;
+        double distance_to_node = closest_thus_far.distance;
         if (distance_to_node - node.radius < closest_thus_far.distance) {
             // may be interesting results in the children
             for (Node child : node.children) {
@@ -393,7 +403,7 @@ public class MTree<T> {
 
         if (node.isLeaf()) { // we are at a leaf - see if ths is closer than other nodes in results
 
-            float node_distance = distance_wrapper.distance(node.data, query);
+            double node_distance = distance_wrapper.distance(node.data, query);
             if (results.size() < n) { // fill up the list without checking until at capacity
                 results.addInDistanceOrder(node.data, node_distance);
 
@@ -406,7 +416,7 @@ public class MTree<T> {
         }
 
         // see if we need to check out the children;
-        float node_distance = distance_wrapper.distance(node.data, query);
+        double node_distance = distance_wrapper.distance(node.data, query);
 
         if (results.size() == 0 || node_distance - node.radius < results.furthestDistance()) {
             // may be nodes in tree closer than those in results
@@ -418,24 +428,25 @@ public class MTree<T> {
     }
 
     /**
-     * Insert some data into a leaf of the Tree.
+     * Insert some data into a node of the Tree.
      *
-     * @param node - the parent of the current node.
+     * @param subTree - the sub-tree into which the data is inserted.
      * @param data - the data to add into the children
+     * @param distance_to_parent
      */
-    private Node leafInsert(Node node, T data) {
+    private Node insertIntoNode(Node subTree, T data, double distance_to_parent) {
 
-        if ((node.isFull())) {
-            return split(node, new Node(data, null));
+        if ((subTree.isFull())) {
+            return split(subTree, new Node(data, null, 0.0f));
 
         } else {
-            if (node.isEmpty()) {
-                Node newnode = new Node(node.data, node);
-                node.addChild(newnode); // we making a leaf into an intermediate node - add Node to its own children
+            if (subTree.isEmpty()) {
+                Node copyOfParent = new Node(subTree.data, subTree, 0.0f);
+                subTree.addChild(copyOfParent, 0.0f); // we making a leaf into an intermediate node - add Node to its own children
             }
-            Node newnode = new Node(data, node);
-            node.addChild(newnode); // children is not yet full - put the data into the children
-            return newnode;
+            Node newLeaf = new Node(data, subTree, distance_to_parent);
+            subTree.addChild(newLeaf, distance_to_parent); // children is not yet full - put the data into the children
+            return newLeaf;
         }
     }
 
@@ -451,15 +462,15 @@ public class MTree<T> {
 
         Node enclosing_pivot = null;
         Node closest_pivot = null;
-        float smallest_distance = -1.0F; // illegal distance
+        double smallest_distance = -1.0; // illegal distance
 
         // find the most appropriate child.
         for (Node child : node.children) {
-            float new_distance = distance_wrapper.distance(child.data, data);
+            double new_distance = distance_wrapper.distance(child.data, data);
 
             if (new_distance < child.radius) { // we are inside the radius of the current existing pivot - new node falls in within this ball
 
-                if (new_distance < smallest_distance || smallest_distance == -1.0F) { // we are closer to this pivot than any previous pivots
+                if (new_distance < smallest_distance || smallest_distance == -1.0) { // we are closer to this pivot than any previous pivots
 
                     enclosing_pivot = child;
                     smallest_distance = new_distance;
@@ -467,11 +478,7 @@ public class MTree<T> {
 
             } else if (enclosing_pivot == null) { // not found any pivot within whose radius the new data falls
 
-                if (closest_pivot == null) {
-                    // no candidates yet so make this one the closest
-                    smallest_distance = new_distance;
-                    closest_pivot = child;
-                } else if (new_distance < smallest_distance) { // this pivot is closer.
+                if (closest_pivot == null || new_distance < smallest_distance) { // this pivot is closer or was null
                     smallest_distance = new_distance;
                     closest_pivot = child;
                 }
@@ -480,21 +487,22 @@ public class MTree<T> {
 
         if (enclosing_pivot == null) { // didn't find an enclosing pivot - put it in the closest.
 
-            if (closest_pivot == null || distance_wrapper.distance(node.data, data) <= smallest_distance) { // this node is closer to the new data
-                return leafInsert(node, data);
+            final double distance = distance_wrapper.distance(node.data, data);
+            if (closest_pivot == null || distance <= smallest_distance) { // this node is closer to the new data
+                return insertIntoNode(node, data, distance);
 
             } else { // one of the children is closer
-                float old_radius = closest_pivot.radius;
+                double old_radius = closest_pivot.radius;
                 Node newnode = add(closest_pivot, data);
                 // now check to see if the radius has changed
-                float new_radius = closest_pivot.radius;
+                double new_radius = closest_pivot.radius;
 
                 if (new_radius > old_radius) { // the radius has grown
-                    float new_distance_to_pivot = distance_wrapper.distance(node.data, closest_pivot.data);
+                    double new_distance_to_pivot = distance_wrapper.distance(node.data, closest_pivot.data);
 
                     // now check if the parent radius needs to be adjusted too.
                     if (new_distance_to_pivot + new_radius > node.radius) {
-                        node.radius = new_distance_to_pivot + new_radius;
+                        node.radius = new_distance_to_pivot + new_radius; // Make the enclosing circle bigger
                     }
                 }
                 return newnode;
@@ -508,8 +516,8 @@ public class MTree<T> {
      * @param children - the children to inspect
      * @return the largest radius of the children
      */
-    private float maxR( List<Node> children ) {
-        float result = 0.0F;
+    private double maxR( List<Node> children ) {
+        double result = 0.0;
         for( Node child : children ) {
             if( child.radius > result ) {
                 result = child.radius;
@@ -534,7 +542,7 @@ public class MTree<T> {
         // two new nodes. Naturally, the overflow may propagate towards the root node and,
         // if the root splits, a new root is created and the tree grows up one level.
 
-        N.addChild(oN);  // add oN into children - now over full
+        N.addChild(oN, distance_wrapper.distance(N.data, oN.data));  // add oN into children - now over full
 
         // but we are about to perform a split - makes computation easier.
         // Select a new pivot from the children (with data added).
@@ -542,7 +550,7 @@ public class MTree<T> {
         // select a second pivot on which to partition S to S1 and S2 according to N and new_pivot:
         Node pivot_node = selectPivot(N, N.children);
 
-        Node new_pivot = new Node(pivot_node.data, null);
+        Node new_pivot = new Node(pivot_node.data, null, 0.0);
 
         // Partition children of N to s1 and s2 according to N and new_pivot
         PairOfNodeLists partition = partitionChildrenIntoPivots(N, new_pivot, N.children);
@@ -553,11 +561,11 @@ public class MTree<T> {
         N.children = new ArrayList<>(); // get rid of existing children of the node before reallocation
 
         // allocate the children from s1 and s2 to N and new pivot
-        for (Node n : s1) {
-            N.addChild(n);                // radii are adjusted as nodes are added
+        for (Node partion1_child : s1) {
+            N.addChild(partion1_child, distance_wrapper.distance(N.data, partion1_child.data));                // radii are adjusted as nodes are added
         }
-        for (Node n : s2) {
-            new_pivot.addChild(n);        // radii are adjusted as nodes are added
+        for (Node partition2_child : s2) {
+            new_pivot.addChild(partition2_child, distance_wrapper.distance(new_pivot.data, partition2_child.data));        // radii are adjusted as nodes are added
         }
 
         // Now have the new_pivot unallocated so we try and put it in the parent of N
@@ -570,7 +578,7 @@ public class MTree<T> {
 
             // make the tree one level deeper.
 
-            root.addChild(N);
+            root.addChild(N, distance_wrapper.distance(new_pivot.data, N.data));
 
         } else {
             // it is a regular node - not the root - it has a a parent into which we can try to insert new_node
@@ -583,7 +591,7 @@ public class MTree<T> {
             if (Np.isFull()) {
                 split(Np, new_pivot);
             } else {
-                Np.addChild(new_pivot);
+                Np.addChild(new_pivot, distance_wrapper.distance(Np.data, new_pivot.data));
             }
         }
         return new_pivot;
@@ -605,8 +613,8 @@ public class MTree<T> {
         List<Node> partition2 = new ArrayList<>();
 
         for (Node child : s) {
-            float r1 = distance_wrapper.distance(p1.data, child.data);
-            float r2 = distance_wrapper.distance(p2.data, child.data);
+            double r1 = distance_wrapper.distance(p1.data, child.data);
+            double r2 = distance_wrapper.distance(p2.data, child.data);
 
             if (r1 < r2) {
                 partition1.add(child);
@@ -663,15 +671,15 @@ public class MTree<T> {
     protected class Node {
 
         public T data;
-        float radius;
-        float distance_to_parent;
+        double radius;
+        double distance_to_parent;
         Node parent;  
         List<Node> children;
 
-        Node(T oN, Node parent) {
+        Node(T oN, Node parent, double distance_to_parent) {
             data = oN;
-            radius = 0.0F;
-            distance_to_parent = parent == null ? 0 : distance_wrapper.distance(oN, parent.data);
+            radius = 0.0;
+            this.distance_to_parent = distance_to_parent;
             children = new ArrayList<>();
             this.parent = parent;
         }
@@ -681,25 +689,25 @@ public class MTree<T> {
          * Pre condition this is only called where a split has already occurred and parent is not full
          *
          * @param newNode the node to add to the Node
+         * @param distance_to_parent
          */
-        void addChild(Node newNode) {
+        void addChild(Node newNode, double distance_to_parent) {
 
             children.add(newNode);
-            float new_distance = distance_wrapper.distance(this.data, newNode.data);
-            newNode.distance_to_parent = new_distance;
+            newNode.distance_to_parent = distance_to_parent;
             newNode.parent = this;
-            float new_radii = new_distance + newNode.radius;
-            if (new_radii > radius) {
-                radius = new_radii;
+            double new_radius = distance_to_parent + newNode.radius;
+            if (new_radius > radius) {
+                radius = new_radius;
             }
         }
 
         boolean isLeaf() {
-            return radius == 0.0F;
+            return radius == 0.0;
         }
 
         boolean isFull() {
-            return children.size() >= MTree.MAX_LEVEL_SIZE;
+            return children.size() >= level_size;
         }
 
         boolean isEmpty() {
@@ -725,7 +733,7 @@ public class MTree<T> {
             return closest.size();
         }
 
-        private void addInDistanceOrder(T data, float distance) {
+        private void addInDistanceOrder(T data, double distance) {
 
             int index;
             if (closest.size() == 0) {
@@ -745,7 +753,7 @@ public class MTree<T> {
             // if we get here then the new element is further than rest so should not be added.
         }
 
-        float furthestDistance() {
+        double furthestDistance() {
 
             DataDistance furthest_element = closest.get(closest.size() - 1);
             return furthest_element.distance;

@@ -27,7 +27,7 @@ import java.util.List;
 public class AllPairs {
 
 
-    private final float similarity_threshold;
+    private final double similarity_threshold;
     private int shingle_size = 2;
 
 //    O = Map from feature to pairs of documents and their similarity_threshold.
@@ -38,7 +38,7 @@ public class AllPairs {
     private HashMap<String,List<DocumentFeaturePair>> indexMap = new HashMap<>(); // maps from a qgram (a feature) to those docs that have that feature.
     private HashMap<String,List<SimilarityPair>> all_matches =  new HashMap<>(); // indexed by orginal string.
 
-    public AllPairs(float similarity ) {
+    public AllPairs(double similarity ) {
         this.similarity_threshold = similarity;
     }
 

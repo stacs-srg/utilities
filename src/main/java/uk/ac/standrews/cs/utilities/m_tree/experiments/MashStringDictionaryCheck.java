@@ -126,7 +126,7 @@ public class MashStringDictionaryCheck {
         Levenshtein levenshtein = new Levenshtein();
 
         @Override
-        public float distance(String s1, String s2) {
+        public double distance(String s1, String s2) {
 
             return levenshtein.distance(s1, s2);
         }

@@ -26,23 +26,23 @@ import java.util.*;
  */
 public class CandidateSet<T> {
     private final int maxEntries;
-    private final TreeMap<Float, T> orderedRes;         //here we maintain the k current best using the distance as entry
-    private final HashMap<T,Float> objectsOfOrderedRes; //here we maintain the k current best using the data as entry
+    private final TreeMap<Double, T> orderedRes;         //here we maintain the k current best using the distance as entry
+    private final HashMap<T,Double> objectsOfOrderedRes; //here we maintain the k current best using the data as entry
     private final T query;                              // the object for which we are finding NN.
     private final Distance<T> distance_wrapper;
     private int k;                                      // number of objects to be retrieved
 
-    private double kDist = Float.MAX_VALUE;
+    private double kDist = Double.MAX_VALUE;
 
-    private HashMap<T,Float> tempResults = new HashMap<>(); // Temporary results?
+    private HashMap<T,Double> tempResults = new HashMap<>(); // Temporary results?
 
     public CandidateSet(T query, Distance<T> distance_wrapper, int maxEntries, int k) {
         this.query = query;
         this.distance_wrapper = distance_wrapper;
         this.maxEntries=maxEntries;
         this.k = k;
-        orderedRes = new TreeMap<Float,T>();
-        objectsOfOrderedRes = new HashMap<T,Float>();
+        orderedRes = new TreeMap<Double,T>();
+        objectsOfOrderedRes = new HashMap<T,Double>();
         tempResults = new HashMap<>();
     }
 
@@ -50,9 +50,9 @@ public class CandidateSet<T> {
 
         int increment = Math.abs( position - score ); //the "spearman footrule" distance is the sum of the position differences
 
-        float currentScore = 0.0f;
+        double currentScore = 0.0f;
 
-        Float i = tempResults.get(object);
+        Double i = tempResults.get(object);
         if ( i != null ) {
             currentScore = i - maxEntries + increment;
             i = currentScore;
@@ -60,7 +60,7 @@ public class CandidateSet<T> {
             currentScore = maxEntries * ( postingListToBeAccessed - 1 ) + increment; /* all ints? */
         }
 
-        float minDist=currentScore-maxEntries*(postingListToBeAccessed-accessedPostingLists); // the minimum distance this object can reach
+        double minDist=currentScore-maxEntries*(postingListToBeAccessed-accessedPostingLists); // the minimum distance this object can reach
 
         if( minDist > kDist ) {
             tempResults.remove(object);
@@ -76,7 +76,7 @@ public class CandidateSet<T> {
     public List<DataDistance<T>> getDataDistances() {
         List<DataDistance<T>> result = new ArrayList<>();
 
-        for( Map.Entry<Float, T> entry : orderedRes.entrySet() ) {
+        for( Map.Entry<Double, T> entry : orderedRes.entrySet() ) {
             result.add( new DataDistance<>( entry.getValue(), distance_wrapper.distance( entry.getValue(), query ) ) );
 
         }
@@ -85,12 +85,12 @@ public class CandidateSet<T> {
 
     //-------------------------------------------------------------
 
-    private void orderedInsert(T object, float dist){
-        float rdist = 0;
+    private void orderedInsert(T object, double dist){
+        double rdist = 0;
 
         if( orderedRes.size() < k ) { // the list is not full - we can do the insert.
 
-            Float d = eliminateDuplicateObjects(object);  // if it is already in objectsOfOrderedRes we remove it
+            Double d = eliminateDuplicateObjects(object);  // if it is already in objectsOfOrderedRes we remove it
             if ( d != null ) {                            // it was in the above collection - so remove it from the other data structure
                 eliminateDuplicateDistances(d);
             } // next do the insertion in the lists
@@ -106,7 +106,7 @@ public class CandidateSet<T> {
         }
         else if( dist < kDist ) {
 
-            Float d = eliminateDuplicateObjects(object);  // if it is already in objectsOfOrderedRes we remove it
+            Double d = eliminateDuplicateObjects(object);  // if it is already in objectsOfOrderedRes we remove it
             if ( d != null ) {                            // it was in the above collection - so remove it from the other data structure
                 eliminateDuplicateDistances(d);
             }
@@ -127,12 +127,12 @@ public class CandidateSet<T> {
         }
     }
 
-    private Float eliminateDuplicateObjects( T object ){
+    private Double eliminateDuplicateObjects( T object ){
         return objectsOfOrderedRes.remove(object );
     }
 
     //if object o is already one of the k current best, we eliminate it
-    private T eliminateDuplicateDistances(float d){
+    private T eliminateDuplicateDistances(double d){
         return orderedRes.remove(d);
     }
 

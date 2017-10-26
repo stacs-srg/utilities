@@ -18,5 +18,5 @@ package uk.ac.standrews.cs.utilities.m_tree;
 
 public interface Distance<T> {
 
-    float distance(T a, T b);
+    double distance(T a, T b);
 }

@@ -58,9 +58,9 @@ public class MinHashTest {
         Set<String> input1_2grams = MinHash.ngrams(input1,2);
         Set<String> input2_2grams = MinHash.ngrams(input2,2);
 
-        float jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
+        double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
-        float jacquard_minhash = Jaccard.jaccard(
+        double jacquard_minhash = Jaccard.jaccard(
                 toCollection(MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE, 2)));
 
@@ -79,9 +79,9 @@ public class MinHashTest {
         Set<String> input1_2grams = MinHash.ngrams(input1,2);
         Set<String> input2_2grams = MinHash.ngrams(input2,2);
 
-        float jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
+        double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
-        float jacquard_minhash = Jaccard.jaccard(
+        double jacquard_minhash = Jaccard.jaccard(
                 toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 
@@ -100,9 +100,9 @@ public class MinHashTest {
         Set<String> input1_2grams = MinHash.ngrams(input1,2);
         Set<String> input2_2grams = MinHash.ngrams(input2,2);
 
-        float jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
+        double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
-        float jacquard_minhash = Jaccard.jaccard(
+        double jacquard_minhash = Jaccard.jaccard(
                 toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 

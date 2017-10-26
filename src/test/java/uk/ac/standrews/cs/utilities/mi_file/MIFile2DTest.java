@@ -45,7 +45,7 @@ public class MIFile2DTest {
 
     private Set<Point> createReferenceObjects() {
         Set<Point> pts = new HashSet<>();
-        for (float step = 10.0F; step < 80.0F; step+=10.0F) {
+        for (double step = 10.0F; step < 80.0F; step+=10.0F) {
 
             pts.add(new Point(+step + 1.0f, +step + 2.0f ));
             pts.add(new Point(-step - 3.0f , -step - 4.0f ));
@@ -129,14 +129,14 @@ public class MIFile2DTest {
     public void addLinear15() throws Exception {
 
         for (int i = 0; i < 15; i++) {
-            file.add(new Point((float) i, 0.0F));
+            file.add(new Point((double) i, 0.0F));
         }
 
         assertEquals(15, file.size());
 
 
         for (int i = 0; i < 15; i++) {
-            Point p = new Point((float) i, 0.0F);
+            Point p = new Point((double) i, 0.0F);
             assertTrue(file.contains(p));
         }
     }
@@ -151,29 +151,29 @@ public class MIFile2DTest {
 
         // lay down 20 points in a line
         for (int i = 0; i < 3; i++) {
-            file.add(new Point((float) i * 10, 0.0F));
+            file.add(new Point((double) i * 10, 0.0F));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 3; i++) {
-            file.add(new Point((float) (i * 10) + 4.0F, 0.0F));
+            file.add(new Point((double) (i * 10) + 4.0F, 0.0F));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 3; i++) {
-            file.add(new Point((float) (i * 10) + 4.5F, 0.0F));
+            file.add(new Point((double) (i * 10) + 4.5F, 0.0F));
         }
 
         assertEquals(9, file.size());
 
         for (int i = 0; i < 3; i++) {
-            assertTrue(file.contains(new Point((float) i * 10, 0.0F)));
+            assertTrue(file.contains(new Point((double) i * 10, 0.0F)));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 3; i++) {
-            assertTrue(file.contains(new Point((float) (i * 10) + 4.0F, 0.0F)));
+            assertTrue(file.contains(new Point((double) (i * 10) + 4.0F, 0.0F)));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 3; i++) {
-            assertTrue(file.contains(new Point((float) (i * 10) + 4.5F, 0.0F)));
+            assertTrue(file.contains(new Point((double) (i * 10) + 4.5F, 0.0F)));
         }
     }
 
@@ -185,7 +185,7 @@ public class MIFile2DTest {
 
         int count = 0;
 
-        for (float step = 1.0F; step < 50.0F; step++) {
+        for (double step = 1.0F; step < 50.0F; step++) {
 
             file.add(new Point(+step, +step));
             count++;
@@ -210,7 +210,7 @@ public class MIFile2DTest {
         int count = addSquares();
         assertEquals(count, file.size());
 
-        for (float step = 1.0F; step < 50.0F; step++) {
+        for (double step = 1.0F; step < 50.0F; step++) {
 
             assertTrue(file.contains(new Point(+step, +step)));
             assertTrue(file.contains(new Point(-step, +step)));
@@ -251,15 +251,15 @@ public class MIFile2DTest {
 //        assertEquals(60, file.size());
 //
 //        for (int i = 0; i < 20; i++) {
-//            assertTrue(file.contains(new Point((float) i * 10, 0.0F)));
+//            assertTrue(file.contains(new Point((double) i * 10, 0.0F)));
 //        }
 //        // new lay down 20 points in a line - that are all close (4 away) to the first 20
 //        for (int i = 0; i < 20; i++) {
-//            assertTrue(file.contains(new Point((float) (i * 10) + 4.0F, 0.0F)));
+//            assertTrue(file.contains(new Point((double) (i * 10) + 4.0F, 0.0F)));
 //        }
 //        // new lay down another 20 points in a line - that are all close (1 away) to the second 20
 //        for (int i = 0; i < 20; i++) {
-//            assertTrue(file.contains(new Point((float) (i * 10) + 4.5F, 0.0F)));
+//            assertTrue(file.contains(new Point((double) (i * 10) + 4.5F, 0.0F)));
 //        }
 //    }
 //
@@ -296,8 +296,8 @@ public class MIFile2DTest {
 //        Point p = new Point(0.0F, 0.0F);
 //
 //        // test search in ever increasing circles.
-//        for (float i = 1.0F; i < 50.0F; i++) {
-//            float search_circle = (float) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid float errors
+//        for (double i = 1.0F; i < 50.0F; i++) {
+//            double search_circle = (double) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid double errors
 //            List<DataDistance<Point>> result = file.rangeSearch(p, search_circle);
 //            List<Point> values = file.mapValues(result);
 //

@@ -134,7 +134,7 @@ public class Mash<T> extends MTree<T> {
             return add( candidate,data );
         }
 
-        float distance_to_target = distance_wrapper.distance(candidate.data, data);
+        double distance_to_target = distance_wrapper.distance(candidate.data, data);
 
         if( distance_to_target <= candidate.radius ) {   // case 2 we are inside where we need to be - move up.
 
@@ -177,7 +177,7 @@ public class Mash<T> extends MTree<T> {
             return super.nearestNeighbour(query);
         }
 
-        float distance_to_target = distance_wrapper.distance(candidate.data, query);
+        double distance_to_target = distance_wrapper.distance(candidate.data, query);
 
         // Case 2 we are outside the covering radius, so move up the tree till we are inside.
         if( distance_to_target > candidate.radius ) {
@@ -212,7 +212,7 @@ public class Mash<T> extends MTree<T> {
             return root;
         }
 
-        float distance_to_target = distance_wrapper.distance(candidate.data, query);
+        double distance_to_target = distance_wrapper.distance(candidate.data, query);
 
         // Case 2 we are outside the covering radius, so move up the tree till we are inside.
         if( distance_to_target > candidate.radius ) {
@@ -242,12 +242,12 @@ public class Mash<T> extends MTree<T> {
      * @param query - the query we are examining for parental closeness
      * @return true if the parent is closer to the query than the node.
      */
-    private boolean parent_closer( Node node, float distance_to_node, T query  ) {
+    private boolean parent_closer( Node node, double distance_to_node, T query  ) {
         Node parent = node.parent;
         if( parent == null ) {
             return false;
         }
-        float parent_distance = distance_wrapper.distance(parent.data, query);
+        double parent_distance = distance_wrapper.distance(parent.data, query);
         return parent_distance <= distance_to_node && parent_distance < parent.radius;
     }
 

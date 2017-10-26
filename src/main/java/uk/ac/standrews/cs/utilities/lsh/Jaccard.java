@@ -26,14 +26,14 @@ import java.util.Set;
  */
 public class Jaccard {
 
-    public static float jaccard(Collection A, Collection B ) {
-        return ( (float) ( intersection( A,B ).size() ) ) / union( A, B ).size();
+    public static double jaccard(Collection A, Collection B ) {
+        return ( (double) ( intersection( A,B ).size() ) ) / union( A, B ).size();
     }
 
-    public static float jaccard(String A, String B ) {
+    public static double jaccard(String A, String B ) {
         Collection agrams = MinHash.ngrams(A,2);
         Collection bgrams = MinHash.ngrams(B,2);
-        return ( (float) ( intersection( agrams,bgrams ).size() ) ) / union( agrams, bgrams ).size();
+        return ( (double) ( intersection( agrams,bgrams ).size() ) ) / union( agrams, bgrams ).size();
     }
 
 
