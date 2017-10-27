@@ -30,6 +30,7 @@ public class TreeStructure {
     public int max_depth = 0;
     public int number_leaves = 0;
     public int number_internals = 0;
+    public int max_level_size = 0;
 
     public void recordChildren(int size) {
         Integer count = child_distribution.get(size);

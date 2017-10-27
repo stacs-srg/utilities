@@ -28,7 +28,7 @@ import java.util.List;
 public class MTree<T> {
 
     private static final int DEFAULT_MAX_LEVEL_SIZE = 20;
-    private final int level_size; // size of a level
+    private final int max_level_size; // size of a level
     private static final float EPSILON = 0.00001f; // A small float to avoid checking with zero.
     final Distance<T> distance_wrapper;
 
@@ -36,10 +36,10 @@ public class MTree<T> {
 
     int num_entries = 0;
 
-    public MTree(Distance<T> d, int level_size ) {
+    public MTree(Distance<T> d, int max_level_size ) {
 
         distance_wrapper = d;
-        this.level_size = level_size;
+        this.max_level_size = max_level_size;
     }
 
     public MTree(Distance<T> d ) {
@@ -247,11 +247,15 @@ public class MTree<T> {
 
     public TreeStructure showStructure() {
         TreeStructure ts = new TreeStructure();
+        ts.max_level_size = max_level_size;
         show_structure(ts, root, 0 );
         return ts;
     }
 
     private void show_structure(TreeStructure ts, Node node, int depth) {
+        if( node == null ) { // safety net
+            return;
+        }
         if( depth > ts.max_depth ) {
             ts.max_depth = depth;
         }
@@ -724,11 +728,11 @@ public class MTree<T> {
         }
 
         boolean isLeaf() {
-            return radius == 0.0;
+            return children.size() == 0;
         }
 
         boolean isFull() {
-            return children.size() >= level_size;
+            return children.size() >= max_level_size;
         }
 
         boolean isEmpty() {
