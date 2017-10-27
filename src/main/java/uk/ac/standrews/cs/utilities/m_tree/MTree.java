@@ -228,7 +228,7 @@ public class MTree<T> {
 
     }
 
-    public void check_invariants( Node node, int indent ) {
+    private void check_invariants( Node node, int indent ) {
         for( int i = 0; i < indent; i++ ) { System.out.print( "\t" ); };
         System.out.println( "checking node: " + node.data + "radius: " + node.radius + " is leaf: " + node.isLeaf() + " count children: " + node.children.size());
         if( node.isLeaf() ) { assert node.children.size() == 0; }
@@ -242,6 +242,27 @@ public class MTree<T> {
             assert child.radius <= node.radius;
             assert distance_wrapper.distance( child.data, node.data ) <= node.radius;
             if( ! child.isLeaf() ) { check_invariants( child, indent + 1); }
+        }
+    }
+
+    public TreeStructure showStructure() {
+        TreeStructure ts = new TreeStructure();
+        show_structure(ts, root, 0 );
+        return ts;
+    }
+
+    private void show_structure(TreeStructure ts, Node node, int depth) {
+        if( depth > ts.max_depth ) {
+            ts.max_depth = depth;
+        }
+        if (node.isLeaf()) {
+            ts.number_leaves++;
+        } else {
+            ts.number_internals++;
+            ts.recordChildren( node.children.size() );
+            for (Node child : node.children) {
+                show_structure(ts, child, depth + 1);
+            }
         }
     }
 
