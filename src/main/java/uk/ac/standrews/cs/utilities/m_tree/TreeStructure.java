@@ -33,12 +33,12 @@ public class TreeStructure {
     public int max_level_size = 0;
 
 
-    public void recordChildren(int size) {
-        Integer count = child_distribution.get(size);
+    public void recordChildren(int number_of_children) {
+        Integer count = child_distribution.get(number_of_children);
         if( count == null ) {
-            child_distribution.put(size,1);
+            child_distribution.put(number_of_children,1);
         } else {
-            count++;
+            child_distribution.put(number_of_children,count + 1 );
         }
     }
     
