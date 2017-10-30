@@ -32,11 +32,11 @@ public class MinHash<Data> {
     public final static int DEFAULTSIGNATURESIZE = 50; // No idea what size to make this!
     private static final int DEFAULTBANDSIZE = 5;
 
-    private int shingle_size = DEFAULTSHINGLESIZE;
-    private int signature_size = DEFAULTSIGNATURESIZE;
-    private int band_size = DEFAULTBANDSIZE;
+    protected int shingle_size = DEFAULTSHINGLESIZE;
+    protected int signature_size = DEFAULTSIGNATURESIZE;
+    protected int band_size = DEFAULTBANDSIZE;
 
-    private HashMap<Band, Set<Data>> lsh_map = new HashMap<>();
+    protected HashMap<Band, Set<Data>> lsh_map = new HashMap<>();
 
     /**
      * Create a min hash map using default values of specified sizes
@@ -69,6 +69,10 @@ public class MinHash<Data> {
         for (int i = 0; i < source.length() - n + 1; i++)
             ngrams.add(source.substring(i, i + n));
         return ngrams;
+    }
+
+    public MinHashStructure showStructure() {
+        return new MinHashStructure( this );
     }
 
     /**

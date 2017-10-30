@@ -46,13 +46,13 @@ public class MIFile<T> {
     private final Set<T> reference_objects;
     private final invertedFile<T> invFile;
 
-    private HashMap<T,PostingList<T>> inverted_index = new HashMap<>();
+    HashMap<T,PostingList<T>> inverted_index = new HashMap<>();
 
-    private int ks;                 //number of nearest pivots used when searching - AMATO
-    private int ki;                 //number of nearest pivots used when indexing  - AMATO
-    private final int n_ro;         // number of reference objects - AMATO
-    private int max_pos_diff;       //consider just objects with at most max_pos_diff with respect to the query - AMATO
-    private int number_of_items;    // Keep a note of how many items are in the data set
+    int ks;                 //number of nearest pivots used when searching - AMATO
+    int ki;                 //number of nearest pivots used when indexing  - AMATO
+    final int n_ro;         // number of reference objects - AMATO
+    int max_pos_diff;       //consider just objects with at most max_pos_diff with respect to the query - AMATO
+    protected int number_of_items;    // Keep a note of how many items are in the data set
 
     /**
      *
@@ -224,5 +224,11 @@ public class MIFile<T> {
 
         return candidateSet.getDataDistances();
     }
+
+    public MIFileStructure showStructure() {
+        MIFileStructure mifs = new MIFileStructure( this );
+        return mifs;
+    }
+
 
 }
