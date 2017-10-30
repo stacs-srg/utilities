@@ -43,6 +43,7 @@ public class MIFileStructure {
         this.max_pos_diff = mif.max_pos_diff;
         this.number_of_items = mif.number_of_items;
 
+
         HashMap<T, PostingList<T>> entries = mif.inverted_index;
 
         this.number_of_keys = entries.keySet().size();
