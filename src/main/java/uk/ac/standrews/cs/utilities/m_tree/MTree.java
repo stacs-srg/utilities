@@ -680,17 +680,18 @@ public class MTree<T> {
         Node smallest_not_pivot = null;
 
         for (Node child : candidates) {
-            if ( ! child.data.equals( pivot.data ) ){ // not identical since we are looking at children - // TODO should be equals?
+            if (!child.data.equals(pivot.data)) { // not identical since we are looking at children - // TODO should be equals?
                 if (smallest_not_pivot == null) {
                     smallest_not_pivot = child;
-                } else if (child.radius < smallest_not_pivot.radius) {
-                    smallest_not_pivot = child;
+                } else if (child.radius < smallest_not_pivot.radius && child.distance_to_parent > 0.0f ) { // don't select a pivot with zero distance the parent
+                    smallest_not_pivot = child;                                                            // otherwise the children will not be redistributed.
                 }
             }
         }
-        if (smallest_not_pivot != null) {
-            smallest_not_pivot.parent = null; // we are about to re-insert this into the tree at a new position.
-        }
+// Don't need to do this - it is performed in Node.insert
+//        if (smallest_not_pivot != null) {
+//            smallest_not_pivot.parent = null; // we are about to re-insert this into the tree at a new position.
+//        }
         return smallest_not_pivot;
     }
 

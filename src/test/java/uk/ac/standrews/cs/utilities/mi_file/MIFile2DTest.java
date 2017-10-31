@@ -277,7 +277,7 @@ public class MIFile2DTest {
 //        List<DataDistance<Point>> result = file.rangeSearch(p, 10.0F);
 //        List<Point> values = file.mapValues(result);
 //
-//        assertEquals(result.size(), 6);
+//        assertEquals(6, result.size());
 //
 //        for (Point pp : values) {
 //            assertTrue(file.contains(pp));                 // point added to the file
@@ -319,7 +319,7 @@ public class MIFile2DTest {
 //
 //        DataDistance<Point> result = file.nearestNeighbour(p);
 //
-//        assertEquals(result.value, new Point(21.0F, 21.0F)); // closest point to 20.6,20.6 - TODO better tests?
+//        assertEquals(new Point(21.0F, 21.0F), result.value); // closest point to 20.6,20.6 - TODO better tests?
 //    }
 
 }

@@ -35,7 +35,7 @@ import static uk.ac.standrews.cs.utilities.crypto.Utils.extension;
  * The digital signature is generated using the RSA algorithm.
  *
  * To perform digital signature operations you need a PRIVATE_KEY and a CERTIFICATE (public), which they can be generated
- * via the {@method #generateKeys()}, {@method #generateKeys(int length)} methods.
+ * via the generateKeys(), generateKeys(int length) methods.
  *
  *
  * Here is an example of using the digital signature algorithm via openssl:
