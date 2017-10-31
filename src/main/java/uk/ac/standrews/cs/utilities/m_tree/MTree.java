@@ -16,6 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
+import uk.ac.standrews.cs.utilities.archive.ErrorHandling;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -591,6 +593,14 @@ public class MTree<T> {
         }
         for (Node partition2_child : s2) {
             new_pivot.addChild(partition2_child, distance_wrapper.distance(new_pivot.data, partition2_child.data));        // radii are adjusted as nodes are added
+        }
+
+        // defensive programming
+        if (N.isFull()) {
+            ErrorHandling.error("After a split, N is still full.");
+        }
+        if (new_pivot.isFull()) {
+            ErrorHandling.error( "After a split, the new_pivot is full." );
         }
 
         // Now have the new_pivot unallocated so we try and put it in the parent of N
