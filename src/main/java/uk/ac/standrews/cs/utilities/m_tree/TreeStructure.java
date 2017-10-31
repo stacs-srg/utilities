@@ -31,6 +31,7 @@ public class TreeStructure {
     public int number_leaves = 0;
     public int number_internals = 0;
     public int max_level_size = 0;
+    public long total_tree_size = 0;
 
 
     public void recordChildren(int number_of_children) {

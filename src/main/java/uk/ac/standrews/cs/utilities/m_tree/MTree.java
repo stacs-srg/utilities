@@ -17,6 +17,7 @@
 package uk.ac.standrews.cs.utilities.m_tree;
 
 import uk.ac.standrews.cs.utilities.archive.ErrorHandling;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,6 +157,30 @@ public class MTree<T> {
 
     //------------------------- Private methods
 
+    private void show_structure(TreeStructure ts, Node node, int depth) {
+        if( node == null ) { // safety net
+            return;
+        }
+        if( depth > ts.max_depth ) {
+            ts.max_depth = depth;
+        }
+        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node); // the size of the node.
+        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.children); // the size of the children array.
+        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.data); // the size of the referenced data object - does not include refs from that object (e.g if an LXP).
+        // only other pointer field is parent which has already been included.
+
+        if (node.isLeaf()) {
+            ts.number_leaves++;
+
+        } else {
+            ts.number_internals++;
+            ts.recordChildren( node.children.size() );
+            for (Node child : node.children) {
+                show_structure(ts, child, depth + 1);
+            }
+        }
+    }
+
     /**
      * Find the number of nodes in a (sub) tree
      *
@@ -252,24 +277,6 @@ public class MTree<T> {
         ts.max_level_size = max_level_size;
         show_structure(ts, root, 0 );
         return ts;
-    }
-
-    private void show_structure(TreeStructure ts, Node node, int depth) {
-        if( node == null ) { // safety net
-            return;
-        }
-        if( depth > ts.max_depth ) {
-            ts.max_depth = depth;
-        }
-        if (node.isLeaf()) {
-            ts.number_leaves++;
-        } else {
-            ts.number_internals++;
-            ts.recordChildren( node.children.size() );
-            for (Node child : node.children) {
-                show_structure(ts, child, depth + 1);
-            }
-        }
     }
 
     /**
@@ -742,7 +749,7 @@ public class MTree<T> {
         }
 
         boolean isFull() {
-            return children.size() >= max_level_size;
+            return children.size() - 1 >= max_level_size;
         }
 
         boolean isEmpty() {
