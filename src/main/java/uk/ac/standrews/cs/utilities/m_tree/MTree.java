@@ -740,7 +740,7 @@ public class MTree<T> {
         }
 
         boolean isFull() {
-            return children.size() >= max_level_size;
+            return children.size() > max_level_size;
         }
 
         boolean isEmpty() {
