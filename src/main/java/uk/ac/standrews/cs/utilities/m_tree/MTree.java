@@ -261,14 +261,19 @@ public class MTree<T> {
         System.out.println( "checking node: " + node.data + "radius: " + node.radius + " is leaf: " + node.isLeaf() + " count children: " + node.children.size());
         if( node.isLeaf() ) { assert node.children.size() == 0; }
         if( node.children.size() == 0 ) { assert node.isLeaf(); }
+        if( ! node.isLeaf() ) {
+            assert node.data == node.children.get(0).data;
+            assert node.children.get(0).radius == 0.0f;
+        }
         for( Node child : node.children ) {
             for( int i = 0; i < indent + 1; i++ ) { System.out.print( "\t" ); }
-            System.out.println( "child: " + child.data + "radius: " + child.radius + " is leaf: " + child.isLeaf() + " count children: " + child.children.size() + " parent: " + node.data);
+            System.out.println( "child: " + child.data + "radius: " + child.radius + " distance to parent: " + child.distance_to_parent + " is leaf: " + child.isLeaf() + " count children: " + child.children.size() + " parent: " + node.data);
             assert child.distance_to_parent <= node.radius;
-            assert distance_wrapper.distance( child.data,node.data ) == child.distance_to_parent;
+            float d = distance_wrapper.distance( child.data,node.data );
+            assert d == child.distance_to_parent;
             assert child.parent == node;
             assert child.radius <= node.radius;
-            assert distance_wrapper.distance( child.data, node.data ) <= node.radius;
+            assert d <= node.radius;
             if( ! child.isLeaf() ) { check_invariants( child, indent + 1); }
         }
     }
@@ -478,7 +483,7 @@ public class MTree<T> {
             return newLeaf;
 
         } else {
-            if (subTree.isEmpty()) {
+            if (subTree.isLeaf()) {
                 Node copyOfParent = new Node(subTree.data, subTree, 0.0f);
                 subTree.addFirstChild(copyOfParent);            // we making a leaf into an intermediate node - add Node to its own children
             }
@@ -495,75 +500,79 @@ public class MTree<T> {
      *
      * @param node - the node into which we are inserting the data
      * @param data the new data.
+     * @return the new node that is inserted into the tree
      */
-     Node add(Node node, T data) {
+    Node add(Node node, T data) {
 
-        Node enclosing_pivot = null;
-        Node closest_pivot = null;
-        float smallest_distance = -1.0f; // illegal distance
+        Node selected_pivot = node; // the best pivot into which to insert - 3 choices: this node, enclosing child, or nearest child.
+        float selected_pivot_distance = distance_wrapper.distance(selected_pivot.data, data); // the distance between data and the selected pivot.
 
-        // find the most appropriate child.
+        // Try and see if there is an enclosing child for the data
         for (Node child : node.children) {
-            float new_distance = distance_wrapper.distance(child.data, data);
+            if( child != node.children.get(0)) { // do not do this on the first child which is the same as the parent
+                float distance_from_data_to_child = distance_wrapper.distance(child.data, data);
 
-            if (new_distance < child.radius) { // we are inside the radius of the current existing pivot - new node falls in within this ball
+                if (distance_from_data_to_child < selected_pivot_distance) { // we are inside the radius of the child - new node falls in within this ball
 
-                if (new_distance < smallest_distance || smallest_distance == -1.0) { // we are closer to this pivot than any previous pivots
-
-                    enclosing_pivot = child;
-                    smallest_distance = new_distance;
-                }
-
-            } else if (enclosing_pivot == null) { // not found any pivot within whose radius the new data falls
-
-                if (closest_pivot == null || new_distance < smallest_distance) { // this pivot is closer or was null
-                    smallest_distance = new_distance;
-                    closest_pivot = child;
+                    selected_pivot = child;
+                    selected_pivot_distance = distance_from_data_to_child;
+                    break; // by definition there is only one of these - points must enclose children uniquely.
                 }
             }
         }
 
-        if (enclosing_pivot == null) { // didn't find an enclosing pivot - put it in the closest.
+        // at this point we are inserting into the node or the child.
+        // If the latter we don't do anything more with searching because an enclosing child is the best choice.
+        // if the former the selected pivot will be equal to the node, so use this as the check.
 
-            final float distance = distance_wrapper.distance(node.data, data);
-                if (closest_pivot == null || distance <= smallest_distance) { // this node is closer to the new data
-                    return insertIntoNode(node, data, distance);
+        if( selected_pivot == node ) { // we didn't find an enclosing child.
 
-            } else { // one of the children is closer
-                float old_radius = closest_pivot.radius;
-                Node newnode = add(closest_pivot, data);
-                // now check to see if the radius has changed
-                float new_radius = closest_pivot.radius;
+            // See if any of the children are closer than the node to data
+            for (Node child : node.children) {
+                if (child != node.children.get(0)) { // do not do this on the first child which is the same as the parent
+                    float distance_from_data_to_child = distance_wrapper.distance(child.data, data);
 
-                if (new_radius > old_radius) { // the radius has grown
-                    float new_distance_to_pivot = distance_wrapper.distance(node.data, closest_pivot.data);
-
-                    // now check if the parent radius needs to be adjusted too.
-                    if (new_distance_to_pivot + new_radius > node.radius) {
-                        node.radius = new_distance_to_pivot + new_radius; // Make the enclosing circle bigger
+                    if (distance_from_data_to_child < selected_pivot_distance) { // this pivot is closer than the node and any other we have found
+                        selected_pivot_distance = distance_from_data_to_child;
+                        selected_pivot = child;
                     }
                 }
-                return newnode;
             }
-        } else { // we found an enclosing pivot - no need to make the radius bigger
-            return add(enclosing_pivot, data);
         }
+
+        Node new_node;
+
+        // at the end of the above tests we have found the best pivot into which to insert
+        // may be the node, an enclosing child or a close child.
+
+        if( selected_pivot == node ) {                                                  // we didn't find anywhere better amongst the children - insert into this node
+            new_node = insertIntoNode(selected_pivot, data, selected_pivot_distance);
+            // insertIntoNode sorts out the radius of this node.
+        } else {                                                                        // recursively insert into one of the children
+            new_node = add(selected_pivot, data);  // may have been added to to an enclosing child or a close one, in the latter case the ball of the child will have expanded.
+        }
+        if( selected_pivot_distance + selected_pivot.radius > node.radius ) {                 // check if we need to make this node's radius bigger
+                node.radius = selected_pivot_distance + selected_pivot.radius;
+        }
+
+        return new_node;
     }
 
     /**
      * @param children - the children to inspect
      * @return the largest radius of the children
      */
-    private float maxR( List<Node> children ) {
+    private float maxR(List<Node> children) {
         float result = 0.0f;
-        for( Node child : children ) {
-            if( child.radius > result ) {
+        for (Node child : children) {
+            if (child.radius > result) {
                 result = child.radius;
             }
         }
         return result;
 
     }
+
     /**
      * Helper method for splitting levels (children) of node in the tree
      *
@@ -634,10 +643,11 @@ public class MTree<T> {
             // we need to make new_pivot the new root
 
             root = new_pivot;
+            new_pivot.parent = null;  // we reused a node whose parent was subroot.
 
             // make the tree one level deeper by adding old sub_root to the new root.
 
-            new_pivot.addChild(sub_root, distance_wrapper.distance(new_pivot.data, sub_root.data));
+            new_pivot.addChild(sub_root, distance_wrapper.distance(new_pivot.data, sub_root.data)); //<<<<<<<< Can we create a loop?
 
         } else {
             // it is a regular node - not the root - it has a a parent into which we can try to insert new_node
@@ -701,15 +711,15 @@ public class MTree<T> {
      * Choose node from s that has the smallest radius and is not the existing @param pivot
      *
      * @param pivot      - the existing pivot
-     * @param candidates - a list of nodes from which to choose a data
+     * @param pivots_children - a list of nodes from which to choose a data
      * @return a new pivot with the smallest radius
      */
-    private Node selectPivot(Node pivot, List<Node> candidates) {
+    private Node selectPivot(Node pivot, List<Node> pivots_children) {
 
         Node smallest_not_pivot = null;
 
-        for (Node child : candidates) {
-            if (child.distance_to_parent > 0.0f) {  // don't select the pivot again - or any note at a distance of zero from pivot
+        for (Node child : pivots_children) {
+            if (child != pivot.children.get(0)) {  // don't select the pivot again - or any note at a distance of zero from pivot
                 if (smallest_not_pivot == null) {
                     // this is the first candidate (!= parent) we assign it to be the smallest
                     smallest_not_pivot = child;
@@ -795,10 +805,6 @@ public class MTree<T> {
 
         boolean isFull() {
             return children.size() >= max_level_size;
-        }
-
-        boolean isEmpty() {
-            return children.isEmpty();
         }
 
         public String toString() {
