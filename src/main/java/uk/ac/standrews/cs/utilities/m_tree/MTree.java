@@ -257,12 +257,12 @@ public class MTree<T> {
     }
 
     private void check_invariants( Node node, int indent ) {
-        for( int i = 0; i < indent; i++ ) { System.out.print( "\t" ); };
+        for( int i = 0; i < indent; i++ ) { System.out.print( "\t" ); }
         System.out.println( "checking node: " + node.data + "radius: " + node.radius + " is leaf: " + node.isLeaf() + " count children: " + node.children.size());
         if( node.isLeaf() ) { assert node.children.size() == 0; }
         if( node.children.size() == 0 ) { assert node.isLeaf(); }
         for( Node child : node.children ) {
-            for( int i = 0; i < indent + 1; i++ ) { System.out.print( "\t" ); };
+            for( int i = 0; i < indent + 1; i++ ) { System.out.print( "\t" ); }
             System.out.println( "child: " + child.data + "radius: " + child.radius + " is leaf: " + child.isLeaf() + " count children: " + child.children.size() + " parent: " + node.data);
             assert child.distance_to_parent <= node.radius;
             assert distance_wrapper.distance( child.data,node.data ) == child.distance_to_parent;
@@ -325,7 +325,7 @@ public class MTree<T> {
 
             float distanceNodeToQ = distance_wrapper.distance(N.data, Q);
             if (distanceNodeToQ <= RQ) {
-                results.add(new DataDistance<T>(N.data, distanceNodeToQ));
+                results.add(new DataDistance<>(N.data, distanceNodeToQ));
             }
 
         } else {
@@ -389,17 +389,17 @@ public class MTree<T> {
     DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
 
         if (node.data.equals(query)) {
-            return new DataDistance<T>(node.data, 0.0f);
+            return new DataDistance<>(node.data, 0.0f);
         }
 
         final float distance_to_node = distance_wrapper.distance(node.data, query);
         if (closest_thus_far == null) {
-            closest_thus_far = new DataDistance<T>(node.data, distance_to_node);
+            closest_thus_far = new DataDistance<>(node.data, distance_to_node);
         }
 
         if (node.isLeaf()) { // is not equal and we are at a leaf
             if (distance_to_node < closest_thus_far.distance) { // this node is closer
-                return new DataDistance<T>(node.data, distance_to_node);
+                return new DataDistance<>(node.data, distance_to_node);
             }
             return closest_thus_far; // we are not any closer.
         }
@@ -408,10 +408,10 @@ public class MTree<T> {
 
     /**
      * Search the children of a node for results
-     * @param node
-     * @param closest_thus_far
-     * @param query
-     * @return
+     * @param node - the node in which to search
+     * @param closest_thus_far - the closest node to node that we have found so far
+     * @param query - the quest being performed
+     * @return the closest node and its distance to query
      */
     DataDistance<T> search_children( Node node, DataDistance<T> closest_thus_far,T query ) {
         float distance_to_node = closest_thus_far.distance;
@@ -467,7 +467,7 @@ public class MTree<T> {
      *
      * @param subTree - the sub-tree into which the data is inserted.
      * @param data - the data to add into the children
-     * @param distance_to_parent
+     * @param distance_to_parent - the distance to the parent from subtree (pre calculated in caller)
      * @return the node inserted into the tree.
      */
     private Node insertIntoNode(Node subTree, T data, float distance_to_parent) {
@@ -709,7 +709,7 @@ public class MTree<T> {
         Node smallest_not_pivot = null;
 
         for (Node child : candidates) {
-            if (child.distance_to_parent > 0) {
+            if (child.distance_to_parent > 0.0f) {  // don't select the pivot again - or any note at a distance of zero from pivot
                 if (smallest_not_pivot == null) {
                     // this is the first candidate (!= parent) we assign it to be the smallest
                     smallest_not_pivot = child;
@@ -718,7 +718,11 @@ public class MTree<T> {
                     // this is smaller than the smallest we know so far
                     smallest_not_pivot = child;
                 }
+                if( smallest_not_pivot.radius == 0.0f ) {  // can't be null - set in arms above.
+                    break;                                 // give up if R is zero - can't do better than that!
+                }
             }
+
         }
 
         if (smallest_not_pivot == null) {
@@ -726,7 +730,7 @@ public class MTree<T> {
         }
 
         if (smallest_not_pivot != null) {
-            smallest_not_pivot.parent = null; // we are about to re-insert this into the tree at a new position.
+            smallest_not_pivot.parent = null; // we are about to re-insert this into the tree at a new position, so unlink from parent
         }
         return smallest_not_pivot;
     }
@@ -768,7 +772,7 @@ public class MTree<T> {
          * Pre condition this is only called where a split has already occurred and parent is not full
          *
          * @param newNode the node to add to the Node
-         * @param distance_to_parent
+         * @param distance_to_parent - the distance from newNode to the parent
          */
         void addChild(Node newNode, float distance_to_parent) {
 
@@ -820,7 +824,7 @@ public class MTree<T> {
 
             int index;
             if (closest.size() == 0) {
-                closest.add(0, new DataDistance<T>(data, distance));
+                closest.add(0, new DataDistance<>(data, distance));
                 return;
             }
             for (index = 0; index < closest.size(); index++) {
@@ -831,7 +835,7 @@ public class MTree<T> {
                     return;
                 }
             }
-            closest.add(index, new DataDistance<T>(data, distance)); // add at the end
+            closest.add(index, new DataDistance<>(data, distance)); // add at the end
             checkEvict();
             // if we get here then the new element is further than rest so should not be added.
         }
