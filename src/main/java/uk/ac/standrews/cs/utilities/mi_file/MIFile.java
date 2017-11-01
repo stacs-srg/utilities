@@ -61,7 +61,6 @@ public class MIFile<T> {
      * If an existing MI-File is being opened, it must be the same than the number used when the index was created.
      * @param ki Specifies the number of reference objects used for indexing. It must be smaller than n_ro
      * @param ks Specifies the number of reference objects used for searching.
-     * @param ks
      */
     public MIFile(Distance<T> d, Set<T> reference_objects, int ki, int ks  ) throws Exception {
 
