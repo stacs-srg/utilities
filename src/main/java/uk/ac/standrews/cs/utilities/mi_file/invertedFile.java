@@ -21,7 +21,7 @@ import java.util.HashMap;
 /**
  * Created by al on 11/10/2017.
  */
-public class invertedFile<T> {
+public class InvertedFile<T> {
 
     private HashMap<T,PostingList<T>> map = new HashMap<>();
     final private int maxScore;     // the highest score you can get in a posting list (equal to no. ref objects).
@@ -32,7 +32,7 @@ public class invertedFile<T> {
      * @param maxScore - the number of reference objects
      * @param lexiconSize -
      */
-    public invertedFile( int maxScore,int lexiconSize ) {
+    public InvertedFile(int maxScore, int lexiconSize ) {
         this.maxScore = maxScore;
         this.lexiconSize = lexiconSize;
     }

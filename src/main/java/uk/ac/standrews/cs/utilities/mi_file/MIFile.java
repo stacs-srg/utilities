@@ -44,7 +44,7 @@ public class MIFile<T> {
 
     final Distance<T> distance_wrapper;
     private final Set<T> reference_objects;
-    private final invertedFile<T> invFile;
+    private final InvertedFile<T> invFile;
 
     HashMap<T,PostingList<T>> inverted_index = new HashMap<>();
 
@@ -73,7 +73,7 @@ public class MIFile<T> {
         this.ki = ki;
         this.ks = ks;
         this.max_pos_diff=ki;
-        invFile = new invertedFile<T>(n_ro,ki);
+        invFile = new InvertedFile<T>(n_ro,ki);
         number_of_items = 0;
     }
 
@@ -95,11 +95,11 @@ public class MIFile<T> {
      */
     public void add(T data) throws Exception{
 
-        TreeMap<Double,T> knp = kNearestReferenceObjects(data, ki);
+        TreeMap<Float,T> knp = kNearestReferenceObjects(data, ki);
 
         int score = 0; // the position of each of the pivots (reference objects).
 
-        for( Map.Entry<Double, T> e : knp.entrySet() ) {
+        for( Map.Entry<Float, T> e : knp.entrySet() ) {
 
             invFile.insert(e.getValue(), data, score++);
         }
@@ -115,7 +115,7 @@ public class MIFile<T> {
      */
     public List<DataDistance<T>> nearestN(T query, int n){
 
-        TreeMap<Double,T>  query_k_nearest_reference_objects = kNearestReferenceObjects(query,ks);
+        TreeMap<Float,T>  query_k_nearest_reference_objects = kNearestReferenceObjects(query,ks);
 
         return incrementalkNNSearch( query, query_k_nearest_reference_objects, n );
     }
@@ -166,12 +166,12 @@ public class MIFile<T> {
      *
      * Signature of method from Amato - code adapted slightly from Giuseppe's version.
      */
-    private TreeMap<Double,T> kNearestReferenceObjects(T object, int k) {   // was called kNearestReferenceObjectsSequential in  Giuseppe's version.
-        TreeMap<Double,T> result = new TreeMap<>(); // maps from distance to an object
+    private TreeMap<Float,T> kNearestReferenceObjects(T object, int k) {   // was called kNearestReferenceObjectsSequential in  Giuseppe's version.
+        TreeMap<Float,T> result = new TreeMap<>(); // maps from distance to an object
 
         for( T reference : reference_objects ) {
 
-            double dist = distance_wrapper.distance(object, reference);
+            float dist = distance_wrapper.distance(object, reference);
 
             T o = reference;
 
@@ -179,14 +179,14 @@ public class MIFile<T> {
                 while (o != null) {
 
                     o = result.put(dist, o);  // problem is that there may be two objects at this distance so insert may overwrite old -
-                    dist += 0.0001;                     // so increment the distance a little and reinsert the overwritten entry to the map
+                    dist += 0.0001f;                     // so increment the distance a little and reinsert the overwritten entry to the map
                 }
             } else if (dist < result.lastKey()) {
 
                 while (o != null) {
 
                     o = result.put(dist, o);  // See comment above that explains (!) this code
-                    dist += 0.0001;
+                    dist += 0.0001f;
                 }
                 result.remove(result.lastKey());  // get rid of the previous highest value (before this addition.
             }
@@ -194,16 +194,16 @@ public class MIFile<T> {
         return result;
     }
 
-    private List<DataDistance<T>> incrementalkNNSearch(T query, TreeMap<Double, T> query_k_nearest_reference_objects, int k) {
+    private List<DataDistance<T>> incrementalkNNSearch(T query, TreeMap<Float, T> query_k_nearest_reference_objects, int k) {
 
         CandidateSet candidateSet = new CandidateSet(query, distance_wrapper, ki + 1, k);
 
         boolean stop = false;
 
-        Iterator<Map.Entry<Double, T>> q_iter = query_k_nearest_reference_objects.entrySet().iterator();
+        Iterator<Map.Entry<Float, T>> q_iter = query_k_nearest_reference_objects.entrySet().iterator();
 
         for (int position = 0; q_iter.hasNext(); position++) { // for each RO in order
-            Map.Entry<Double, T> nextRO = q_iter.next();
+            Map.Entry<Float, T> nextRO = q_iter.next();
             T pivot = nextRO.getValue();                        // the data of the reference object
 
             int low_inv_file_pos = position - max_pos_diff; // was Math.min( 0, position - max_pos_diff ) in als version!

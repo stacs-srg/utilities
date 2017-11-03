@@ -95,7 +95,11 @@ public class MTree<T> {
      * @return the nearest neighbour of T.
      */
     public DataDistance<T> nearestNeighbour(T query) {
-        return nearestNeighbour(root, null, query);
+        if( root == null ) {
+            return null;
+        } else {
+            return nearestNeighbour(root, new DataDistance<>(root.data,distance_wrapper.distance(root.data,query)), query);
+        }
     }
 
     /**
@@ -402,22 +406,18 @@ public class MTree<T> {
      */
     DataDistance<T> nearestNeighbour(Node node, DataDistance<T> closest_thus_far, T query) {
 
-        if (node.data.equals(query)) {
-            return new DataDistance<>(node.data, 0.0f);
-        }
+        if (node.isLeaf()) {
 
-        final float distance_to_node = distance_wrapper.distance(node.data, query);
-        if (closest_thus_far == null) {
-            closest_thus_far = new DataDistance<>(node.data, distance_to_node);
-        }
-
-        if (node.isLeaf()) { // is not equal and we are at a leaf
-            if (distance_to_node < closest_thus_far.distance) { // this node is closer
-                return new DataDistance<>(node.data, distance_to_node);
+            final float distance_from_this_leaf_query = distance_wrapper.distance(node.data, query);
+            if (distance_from_this_leaf_query < closest_thus_far.distance) { // this node is closer
+                return new DataDistance<>(node.data, distance_from_this_leaf_query);
+            } else {
+                return closest_thus_far;
             }
-            return closest_thus_far; // we are not any closer.
+        } else { // an intermediate node - we don't need to check the intermediate since first child holds the data.
+
+            return search_children(node, closest_thus_far, query);
         }
-        return search_children(node, closest_thus_far, query);
     }
 
     /**
@@ -429,16 +429,18 @@ public class MTree<T> {
      * @return the closest node and its distance to query
      */
     DataDistance<T> search_children(Node node, DataDistance<T> closest_thus_far, T query) {
-        float distance_to_node = closest_thus_far.distance;
-        if (distance_to_node - node.radius < closest_thus_far.distance) {
-            // may be interesting results in the children
-            for (Node child : node.children) {
-                DataDistance<T> nn = nearestNeighbour(child, closest_thus_far, query);
-                if (distance_wrapper.distance(nn.value, query) < closest_thus_far.distance) {
+
+        for (Node child : node.children) {
+
+            if ( child.isLeaf() || distance_wrapper.distance(child.data, query) - child.radius <= EPSILON) { // query may be inside this child.
+
+                DataDistance<T> nn = nearestNeighbour(child, closest_thus_far, query);  // do recursive search
+                if (nn.distance < closest_thus_far.distance) {
                     closest_thus_far = nn;
                 }
             }
         }
+
         return closest_thus_far;
     }
 
