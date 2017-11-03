@@ -1,6 +1,6 @@
 # utilities
 
-A collection of utility code..
+A collection of utility code.
 
 ## Usage via maven
 
