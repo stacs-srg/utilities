@@ -299,49 +299,17 @@ public class MTree<T> {
     }
 
     /**
-     * Find the nodes withing @param RQ of @param Q.
+     * Find the nodes withing @param RQ of @param query.
      *
      * @param N  - the node we are searching
-     * @param Q  the query data
+     * @param query  the query data
      * @param RQ the search radius
-     *           <p>
-     *           Algorithm RangeSearch from https://en.wikipedia.org/wiki/M-tree
-     *           Input: Node N of M-Tree MT,  Q: query object, R(Q): search radius
-     *           Output: all the DB objects such that
-     *           d(O,j,Q) ≤ RQ(Q)
-     *           <p>
-     *           <pre>
-     *                     {
-     *                       let Op be the parent object of node N;
-     *
-     *                       if N is not a leaf then {
-     *                         for each entry(Or) in N do {
-     *                               if |d(Op,Q) − d(Or,Op)| ≤ R(Q)+R(Or) then {
-     *                                 Compute d(Or,Q);
-     *                     			if d(Or,Q) ≤ RQ(Q)+R(Or)} then
-     *                                   RangeSearch(*ptr(T(Or)),Q,R(Q));
-     *                               }
-     *                         }
-     *                       }
-     *                       else { // it is leaf
-     *                         for each entry(Oj) in N do {
-     *                               if |d(Op,Q) - d(Oj,Op)| ≤ R(Q) then {
-     *                                 Compute d(Oj,Q);
-     *                                 if d(Oj,Q) ≤ R(Q) then
-     *                                   add oid(Oj) to the result;
-     *                               }
-     *                         }
-     *                       }
-     *                     }
-     *                     </pre>
      */
-    void rangeSearch(Node N, T Q, float RQ, ArrayList<DataDistance<T>> results) {
-
-        Node parent = N.parent;
+    void rangeSearch(Node N, T query, float RQ, ArrayList<DataDistance<T>> results) {
 
         if (N.isLeaf()) {
 
-            float distanceNodeToQ = distance_wrapper.distance(N.data, Q);
+            float distanceNodeToQ = distance_wrapper.distance(N.data, query);
             if (distanceNodeToQ <= RQ) {
                 results.add(new DataDistance<>(N.data, distanceNodeToQ));
             }
@@ -349,15 +317,10 @@ public class MTree<T> {
         } else {
             for (Node child : N.children) {
 
-                float distanceQtoParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(parent.data, Q);
-                float distanceChildToParent = parent == null ? Float.MAX_VALUE : distance_wrapper.distance(parent.data, child.data);
+                float distanceChildToQ = distance_wrapper.distance(child.data, query);
 
-                if (parent == null || Math.abs(distanceQtoParent - distanceChildToParent) <= RQ + child.radius) {
-
-                    float distanceChildToQ = distance_wrapper.distance(child.data, Q);
-                    if (distanceChildToQ <= RQ + child.radius) {
-                        rangeSearch(child, Q, RQ, results);
-                    }
+                if (distanceChildToQ <= RQ + child.radius) {    // query may be inside this child because
+                    rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
                 }
             }
         }
