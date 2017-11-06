@@ -95,9 +95,9 @@ public class MTree<T> {
 
         ArrayList<DataDistance<T>> results = new ArrayList<>();
         rangeSearch(root, query, r, results);
-        System.out.println( "leaf comparisons = " + count_leaf_comparisons);
-        System.out.println( "intermediate comparisons = " + count_intermediate_comparisons);
-        System.out.println( "max depth = " + deepest );
+        System.err.println( "leaf comparisons = " + count_leaf_comparisons);
+        System.err.println( "intermediate comparisons = " + count_intermediate_comparisons);
+        System.err.println( "max depth = " + deepest );
         return results;
     }
 
