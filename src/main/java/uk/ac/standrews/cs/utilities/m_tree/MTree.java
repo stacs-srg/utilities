@@ -510,11 +510,10 @@ public class MTree<T> {
             if (child != node.children.get(0)) { // do not do this on the first child which is the same as the parent
                 float distance_from_data_to_child = distance_wrapper.distance(child.data, data);
 
-                if (distance_from_data_to_child < selected_pivot_distance) { // we are inside the radius of the child - new node falls in within this ball
+                if (distance_from_data_to_child < child.radius && distance_from_data_to_child < selected_pivot_distance) { // we are inside the radius of the child and closer
 
                     selected_pivot = child;
                     selected_pivot_distance = distance_from_data_to_child;
-                    break; // by definition there is only one of these - points must enclose children uniquely.
                 }
             }
         }
@@ -536,7 +535,31 @@ public class MTree<T> {
                     }
                 }
             }
+            // avoid creating ball overlaps in children ....
+            if( selected_pivot != node) {    // we are planning to put data in a child.
+
+                if( selected_pivot_distance > selected_pivot.radius ) {  // the chosen child would get bigger
+
+                    // check to see if we have created an overlap in doing this.
+                    // and if we have avoid it.
+
+                    for (Node child : node.children) {  // check all the children for overlap
+                        if( child != selected_pivot ) {
+                            float d_from_selected_pivot_to_child = distance_wrapper.distance(child.data, selected_pivot.data);
+
+                            if( d_from_selected_pivot_to_child - child.radius - selected_pivot.radius <= EPSILON ) {
+                                // using this selected_pivot would create overlap.
+                                // so don't use and use node instead.
+                                selected_pivot = node;
+                                selected_pivot_distance = distance_wrapper.distance(selected_pivot.data, data);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
+
 
         Node new_node;
 
@@ -545,12 +568,17 @@ public class MTree<T> {
 
         if (selected_pivot == node) {                                                  // we didn't find anywhere better amongst the children - insert into this node
             new_node = insertIntoNode(selected_pivot, data, selected_pivot_distance);
-            // insertIntoNode sorts out the radius of this node.
-        } else {                                                                        // recursively insert into one of the children
+            // insertIntoNode sorts out the radius of selected_pivot
+        } else {     // recursively insert into one of the children
+
             new_node = add(selected_pivot, data);  // may have been added to to an enclosing child or a close one, in the latter case the ball of the child will have expanded.
-        }
-        if (selected_pivot_distance + selected_pivot.radius > node.radius) {                 // check if we need to make this node's radius bigger
-            node.radius = selected_pivot_distance + selected_pivot.radius;
+
+            float distance_pivot_to_node = distance_wrapper.distance(selected_pivot.data, node.data);
+
+            if ( distance_pivot_to_node + selected_pivot.radius > node.radius ) {                 // check if we need to make this node's radius bigger
+                node.radius = distance_pivot_to_node + selected_pivot.radius;
+            }
+
         }
 
         return new_node;
@@ -618,19 +646,6 @@ public class MTree<T> {
         for (Node partition2_child : partition.partition2) {
             new_pivot.addChild(partition2_child, distance_wrapper.distance(new_pivot.data, partition2_child.data));        // radii are adjusted as nodes are added
         }
-
-
-//        if (sub_root.isFull() && new_pivot.isFull()) {
-//            ErrorHandling.error("After a split, both pivots are full.");
-//        } else {
-//            // defensive programming
-//            if (sub_root.isFull()) {
-//                ErrorHandling.error("After a split, sub_root is still full.");
-//            }
-//            if (new_pivot.isFull()) {
-//                ErrorHandling.error("After a split, the new_pivot is full.");
-//            }
-//        }
 
         // Now have the new_pivot unallocated so we try and put it in the parent of sub_root
 
