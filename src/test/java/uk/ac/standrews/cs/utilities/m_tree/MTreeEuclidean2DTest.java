@@ -231,7 +231,7 @@ public class MTreeEuclidean2DTest {
 
         addNestedPoints();
 
-        // tree.showTree();
+        tree.showTree();
 
         Point p = new Point(15.0F, 0.0F);
         List<DataDistance<Point>> result = tree.rangeSearch(p, 10.0F);

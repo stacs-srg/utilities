@@ -74,6 +74,11 @@ public class MTree<T> {
         return results.values();
     }
 
+    private static int count_leaf_comparisons = 0;
+    private static int count_intermediate_comparisons = 0;
+    private static int count_depth = 0;
+    private static int deepest = 0;
+
     /**
      * Find the nodes withing @param r of @param T.
      *
@@ -83,8 +88,16 @@ public class MTree<T> {
      */
     public List<DataDistance<T>> rangeSearch(T query, float r) {
 
+        count_leaf_comparisons = 0;
+        count_intermediate_comparisons = 0;
+        count_depth = 0;
+        deepest = 0;
+
         ArrayList<DataDistance<T>> results = new ArrayList<>();
         rangeSearch(root, query, r, results);
+        System.out.println( "leaf comparisons = " + count_leaf_comparisons);
+        System.out.println( "intermediate comparisons = " + count_intermediate_comparisons);
+        System.out.println( "max depth = " + deepest );
         return results;
     }
 
@@ -98,7 +111,7 @@ public class MTree<T> {
         if( root == null ) {
             return null;
         } else {
-            return nearestNeighbour(root, new DataDistance<>(root.data,distance_wrapper.distance(root.data,query)), query);
+            return nearestNeighbour(root, new DataDistance<>(root.data, distance_wrapper.distance(root.data, query)), query);
         }
     }
 
@@ -170,7 +183,7 @@ public class MTree<T> {
         }
         ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node); // the size of the node.
         ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.children); // the size of the children array.
-        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.data); // the size of the referenced data object - does not include refs from that object (e.g if an LXP).
+        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.data); // the size of the referenced data object.
         // only other pointer field is parent which has already been included.
 
         if (node.isLeaf()) {
@@ -305,9 +318,12 @@ public class MTree<T> {
      * @param query  the query data
      * @param RQ the search radius
      */
+
     void rangeSearch(Node N, T query, float RQ, ArrayList<DataDistance<T>> results) {
 
         if (N.isLeaf()) {
+
+            count_leaf_comparisons++;
 
             float distanceNodeToQ = distance_wrapper.distance(N.data, query);
             if (distanceNodeToQ <= RQ) {
@@ -315,13 +331,21 @@ public class MTree<T> {
             }
 
         } else {
-            for (Node child : N.children) {
+            float distanceNodeToQ = distance_wrapper.distance(N.data, query);
+            count_intermediate_comparisons++;
 
-                float distanceChildToQ = distance_wrapper.distance(child.data, query);
+            if ( distanceNodeToQ - RQ - N.radius <= EPSILON ) {  // only look at the children if the query is inside the ball.
 
-                if (distanceChildToQ <= RQ + child.radius) {    // query may be inside this child because
-                    rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
+                for (Node child : N.children) {
+
+                        count_depth++;
+                        if( count_depth > deepest) {
+                            deepest = count_depth;
+                        }
+                        rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
+                        count_depth--;
                 }
+
             }
         }
     }
