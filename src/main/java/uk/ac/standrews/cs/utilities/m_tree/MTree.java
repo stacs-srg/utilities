@@ -182,8 +182,6 @@ public class MTree<T> {
             ts.max_depth = depth;
         }
 
-        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(root);
-
         if (node.isLeaf()) {
             ts.number_leaves++;
 
@@ -305,6 +303,7 @@ public class MTree<T> {
     public TreeStructure showStructure() {
         TreeStructure ts = new TreeStructure();
         ts.max_level_size = max_level_size;
+        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(root);
         show_structure(ts, root, 0);
         return ts;
     }
@@ -504,6 +503,7 @@ public class MTree<T> {
         float selected_pivot_distance = distance_wrapper.distance(selected_pivot.data, data); // the distance between data and the selected pivot.
 
         // Try and see if there is an enclosing child for the data
+        // This can create unavoidable overlaps in the balls.
         for (Node child : node.children) {
             if (child != node.children.get(0)) { // do not do this on the first child which is the same as the parent
                 float distance_from_data_to_child = distance_wrapper.distance(child.data, data);
@@ -533,29 +533,29 @@ public class MTree<T> {
                     }
                 }
             }
+
             // avoid creating ball overlaps in children ....
-            if( selected_pivot != node) {    // we are planning to put data in a child.
 
-                if( selected_pivot_distance > selected_pivot.radius ) {  // the chosen child would get bigger
+            if (selected_pivot_distance > selected_pivot.radius) {  // the chosen child would get bigger
 
-                    // check to see if we have created an overlap in doing this.
-                    // and if we have avoid it.
+                // check to see if we have created an overlap in doing this.
+                // and if we have try and avoid it
 
-                    for (Node child : node.children) {  // check all the children for overlap
-                        if( child != selected_pivot ) {
-                            float d_from_selected_pivot_to_child = distance_wrapper.distance(child.data, selected_pivot.data);
+                for (Node child : node.children) {  // check all the children for overlap
+                    if (child != selected_pivot) {
+                        float d_from_selected_pivot_to_child = distance_wrapper.distance(child.data, selected_pivot.data);
 
-                            if( d_from_selected_pivot_to_child - child.radius - selected_pivot.radius <= EPSILON ) {
-                                // using this selected_pivot would create overlap.
-                                // so don't use and use node instead.
-                                selected_pivot = node;
-                                selected_pivot_distance = distance_wrapper.distance(selected_pivot.data, data);
-                                break;
-                            }
+                        if (d_from_selected_pivot_to_child - child.radius - selected_pivot.radius <= EPSILON) {
+                            // using this selected_pivot would create overlap.
+                            // so don't use and use node instead - BUT we do not check for overlap in node.
+                            selected_pivot = node;
+                            selected_pivot_distance = distance_wrapper.distance(selected_pivot.data, data);
+                            break;
                         }
                     }
                 }
             }
+
         }
 
 
