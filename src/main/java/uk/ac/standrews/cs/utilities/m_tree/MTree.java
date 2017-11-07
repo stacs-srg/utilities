@@ -181,10 +181,8 @@ public class MTree<T> {
         if (depth > ts.max_depth) {
             ts.max_depth = depth;
         }
-        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node); // the size of the node.
-        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.children); // the size of the children array.
-        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(node.data); // the size of the referenced data object.
-        // only other pointer field is parent which has already been included.
+
+        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(root);
 
         if (node.isLeaf()) {
             ts.number_leaves++;
