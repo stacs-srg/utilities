@@ -185,7 +185,7 @@ public class MTree<T> {
 
     //------------------------- Private methods
 
-    private void show_structure(TreeStructure ts, Node node, int depth) {
+    private void initialise_structure(TreeStructure ts, Node node, int depth) {
         if (node == null) { // safety net
             return;
         }
@@ -200,9 +200,26 @@ public class MTree<T> {
             ts.number_internals++;
             ts.recordChildren(node.children.size());
             for (Node child : node.children) {
-                show_structure(ts, child, depth + 1);
+                initialise_structure(ts, child, depth + 1);
+            }
+            examine_overlaps( ts, node );
+        }
+    }
+
+    private void examine_overlaps(TreeStructure ts, Node node) {
+        int overlaps = 0;
+        List<Node> kids = node.children;
+        int count = kids.size();
+        for( int i = 1; i <= count; i++ ) {             // don't look at the zeroth child.
+            for( int j = i+1; j <= count; j++ ) {
+                Node first = kids.get(i);
+                Node second = kids.get(j);
+                if( first.radius + second.radius < distance_wrapper.distance(first.data,second.data)) {
+                    overlaps++;
+                }
             }
         }
+        ts.record_overlap( count, overlaps / ( ( count * (count -1) ) / 2.0f ) );
     }
 
     /**
@@ -315,7 +332,7 @@ public class MTree<T> {
         TreeStructure ts = new TreeStructure();
         ts.max_level_size = max_level_size;
         ts.total_tree_size += ObjectSizeCalculator.getObjectSize(root);
-        show_structure(ts, root, 0);
+        initialise_structure(ts, root, 0);
         return ts;
     }
 

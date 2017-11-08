@@ -17,7 +17,10 @@
 
 package uk.ac.standrews.cs.utilities.m_tree;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class used to hold the structure of the tree for analysis purposes.
@@ -27,6 +30,8 @@ import java.util.HashMap;
 public class TreeStructure {
 
     public HashMap<Integer,Integer> child_distribution = new HashMap<>(); // Used by showStructure to record children size distributions
+    public HashMap<Integer,List<Float>> overlap_distribution = new HashMap<>(); // Used by showStructure to record overlaps in children
+
     public int max_depth = 0;
     public int number_leaves = 0;
     public int number_internals = 0;
@@ -42,6 +47,74 @@ public class TreeStructure {
             child_distribution.put(number_of_children,count + 1 );
         }
     }
-    
-    
+
+
+    public void record_overlap(int count, float v) {
+        List<Float> list =  overlap_distribution.get(count);
+        if( list == null ) {
+            list = new ArrayList<>();
+            list.add(v);
+            overlap_distribution.put(count,list);
+        } else {
+            list.add(v);
+        }
+    }
+
+    public void printStats() {
+
+        int total_number_nodes = number_leaves + number_internals;
+
+        System.err.println( "Tree report: ") ;
+        System.err.println( "Max level size: " + max_level_size );
+        System.err.println( "Max depth: " + max_depth ) ;
+        System.err.println( "Number of nodes: " + total_number_nodes ) ;
+        System.err.println( "Number of leaves: " + number_leaves ) ;
+        System.err.println( "Number of internals: " + number_internals ) ;
+        System.err.println( "Total tree size: (excluding LXP Strings and values) " + total_tree_size );
+        print_child_distributions();
+        print_overlap_distributions();
+    }
+
+    public void print_child_distributions() {
+        System.err.println( "Children distribution:" );
+
+        int counts = 0;
+        int products = 0;
+        for( Map.Entry<Integer,Integer> entry : child_distribution.entrySet() ) {
+            int size = entry.getKey();
+            int count = entry.getValue();
+            products += size * count;
+            counts += count;
+            System.err.println( "\tsize: " +  size + " count: " + count );
+        }
+        System.err.println( "Average number of children (non leaf nodes) : " + (float) products / counts );
+
+    }
+
+    private void print_overlap_distributions() {
+        System.err.println( "Overlaps in Children:" );
+
+        int count = 0;
+        float total = 0.0f;
+
+        for( Map.Entry<Integer,List<Float>> entry : overlap_distribution.entrySet() ) {
+            int size = entry.getKey();
+            List<Float> entries = entry.getValue();
+            int entries_count = entries.size();
+            float min = Float.MAX_VALUE;
+            float max = Float.MIN_VALUE;
+            float sub_count = 0;
+
+            for( Float f : entries ) {
+                count++;
+                sub_count += f;
+                total += f;
+                if( f > max ) { max = f; };
+                if( f < min ) { min = f; };
+            }
+            System.err.println( "\tsize: " +  size + " min overlaps: " + min + " max overlaps: " + max + " average overlaps: " + (float) sub_count / entries_count );
+        }
+        System.err.println( "Average overlaps for whole tree: " + (float) total / count );
+
+    }
 }
