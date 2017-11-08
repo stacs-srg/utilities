@@ -356,7 +356,7 @@ public class MTree<T> {
             }
 
         } else {
-            
+
             count_intermediate_comparisons++;
 
             float distanceNodeToQ = distance_wrapper.distance(N.data, query);
@@ -369,7 +369,7 @@ public class MTree<T> {
 
                     float distanceChildToQ = distance_wrapper.distance(child.data, query);
 
-                    if (distanceChildToQ <= RQ + child.radius) {
+                    if (distanceChildToQ - RQ - child.radius <= EPSILON) {
                         count_depth++;
                         if (count_depth > deepest) {
                             deepest = count_depth;
