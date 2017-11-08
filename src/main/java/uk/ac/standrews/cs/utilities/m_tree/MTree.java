@@ -336,8 +336,10 @@ public class MTree<T> {
             for (Node child : N.children) {
 
                 float distanceChildToParent = child.distance_to_parent;
-                float distanceChildToQ = distance_wrapper.distance(child.data, query);
+
                 if (Math.abs(distanceNodeToQ - distanceChildToParent) <= RQ + child.radius) {  // only look at the children if the query is inside the ball.
+
+                    float distanceChildToQ = distance_wrapper.distance(child.data, query);
 
                     if (distanceChildToQ <= RQ + child.radius) {
                         count_depth++;
