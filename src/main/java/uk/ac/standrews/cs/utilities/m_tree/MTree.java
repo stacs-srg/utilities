@@ -210,8 +210,8 @@ public class MTree<T> {
         int overlaps = 0;
         List<Node> kids = node.children;
         int count = kids.size();
-        for( int i = 1; i <= count; i++ ) {             // don't look at the zeroth child.
-            for( int j = i+1; j <= count; j++ ) {
+        for( int i = 1; i < count; i++ ) {             // don't look at the zeroth child.
+            for( int j = i+1; j < count; j++ ) {
                 Node first = kids.get(i);
                 Node second = kids.get(j);
                 if( first.radius + second.radius < distance_wrapper.distance(first.data,second.data)) {
