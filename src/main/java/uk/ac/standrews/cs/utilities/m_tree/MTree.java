@@ -78,6 +78,11 @@ public class MTree<T> {
     private static int count_intermediate_comparisons = 0;
     private static int count_depth = 0;
     private static int deepest = 0;
+    private static int type1_pruned = 0;
+    private static int type1_total = 0;
+    private static int type2_pruned = 0;
+    private static int type2_total = 0;
+
 
     /**
      * Find the nodes withing @param r of @param T.
@@ -92,12 +97,18 @@ public class MTree<T> {
         count_intermediate_comparisons = 0;
         count_depth = 0;
         deepest = 0;
+        type1_pruned = 0;
+        type1_total = 0;
+        type2_pruned = 0;
+        type2_total = 0;
 
         ArrayList<DataDistance<T>> results = new ArrayList<>();
         rangeSearch(root, query, r, results);
         System.err.println( "leaf comparisons = " + count_leaf_comparisons);
         System.err.println( "intermediate comparisons = " + count_intermediate_comparisons);
         System.err.println( "max depth = " + deepest );
+        System.err.println( "type 1 pruning = " + type1_pruned + " out of " + type1_total);
+        System.err.println( "type 2 pruning = " + type2_pruned + " out of " + type2_total);
         return results;
     }
 
@@ -348,8 +359,14 @@ public class MTree<T> {
                         }
                         rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
                         count_depth--;
+                    } else {
+                        type2_pruned++;
                     }
+                    type2_total++;
+                } else {
+                    type1_pruned++;
                 }
+                type1_total++;
 
             }
         }
