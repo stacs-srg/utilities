@@ -375,97 +375,19 @@ public class MTree<T> {
                             deepest = count_depth;
                         }
                         rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
-
-
                         count_depth--;
                     } else {
                         type2_pruned++;
-
-
-                        ArrayList<DataDistance<T>> missed = rangeSearch_NonLeaf_SanityCheck(N, query, RQ);
-                        if (missed.size() > 0) {
-                            System.err.println("Type 1 - MTree loses nodes during rangeSearch " + missed.size());
-                            for (DataDistance<T> dd: missed) {
-                                System.err.println("Missing: " + dd.value + " with distance" + dd.distance);
-                            }
-                            System.err.println();
-                        }
-
                     }
                     type2_total++;
                 } else {
                     type1_pruned++;
-
-                    ArrayList<DataDistance<T>> missed = rangeSearch_NonLeaf_SanityCheck(N, query, RQ);
-                    if (missed.size() > 0) {
-                        System.err.println("Type 2 - MTree loses nodes during rangeSearch " + missed.size());
-                        for (DataDistance<T> dd: missed) {
-                            System.err.println("Missing: " + dd.value + " with distance" + dd.distance);
-                        }
-                        System.err.println();
-                    }
-
-
                 }
                 type1_total++;
 
             }
-
-
-
-
         }
     }
-
-    ArrayList<DataDistance<T>> rangeSearch_NonLeaf_SanityCheck(Node N, T query, float RQ) {
-
-        ArrayList<DataDistance<T>> results = new ArrayList<>();
-
-        for (Node child : N.children) {
-
-            float distanceChildToQ = distance_wrapper.distance(child.data, query);
-            if (distanceChildToQ - RQ - N.radius <= EPSILON) {  // only look at the children if the query is inside the ball.
-
-                rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
-            }
-
-        }
-
-        return results;
-    }
-
-    void rangeSearchOld(Node N, T query, float RQ, ArrayList<DataDistance<T>> results) {
-
-        if (N.isLeaf()) {
-
-            count_leaf_comparisons++;
-
-            float distanceNodeToQ = distance_wrapper.distance(N.data, query);
-            if (distanceNodeToQ <= RQ) {
-                results.add(new DataDistance<>(N.data, distanceNodeToQ));
-            }
-
-        } else {
-
-            count_intermediate_comparisons++;
-
-            for (Node child : N.children) {
-
-                float distanceChildToQ = distance_wrapper.distance(child.data, query);
-                if (distanceChildToQ - RQ - N.radius <= EPSILON) {  // only look at the children if the query is inside the ball.
-
-                    count_depth++;
-                    if (count_depth > deepest) {
-                        deepest = count_depth;
-                    }
-                    rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
-                    count_depth--;
-                }
-
-            }
-        }
-    }
-
 
 
     /**
