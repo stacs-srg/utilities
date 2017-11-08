@@ -351,7 +351,7 @@ public class MTree<T> {
             count_leaf_comparisons++;
 
             float distanceNodeToQ = distance_wrapper.distance(N.data, query);
-            if (distanceNodeToQ <= RQ) {
+            if (distanceNodeToQ - RQ <= EPSILON) {
                 results.add(new DataDistance<>(N.data, distanceNodeToQ));
             }
 
