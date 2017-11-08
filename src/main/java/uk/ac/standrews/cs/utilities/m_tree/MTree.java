@@ -365,7 +365,7 @@ public class MTree<T> {
 
                 float distanceChildToParent = child.distance_to_parent;
 
-                if (Math.abs(distanceNodeToQ - distanceChildToParent) <= RQ + child.radius) {  // only look at the children if the query is inside the ball.
+                if (Math.abs(distanceNodeToQ - distanceChildToParent) - RQ - child.radius <= EPSILON) {  // only look at the children if the query is inside the ball.
 
                     float distanceChildToQ = distance_wrapper.distance(child.data, query);
 
