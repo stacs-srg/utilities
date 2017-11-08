@@ -331,22 +331,28 @@ public class MTree<T> {
             
             count_intermediate_comparisons++;
 
+            float distanceNodeToQ = distance_wrapper.distance(N.data, query);
+
             for (Node child : N.children) {
 
+                float distanceChildToParent = child.distance_to_parent;
                 float distanceChildToQ = distance_wrapper.distance(child.data, query);
-                if (distanceChildToQ - RQ - N.radius <= EPSILON) {  // only look at the children if the query is inside the ball.
+                if (Math.abs(distanceNodeToQ - distanceChildToParent) <= RQ + child.radius) {  // only look at the children if the query is inside the ball.
 
-                    count_depth++;
-                    if (count_depth > deepest) {
-                        deepest = count_depth;
+                    if (distanceChildToQ <= RQ + child.radius) {
+                        count_depth++;
+                        if (count_depth > deepest) {
+                            deepest = count_depth;
+                        }
+                        rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
+                        count_depth--;
                     }
-                    rangeSearch(child, query, RQ, results);     // distance between them is less than the sum of the radii.
-                    count_depth--;
                 }
 
             }
         }
     }
+
 
     /**
      * @param query - some data for which to search
