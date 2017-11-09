@@ -543,7 +543,12 @@ public class MTree<T> {
     Node add(Node node, T data) {
 
         Node selected_pivot = node; // the best pivot into which to insert - 3 choices: this node, enclosing child, or nearest child.
-        float selected_pivot_distance = distance_wrapper.distance(selected_pivot.data, data); // the distance between data and the selected pivot.
+
+        float distance_from_data_to_node = distance_wrapper.distance(selected_pivot.data, data); // the distance between data and the selected pivot.
+
+        float selected_pivot_distance = distance_from_data_to_node; // the distance between data and the selected pivot.
+
+
 
         // Try and see if there is an enclosing child for the data
         // This can create unavoidable overlaps in the balls.
@@ -616,10 +621,9 @@ public class MTree<T> {
 
             float distance_pivot_to_node = distance_wrapper.distance(selected_pivot.data, node.data);
 
-            if ( distance_pivot_to_node + selected_pivot.radius > node.radius ) {                 // check if we need to make this node's radius bigger
-                node.radius = distance_pivot_to_node + selected_pivot.radius;
+            if ( distance_from_data_to_node  > node.radius ) {                 // check if we need to make this node's radius bigger
+                node.radius = distance_from_data_to_node ;
             }
-
         }
 
         return new_node;
