@@ -495,11 +495,12 @@ public class MTree<T> {
         }
 
         // see if we need to check out the children;
-        float node_distance = distance_wrapper.distance(node.data, query);
 
-        if (results.size() == 0 || node_distance - node.radius < results.furthestDistance()) {
-            // may be nodes in tree closer than those in results
-            for (Node child : node.children) {
+
+        for (Node child : node.children) {
+
+            float child_distance = distance_wrapper.distance(child.data, query);
+            if (results.size() < n || child_distance + node.radius < results.furthestDistance()) {
 
                 nearestN(child, n, query, results); // have a look at the children
             }

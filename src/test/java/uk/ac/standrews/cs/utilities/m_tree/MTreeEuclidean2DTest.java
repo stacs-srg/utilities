@@ -294,7 +294,7 @@ public class MTreeEuclidean2DTest {
             // move out in squares of size 4, each loop should include 4 more nodes
             List<DataDistance<Point>> result = tree.nearestN(p, i);
             List<Point> values = tree.mapValues(result);
-            assertTrue(result.size() == i);
+            assertEquals(i, result.size());
             for (Point pp : values) {
                 assertTrue(tree.contains(pp));   // TODO How to check that they are the right ones????
             }

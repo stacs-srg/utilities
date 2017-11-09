@@ -47,8 +47,10 @@ public class MTreeEuclidean2DSystematicTest {
     private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Float.compare(o1.distance, o2.distance);
 
     private static final float[] radii = new float[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
-    private static final int[] tree_sizes = new int[]{1, 2, 3, 5, 10, 100};
-    private static final int number_of_repetitions = 10;
+//    private static final int[] tree_sizes = new int[]{1, 2, 3, 5, 10, 100};
+//    private static final int number_of_repetitions = 10;
+    private static final int[] tree_sizes = new int[]{2};
+    private static final int number_of_repetitions = 1;
 
     @Parameters(name = "tree size={0}, repetition={1}, duplicates={2}")
     public static Collection<Object[]> generateData() {
@@ -137,7 +139,6 @@ public class MTreeEuclidean2DSystematicTest {
     }
 
     @Test
-    @Ignore
     public void checkNearestNeighboursOfAllPoints() {
 
         for (final Point p : points) {
@@ -158,6 +159,7 @@ public class MTreeEuclidean2DSystematicTest {
         for (int number_of_neighbours = 1; number_of_neighbours < points.size(); number_of_neighbours++) {
 
             final List<DataDistance<Point>> tree_distances = tree.nearestN(p, number_of_neighbours);
+            tree_distances.sort(distance_comparator);
             final List<DataDistance<Point>> brute_force_distances = brute_force.nearestN(p, number_of_neighbours);
 
             assertEquals(number_of_neighbours, tree_distances.size());

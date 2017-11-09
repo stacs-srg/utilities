@@ -17,13 +17,11 @@
 package uk.ac.standrews.cs.utilities.m_tree;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class MTreeEuclidean2DExtractedTests {
 
@@ -36,7 +34,6 @@ public class MTreeEuclidean2DExtractedTests {
     }
 
     @Test
-    @Ignore
     public void expectedNumberOfNearestNeighbours1() {
 
         final Point[] points = new Point[]{new Point(73f, 83f), new Point(24f, 60f), new Point(63f, 30f)};
@@ -45,11 +42,10 @@ public class MTreeEuclidean2DExtractedTests {
             tree.add(p);
         }
 
-        assertEquals(2, tree.nearestN(new Point(73f,83f), 2).size());
+        assertEquals(2, tree.nearestN(new Point(74f,85f), 2).size());
     }
 
     @Test
-    @Ignore
     public void expectedNumberOfNearestNeighbours2() {
 
         final Point[] points = new Point[]{new Point(59f, 34f), new Point(39f, 82f), new Point(53f, 16f), new Point(52f, 27f), new Point(11f, 82f)};
