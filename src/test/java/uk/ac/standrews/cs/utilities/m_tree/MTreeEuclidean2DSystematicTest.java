@@ -29,8 +29,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-@RunWith(Parameterized.class)
-public class MTreeEuclidean2DSystematicTest {
+public abstract class MTreeEuclidean2DSystematicTest {
 
     private MTree<Point> tree;
     private BruteForceSimilaritySearch<Point> brute_force;
@@ -47,24 +46,6 @@ public class MTreeEuclidean2DSystematicTest {
     private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Float.compare(o1.distance, o2.distance);
 
     private static final float[] radii = new float[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
-//    private static final int[] tree_sizes = new int[]{1, 2, 3, 5, 10, 100};
-//    private static final int number_of_repetitions = 10;
-    private static final int[] tree_sizes = new int[]{2};
-    private static final int number_of_repetitions = 1;
-
-    @Parameters(name = "tree size={0}, repetition={1}, duplicates={2}")
-    public static Collection<Object[]> generateData() {
-
-        final Object[][] objects = new Object[number_of_repetitions * tree_sizes.length * 2][];
-
-        for (int i = 0; i < number_of_repetitions; i++) {
-            for (int j = 0; j < tree_sizes.length; j++) {
-                objects[(i * tree_sizes.length + j) * 2] = new Object[]{ tree_sizes[j], i, false};
-                objects[(i * tree_sizes.length + j) * 2 + 1] = new Object[]{ tree_sizes[j], i, true};
-            }
-        }
-        return Arrays.asList(objects);
-    }
 
     public MTreeEuclidean2DSystematicTest(final int number_of_points, final int repetition_number, final boolean duplicate_values) {
 
@@ -111,6 +92,7 @@ public class MTreeEuclidean2DSystematicTest {
     private void addPoints() {
 
         for (final Point p : points) {
+
             tree.add(p);
             brute_force.add(p);
         }
@@ -122,12 +104,17 @@ public class MTreeEuclidean2DSystematicTest {
     }
 
     @Test
-    @Ignore
     public void treeContainsPoints() {
 
         for (final Point p : points) {
             assertTrue(tree.contains(p));
         }
+    }
+
+    @Test
+    public void treeSizeIsCorrect() {
+
+        assertEquals(points.size(), tree.size());
     }
 
     @Test
@@ -177,7 +164,7 @@ public class MTreeEuclidean2DSystematicTest {
 
             assertEqualValues(tree_distances, brute_force_distances);
 
-            for (DataDistance<Point> data_distance : tree_distances) {
+            for (final DataDistance<Point> data_distance : tree_distances) {
                 assertTrue(data_distance.distance <= radius);
             }
         }

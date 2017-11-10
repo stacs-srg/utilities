@@ -413,10 +413,8 @@ public class MTree<T> {
         } else { // the data may be inside this ball
             // need to check children
             for (Node child : node.children) {
-                if (!child.data.equals(node.data)) { // first child holds the same data as the node
-                    if (contains(child, query)) {
-                        return true;
-                    }
+                if (contains(child, query)) {
+                    return true;
                 }
             }
             return false;
@@ -500,7 +498,7 @@ public class MTree<T> {
         for (Node child : node.children) {
 
             float child_distance = distance_wrapper.distance(child.data, query);
-            if (results.size() < n || child_distance + node.radius < results.furthestDistance()) {
+            if (results.size() < n || child_distance - node.radius < results.furthestDistance()) {
 
                 nearestN(child, n, query, results); // have a look at the children
             }
