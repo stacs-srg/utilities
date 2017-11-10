@@ -109,7 +109,7 @@ public class Mash<T> extends MTree<T> {
                 super.add(data);  // NUM_ENTRIES INCREMENTED HERE - but not in helper functions.
                 return root;
             } else {
-                num_entries++;
+                number_of_entries++;
                 // no hints but we have a root
                 return super.add( root,data );
             }
@@ -118,7 +118,7 @@ public class Mash<T> extends MTree<T> {
         // TODO Problem: how to choose the best from the Set?
         // TODO for now just choose the first
         // TODO could have a look see and choose a good one here!
-        num_entries++;
+        number_of_entries++;
         Node node = node_hints.iterator().next();
         return insert_zoom(node,data);
     }
