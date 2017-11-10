@@ -31,7 +31,8 @@ import java.util.List;
 public class MTree<T> {
 
     private static final int DEFAULT_MAX_LEVEL_SIZE = 20;
-    private static final float EPSILON = 0.0000000001f; // A small float to avoid checking with zero.
+    static final float EPSILON = 0.0000000001f; // A small float to avoid checking with zero.
+    private static final boolean DEBUG = false;
 
     private static int count_leaf_comparisons = 0;
     private static int count_intermediate_comparisons = 0;
@@ -101,11 +102,13 @@ public class MTree<T> {
         final ArrayList<DataDistance<T>> results = new ArrayList<>();
         rangeSearch(root, query, r, results);
 
-        System.err.println( "leaf comparisons = " + count_leaf_comparisons);
-        System.err.println( "intermediate comparisons = " + count_intermediate_comparisons);
-        System.err.println( "max depth = " + deepest );
-        System.err.println( "type 1 pruning = " + type1_pruned + " out of " + type1_total);
-        System.err.println( "type 2 pruning = " + type2_pruned + " out of " + type2_total);
+        if (DEBUG) {
+            System.err.println("leaf comparisons = " + count_leaf_comparisons);
+            System.err.println("intermediate comparisons = " + count_intermediate_comparisons);
+            System.err.println("max depth = " + deepest);
+            System.err.println("type 1 pruning = " + type1_pruned + " out of " + type1_total);
+            System.err.println("type 2 pruning = " + type2_pruned + " out of " + type2_total);
+        }
 
         return results;
     }

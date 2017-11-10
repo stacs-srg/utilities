@@ -17,11 +17,7 @@
 package uk.ac.standrews.cs.utilities.m_tree;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
@@ -52,10 +48,6 @@ public abstract class MTreeEuclidean2DSystematicTest {
         this.number_of_points = number_of_points;
         this.repetition_number = repetition_number;
         this.duplicate_values = duplicate_values;
-    }
-
-    public String toString() {
-        return "tree size: " + number_of_points;
     }
 
     @Before
@@ -141,16 +133,23 @@ public abstract class MTreeEuclidean2DSystematicTest {
         }
     }
 
+    @Test
+    public void askingForTooManyNeighboursDoesntCrash() {
+
+        for (final Point p : points) {
+            tree.nearestN(p, points.size() + 1);
+        }
+    }
+
     private void checkNearestNeighboursOfPoint(final Point p) {
 
         for (int number_of_neighbours = 1; number_of_neighbours < points.size(); number_of_neighbours++) {
 
             final List<DataDistance<Point>> tree_distances = tree.nearestN(p, number_of_neighbours);
-            tree_distances.sort(distance_comparator);
             final List<DataDistance<Point>> brute_force_distances = brute_force.nearestN(p, number_of_neighbours);
 
             assertEquals(number_of_neighbours, tree_distances.size());
-            assertEqualValues(tree_distances, brute_force_distances);
+            assertSameDistanceOrder(tree_distances, brute_force_distances);
         }
     }
 
@@ -159,10 +158,12 @@ public abstract class MTreeEuclidean2DSystematicTest {
         for (final float radius : radii) {
 
             final List<DataDistance<Point>> tree_distances = tree.rangeSearch(p, radius);
-            tree_distances.sort(distance_comparator);
             final List<DataDistance<Point>> brute_force_distances = brute_force.rangeSearch(p, radius);
 
-            assertEqualValues(tree_distances, brute_force_distances);
+            // Sort the MTree results since they're not ordered by distance.
+            tree_distances.sort(distance_comparator);
+
+            assertSameDistanceOrder(tree_distances, brute_force_distances);
 
             for (final DataDistance<Point> data_distance : tree_distances) {
                 assertTrue(data_distance.distance <= radius);
@@ -170,17 +171,17 @@ public abstract class MTreeEuclidean2DSystematicTest {
         }
     }
 
-    private static void assertEqualValues(final List<DataDistance<Point>> tree_distances, final List<DataDistance<Point>> brute_force_distances) {
+    private static void assertSameDistanceOrder(final List<DataDistance<Point>> tree_distances, final List<DataDistance<Point>> brute_force_distances) {
 
         final int number_of_neighbours = tree_distances.size();
         assertEquals(number_of_neighbours, brute_force_distances.size());
 
         for (int i = 0; i < number_of_neighbours; i++) {
 
-            final Point brute_force_value = brute_force_distances.get(i).value;
-            final Point tree_value = tree_distances.get(i).value;
+            // Check that the pair-wise distances are the same, not the actual points, since order of points is undefined
+            // if there are pairs with equal distances.
 
-            assertEquals(tree_value, brute_force_value);
+            assertTrue(Math.abs(tree_distances.get(i).distance - brute_force_distances.get(i).distance) < MTree.EPSILON);
         }
     }
 }

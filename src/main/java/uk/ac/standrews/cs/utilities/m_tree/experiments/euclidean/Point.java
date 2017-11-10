@@ -18,10 +18,10 @@ package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
 
 public class Point implements Comparable<Point> {
 
-    public float x;
-    public float y;
+    public final float x;
+    public final float y;
 
-    public Point(float x, float y) {
+    public Point(final float x, final float y) {
         this.x = x;
         this.y = y;
     }
@@ -30,23 +30,21 @@ public class Point implements Comparable<Point> {
         return "[" + x + "," + y + "]";
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
 
         if (o instanceof Point) {
-            Point p = (Point) o;
+            final Point p = (Point) o;
             return x == p.x && y == p.y;
-
-        } else return false;
+        }
+        return false;
     }
 
     @Override
-    public int compareTo(Point o) {
-        return this.magnitude() > o.magnitude() ? +1 : this.magnitude() < o.magnitude() ? -1 : 0;
+    public int compareTo(final Point p) {
+        return Double.compare(magnitude(), p.magnitude());
     }
 
     private double magnitude() {
-        return Math.sqrt( ( x * x ) + ( y * y ) );
+        return Math.sqrt((x * x) + (y * y));
     }
-
-
 }

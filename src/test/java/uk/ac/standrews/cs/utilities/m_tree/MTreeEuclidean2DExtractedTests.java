@@ -33,7 +33,7 @@ public class MTreeEuclidean2DExtractedTests {
     @Before
     public void setUp() throws Exception {
 
-        tree = new MTree<>((Distance) new EuclideanDistance());
+        tree = new MTree<>(new EuclideanDistance());
     }
 
     @Test

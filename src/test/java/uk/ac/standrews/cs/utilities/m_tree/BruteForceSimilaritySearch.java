@@ -58,7 +58,7 @@ public class BruteForceSimilaritySearch<T> {
 
         final List<DataDistance<T>> distances_relative_to_query = getDistancesRelativeToQuery(query);
         distances_relative_to_query.sort(distance_comparator);
-        return distances_relative_to_query.subList(0, n);
+        return distances_relative_to_query.size() < n ? distances_relative_to_query : distances_relative_to_query.subList(0, n);
     }
 
     private List<DataDistance<T>> getDistancesRelativeToQuery(final T query) {
@@ -66,12 +66,13 @@ public class BruteForceSimilaritySearch<T> {
         final List<DataDistance<T>> result = new ArrayList<>();
 
         int query_index = 0;
-        while (!query.equals(values.get(query_index))) {
+        while (query_index < values.size() && !query.equals(values.get(query_index))) {
             query_index++;
         }
 
         for (int i = 0; i < values.size(); i++) {
-            result.add(new DataDistance<>(values.get(i), distances[query_index][i]));
+            final float distance = query_index < values.size() ? distances[query_index][i] : distance_metric.distance(values.get(i), query);
+            result.add(new DataDistance<>(values.get(i), distance));
         }
 
         return result;
