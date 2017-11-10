@@ -16,18 +16,11 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
-import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
 import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class MTreeEuclidean2DSystematicSmallTest extends MTreeEuclidean2DSystematicTest {
@@ -42,8 +35,8 @@ public class MTreeEuclidean2DSystematicSmallTest extends MTreeEuclidean2DSystema
 
         for (int i = 0; i < number_of_repetitions; i++) {
             for (int j = 0; j < tree_sizes.length; j++) {
-                parameters[(i * tree_sizes.length + j) * 2] = new Object[]{ tree_sizes[j], i, false};
-                parameters[(i * tree_sizes.length + j) * 2 + 1] = new Object[]{ tree_sizes[j], i, true};
+                parameters[(i * tree_sizes.length + j) * 2] = new Object[]{tree_sizes[j], i, false};
+                parameters[(i * tree_sizes.length + j) * 2 + 1] = new Object[]{tree_sizes[j], i, true};
             }
         }
 

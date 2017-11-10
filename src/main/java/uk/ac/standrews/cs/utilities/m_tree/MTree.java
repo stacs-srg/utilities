@@ -31,7 +31,7 @@ import java.util.List;
 public class MTree<T> {
 
     private static final int DEFAULT_MAX_LEVEL_SIZE = 20;
-    private static final float EPSILON = 0.00001f; // A small float to avoid checking with zero.
+    private static final float EPSILON = 0.0000000001f; // A small float to avoid checking with zero.
 
     private static int count_leaf_comparisons = 0;
     private static int count_intermediate_comparisons = 0;
