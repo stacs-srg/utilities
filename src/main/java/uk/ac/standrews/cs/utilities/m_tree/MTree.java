@@ -461,8 +461,6 @@ public class MTree<T> {
             return;
         }
 
-        // Node new_pivot = new Node(pivot_node.data, null, 0.0f);
-
         // Partition children of sub_root to sub_root_children and s2 according to sub_root and new_pivot
         final PairOfNodeLists partition = partitionChildrenIntoPivots(sub_root, new_pivot);
 
@@ -480,6 +478,10 @@ public class MTree<T> {
         }
 
         // Now have the new_pivot unallocated so we try and put it in the parent of sub_root
+        configurePivot(sub_root, new_pivot);
+    }
+
+    private void configurePivot(Node sub_root, Node new_pivot) {
 
         if (sub_root == root) { // it was the root had filled up - cannot go any higher so make the new_pivot the new root.
 
