@@ -26,7 +26,7 @@ import java.time.Duration;
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
-public class Formatting {
+public classx Formatting {
 
     /**
      * Prints the given value if the current logging level is at or higher than the given threshold.
