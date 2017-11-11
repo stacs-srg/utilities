@@ -8,4 +8,4 @@ This project provides various utility classes.
 
 ## Build and coverage status
 
-[![CircleCI](https://circleci.com/gh/stacs-srg/utilities.svg?style=svg)](https://circleci.com/gh/stacs-srg/utilities) [![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
+[![TeamCity](https://quicksilver.host.cs.st-andrews.ac.uk/buildstatus/build-status.png)](https://beast.cs.st-andrews.ac.uk/teamcity/viewType.html?buildTypeId=Utilities_Build) [![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
