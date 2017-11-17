@@ -16,7 +16,6 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import uk.ac.standrews.cs.utilities.archive.Diagnostic;
 
 import java.util.ArrayList;
@@ -911,7 +910,7 @@ public class MTree<T> {
 
         final TreeStructure ts = new TreeStructure();
         ts.max_level_size = max_level_size;
-        ts.total_tree_size += ObjectSizeCalculator.getObjectSize(root);
+        // ts.total_tree_size += ObjectSizeCalculator.getObjectSize(root);
         initialiseStructure(ts, root, 0);
         return ts;
     }
