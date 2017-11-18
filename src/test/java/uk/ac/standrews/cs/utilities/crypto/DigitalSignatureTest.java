@@ -23,10 +23,13 @@ import uk.ac.standrews.cs.utilities.FileManipulation;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 
 import static org.junit.Assert.*;
 
@@ -211,5 +214,30 @@ public class DigitalSignatureTest {
 
         boolean valid_1 = DigitalSignature.verifyKeyPair(otherKeys.getPublic(), keys.getPrivate());
         assertFalse(valid_1);
+    }
+
+    @Test
+    public void loadKeys() throws CryptoException, URISyntaxException {
+
+        PublicKey certificate = DigitalSignature.getCertificate(Paths.get(getClass().getResource("test.crt").toURI()));
+        PrivateKey privateKey = DigitalSignature.getPrivateKey(Paths.get(getClass().getResource("test.key").toURI()));
+
+        String signedText = DigitalSignature.sign64(privateKey, "TEST");
+        boolean verified = DigitalSignature.verify64(certificate, "TEST", signedText);
+        assertTrue(verified);
+    }
+
+    @Test
+    public void loadKeysAndSignRandom() throws CryptoException, URISyntaxException {
+
+        PublicKey certificate = DigitalSignature.getCertificate(Paths.get(getClass().getResource("test.crt").toURI()));
+        PrivateKey privateKey = DigitalSignature.getPrivateKey(Paths.get(getClass().getResource("test.key").toURI()));
+
+        SecureRandom random = new SecureRandom();
+        String challenge = new BigInteger(1024, random).toString(32);
+
+        String signedText = DigitalSignature.sign64(privateKey, challenge);
+        boolean verified = DigitalSignature.verify64(certificate, challenge, signedText);
+        assertTrue(verified);
     }
 }
