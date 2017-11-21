@@ -36,7 +36,7 @@ public class Mash<T> extends MTree<T> {
      */
     public Mash(Distance<T> distance, KeyMaker km ) {
         super(distance);
-        minHash = new MinHash<Node>();
+        minHash = new MinHash<Node>(2, 50, 2);
         this.km = km;
     }
 

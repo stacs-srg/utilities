@@ -27,40 +27,41 @@ public class MinHashExample1 {
 
     /**
      * A utility method used for debugging
+     *
      * @param arrai - an array to be turned into a colection
      * @return the array as a collection
      */
-    private static Collection<Integer> toCollection(int[] arrai ) {
+    private static Collection<Integer> toCollection(int[] arrai) {
         ArrayList<Integer> result = new ArrayList<Integer>();
-        for( int i = 0; i < arrai.length; i++) {
-            result.add( arrai[i]);
+        for (int i = 0; i < arrai.length; i++) {
+            result.add(arrai[i]);
         }
         return result;
     }
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
 
         String input1 = "The attribute to awe and majesty.";
         String input2 = "But there's but one in all doth hold his place.";
 
-        Set<String> input1_2grams = MinHash.ngrams(input1,2);
-        Set<String> input2_2grams = MinHash.ngrams(input2,2);
+        Set<String> input1_2grams = MinHash.ngrams(input1, 2);
+        Set<String> input2_2grams = MinHash.ngrams(input2, 2);
 
-        int[] input1_minHashSignature = MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE, MinHash.DEFAULTSIGNATURESIZE );
-        int[] input2_minHashSignature = MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE, MinHash.DEFAULTSIGNATURESIZE );
+        int[] input1_minHashSignature = MinHash.createMinHashSignature(input1, 50, 2);
+        int[] input2_minHashSignature = MinHash.createMinHashSignature(input2, 50, 2);
 
-        System.out.println( "Input 1 = " + input1 );
-        System.out.println( "Input 2 = " + input2 );
-
-        System.out.println();
-
-        System.out.println( "2grams intersection = " + Jaccard.intersection( input1_2grams, input2_2grams ).size() + ", union = " + Jaccard.union( input1_2grams, input2_2grams ).size() );
-        System.out.println( "Jaccard (ngrams) = " + Jaccard.jaccard(input1_2grams,input2_2grams ) );
+        System.out.println("Input 1 = " + input1);
+        System.out.println("Input 2 = " + input2);
 
         System.out.println();
 
-        System.out.println( "minhash intersection = " + Jaccard.intersection( toCollection(input1_minHashSignature), toCollection(input2_minHashSignature) ).size() + ", union = " + Jaccard.union( toCollection(input1_minHashSignature), toCollection(input2_minHashSignature) ).size() );
-        System.out.println( "Jaccard (minhash) = " + Jaccard.jaccard(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)) );
+        System.out.println("2grams intersection = " + Jaccard.intersection(input1_2grams, input2_2grams).size() + ", union = " + Jaccard.union(input1_2grams, input2_2grams).size());
+        System.out.println("Jaccard (ngrams) = " + Jaccard.jaccard(input1_2grams, input2_2grams));
+
+        System.out.println();
+
+        System.out.println("minhash intersection = " + Jaccard.intersection(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)).size() + ", union = " + Jaccard.union(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)).size());
+        System.out.println("Jaccard (minhash) = " + Jaccard.jaccard(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)));
 
     }
 }
