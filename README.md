@@ -20,12 +20,9 @@ A collection of utility code.
 </dependency>
 ```
 
-## Build and coverage status
-
-[![CircleCI](https://circleci.com/gh/stacs-srg/utilities.svg?style=svg)](https://circleci.com/gh/stacs-srg/utilities) [![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
-
 ## See also
 
 * [API documentation](https://quicksilver.host.cs.st-andrews.ac.uk/apidocs/utilities/)
 * [project website](https://stacs-srg.github.io/utilities/)
+* [build server](https://beast.cs.st-andrews.ac.uk/teamcity/viewType.html?buildTypeId=Utilities_Build) (private)
 * [relevant Maven goals](https://github.com/stacs-srg/hub/tree/master/maven) (private)
