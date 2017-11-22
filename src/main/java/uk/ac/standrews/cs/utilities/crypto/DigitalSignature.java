@@ -53,7 +53,7 @@ public class DigitalSignature {
 
     private static final String RSA_ALGORITHM = "RSA";
     private static final String PROVIDER = "BC";
-    private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
+    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     private static final int DEFAULT_KEY_LENGTH_IN_BITS = 512;
     private static final int MIN_KEY_LENGTH_IN_BITS = 512;
     private static final int MAX_KEY_LENGTH_IN_BITS = 4096;

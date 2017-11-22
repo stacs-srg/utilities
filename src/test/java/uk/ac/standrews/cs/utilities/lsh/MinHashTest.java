@@ -31,6 +31,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class MinHashTest {
 
+    private final static int DEFAULTSIGNATURESIZE_TEST = 50; // Arbitrary number
+
     /**
      * A utility method used for debugging
      * @param arrai - an array to be turned into a colection
@@ -61,8 +63,8 @@ public class MinHashTest {
         double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
 
         double jacquard_minhash = Jaccard.jaccard(
-                toCollection(MinHash.createMinHashSignature( input1,MinHash.DEFAULTSIGNATURESIZE, 2 )),
-                toCollection(MinHash.createMinHashSignature( input2,MinHash.DEFAULTSIGNATURESIZE, 2)));
+                toCollection(MinHash.createMinHashSignature( input1, DEFAULTSIGNATURESIZE_TEST, 2 )),
+                toCollection(MinHash.createMinHashSignature( input2, DEFAULTSIGNATURESIZE_TEST, 2)));
 
         System.out.println( "Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
 
