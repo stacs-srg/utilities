@@ -16,41 +16,28 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-import uk.ac.standrews.cs.utilities.lsh.MinHash;
-
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by al on 28/09/2017.
  */
 public class Mash<T> extends MTree<T> {
 
-    private final MinHash minHash;
-    private final KeyMaker km;
+    private TopDownMashHelper mh;
 
     /**
      * Creates a hybrid MTree with associated LSH with a given key generator and distance function
      * @param distance - the distance function to use in the MTree.
      * @param km - a key mapper which generates a key from a given value of type T.
      */
-    public Mash(Distance<T> distance, KeyMaker km ) {
+    public Mash(Distance<T> distance, KeyMaker km, int number_of_hints ) {
         super(distance);
-        minHash = new MinHash<Node>(2, 50, 2);
-        this.km = km;
+        mh = new TopDownMashHelper<T>( this, km, number_of_hints, distance );
     }
 
-    /**
-     * Add some data to the MTree
-     *
-     * @param data the data to be added to the tree
-     */
-    @Override
-    public void add(T data) {
-        String key = km.makeKey(data);
-        Set<Node> node_hints = minHash.getClosest(key);
-        Node mTreeNode = addWithHint( data, node_hints); // add the data to the MTree.
-        minHash.put( key,mTreeNode ); // save the new node in the lsh structure.
+
+    public void initialiseHints() {
+        mh.initialiseHints();
     }
 
     /**
@@ -61,9 +48,8 @@ public class Mash<T> extends MTree<T> {
      */
     @Override
     public DataDistance<T> nearestNeighbour(T query) {
-        String key = km.makeKey(query);
-        Set<Node> nodes = minHash.getClosest(key);
-        return nnWithHint( query, nodes );
+        Node hint = mh.getHint(query);
+        return nnWithHint( query, hint );
     }
 
     /**
@@ -75,21 +61,15 @@ public class Mash<T> extends MTree<T> {
      */
     @Override
     public List<DataDistance<T>> nearestN(T query, int n) {
-        String key = km.makeKey(query);
-        Set<Node> node_hints = minHash.getClosest(key);
 
-        if( node_hints.isEmpty() ) { // just add normally                       // copied from nearestNeighbour above
+        Node hint = mh.getHint(query);
+
+        if( hint == null ) { // just lookup normally                       // copied from nearestNeighbour above
             return super.nearestN( query,n );
         }
 
-        // We have some help so try and jump to the right place.
-        // TODO Problem: how to choose the best from the Set?
-        // TODO for now just choose the first
-        // TODO could have a look see and choose a good one here!
-        Node node = node_hints.iterator().next();
-        node = refineCandidate(node,query);
         ClosestSet results = new ClosestSet(n);
-        super.nearestN( node, n, query, results );
+        super.nearestN( hint, n, query, results );
         return results.values();
     }
 
@@ -100,11 +80,11 @@ public class Mash<T> extends MTree<T> {
     /**
      * Add some data to the MTree
      * @param data the data to be added to the tree
-     * @param node_hints - some nodes that are likely to be close to the right insertion point.
+     * @param node_hint - a nodes likely to be close to and above right insertion point.
      */
-    private Node addWithHint(T data, Set<Node> node_hints ) {
+    private Node addWithHint(T data, Node node_hint ) {
 
-        if( node_hints.isEmpty() ) { // just add normally
+        if( node_hint == null ) { // just add normally
             if( root == null ) { // new tree
                 super.add(data);  // NUM_ENTRIES INCREMENTED HERE - but not in helper functions.
                 return root;
@@ -114,13 +94,8 @@ public class Mash<T> extends MTree<T> {
                 return super.add( root,data );
             }
         }
-        // We have some help so try and jump to the right place.
-        // TODO Problem: how to choose the best from the Set?
-        // TODO for now just choose the first
-        // TODO could have a look see and choose a good one here!
         number_of_entries++;
-        Node node = node_hints.iterator().next();
-        return insert_zoom(node,data);
+        return insert_zoom(node_hint,data);
     }
 
     private Node insert_zoom(Node candidate, T data) {
@@ -154,16 +129,11 @@ public class Mash<T> extends MTree<T> {
         return super.add(candidate, data);
     }
 
-    private DataDistance<T> nnWithHint(T query, Set<Node> node_hints) {
-        if( node_hints.isEmpty() ) { // just add normally
+    private DataDistance<T> nnWithHint(T query, Node hint) {
+        if( hint == null ) { // just lookup normally
             return super.nearestNeighbour( root,null,query );
         }
-        // We have some help so try and jump to the right place.
-        // TODO Problem: how to choose the best from the Set?
-        // TODO for now just choose the first
-        // TODO could have a look see and choose a good one here!
-        Node node = node_hints.iterator().next();
-        return nearestNeighbour_zoom( node,query );
+        return nearestNeighbour_zoom( hint,query );
     }
 
     private DataDistance<T> nearestNeighbour_zoom(Node candidate, T query) {
@@ -201,40 +171,6 @@ public class Mash<T> extends MTree<T> {
         return super.nearestNeighbour(candidate, null , query); // new DataDistance(candidate.data, distance_to_target)
     }
 
-    private Node refineCandidate(Node candidate, T query) {
-        // There are THREE possibilities:
-        //  1. We are at the root - search at the root.
-        //  2. We are outside of the circle - need to move back up the tree until we are inside the first found.
-
-        //  3. We are inside the circle - need to move back up tree to highest enclosing node
-
-        if( candidate == root ) {   // Case 1 easy.
-            return root;
-        }
-
-        double distance_to_target = distance_wrapper.distance(candidate.data, query);
-
-        // Case 2 we are outside the covering radius, so move up the tree till we are inside.
-        if( distance_to_target > candidate.radius ) {
-            while( candidate.parent != null && distance_to_target >= candidate.radius ) {
-                // same code as while loop above but different condition.
-                candidate = candidate.parent; // move back up the tree.
-                distance_to_target = distance_wrapper.distance(candidate.data, query);
-            }
-            return candidate;
-        }
-
-        // if (distance_to_node - node.radius < closest_thus_far.distance)
-        // By definition the parent also satisfies this condition (nesting of radii).
-        // Need to see if parent is closer.
-
-        while(parent_closer(candidate,distance_to_target,query)) {
-            // this look moves us up the tree and stops at root or largest covering radius.
-            candidate = candidate.parent; // move back up the tree.
-            distance_to_target = distance_wrapper.distance(candidate.data, query);
-        }
-        return candidate;
-    }
 
     /**
      * @param node - a node to examine to see if the parent if closer to a query
@@ -250,7 +186,6 @@ public class Mash<T> extends MTree<T> {
         double parent_distance = distance_wrapper.distance(parent.data, query);
         return parent_distance <= distance_to_node && parent_distance < parent.radius;
     }
-
 
 
 }

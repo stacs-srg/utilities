@@ -42,7 +42,7 @@ public class MTree<T> {
     private static int type2_pruned = 0;
     private static int type2_total = 0;
 
-    Node root = null;
+    public Node root = null;
     int number_of_entries = 0;
     private final int max_level_size; // size of a level
     final Distance<T> distance_wrapper;
@@ -335,7 +335,7 @@ public class MTree<T> {
         } else {
 
             final Node newLeaf = new Node(data, subTree, distance_to_parent);
-            subTree.addChild(newLeaf, distance_to_parent); // children is not yet full - put the data into the children
+            subTree.addChild(newLeaf, distance_to_parent); // children is not yet full - addHint the data into the children
             return newLeaf;
         }
     }
@@ -476,7 +476,7 @@ public class MTree<T> {
             new_pivot.addChild(partition2_child, distance_wrapper.distance(new_pivot.data, partition2_child.data));        // radii are adjusted as nodes are added
         }
 
-        // Now have the new_pivot unallocated so we try and put it in the parent of sub_root
+        // Now have the new_pivot unallocated so we try and addHint it in the parent of sub_root
         configurePivot(sub_root, new_pivot);
     }
 
@@ -601,7 +601,7 @@ public class MTree<T> {
     /**
      * This is the class used to build the M-tree.
      */
-    protected class Node {
+    public class Node {
 
         public T data;
         float radius;
@@ -651,6 +651,18 @@ public class MTree<T> {
 
         public String toString() {
             return "data= " + data + " r= " + radius + " dp= " + distance_to_parent;
+        }
+
+        public int getNumberOfDescendants() {
+            if( this.isLeaf() ) {
+                return 0;
+            } else {
+                int count = this.children.size() - 1; // first child always the same as parent
+                for( Node child : this.children ) {
+                    count += child.getNumberOfDescendants();
+                }
+                return count;
+            }
         }
     }
 

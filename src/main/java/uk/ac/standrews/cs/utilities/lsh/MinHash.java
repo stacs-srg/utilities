@@ -106,7 +106,7 @@ public class MinHash<Data> {
 
                 int currentHashValue = hashFunction(token, seeds.next(), seeds.next()); // do the hash
 
-                if (currentHashValue < signature[index]) { //Only retain the minimum value and put into signature
+                if (currentHashValue < signature[index]) { //Only retain the minimum value and addHint into signature
                     signature[index] = currentHashValue;
                 }
             }
@@ -118,7 +118,7 @@ public class MinHash<Data> {
     /**
      * Put the value into a LSH Map with key key.
      * @param key - the key to which the data should be mapped
-     * @param value - the value to put in the map.
+     * @param value - the value to addHint in the map.
      */
     public void put(String key, Data value) {
         int[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
@@ -142,7 +142,7 @@ public class MinHash<Data> {
     }
 
     /**
-     * @param key - the key of teh data to be searched.
+     * @param key - the key of the data to be searched.
      * @return the set of data that are mapped by the key
      */
     public Set<Data> getClosest(String key) {
