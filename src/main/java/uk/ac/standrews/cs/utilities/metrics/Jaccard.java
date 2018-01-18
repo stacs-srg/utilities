@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.lsh;
+package uk.ac.standrews.cs.utilities.metrics;
+
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,16 +26,21 @@ import java.util.Set;
 /**
  * Created by al on 06/09/2017.
  */
-public class Jaccard {
+public class Jaccard implements Metric<String> {
 
-    public static double jaccard(Collection A, Collection B ) {
+    public double distance(Collection A, Collection B ) {
         return ( (double) ( intersection( A,B ).size() ) ) / union( A, B ).size();
     }
 
-    public static double jaccard(String A, String B ) {
-        Collection agrams = MinHash.ngrams(A,2);
-        Collection bgrams = MinHash.ngrams(B,2);
+    public double distance(String A, String B ) {
+        Collection agrams = Shingle.ngrams(A,2);
+        Collection bgrams = Shingle.ngrams(B,2);
         return ( (double) ( intersection( agrams,bgrams ).size() ) ) / union( agrams, bgrams ).size();
+    }
+
+    @Override
+    public String getMetricName() {
+        return "Jaccard";
     }
 
 

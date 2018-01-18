@@ -18,6 +18,8 @@ package uk.ac.standrews.cs.utilities.lsh;
 
 import org.junit.Before;
 import org.junit.Test;
+import uk.ac.standrews.cs.utilities.metrics.Jaccard;
+import uk.ac.standrews.cs.utilities.metrics.Shingle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +34,8 @@ import static org.junit.Assert.assertTrue;
 public class MinHashTest {
 
     private final static int DEFAULTSIGNATURESIZE_TEST = 50; // Arbitrary number
+
+    Jaccard jaccard = new Jaccard();
 
     /**
      * A utility method used for debugging
@@ -57,12 +61,12 @@ public class MinHashTest {
         String input1 = "The attribute to awe and majesty.";
         String input2 = "The attribute to awe and majesty.";
 
-        Set<String> input1_2grams = MinHash.ngrams(input1,2);
-        Set<String> input2_2grams = MinHash.ngrams(input2,2);
+        Set<String> input1_2grams = Shingle.ngrams(input1,2);
+        Set<String> input2_2grams = Shingle.ngrams(input2,2);
 
-        double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
+        double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
 
-        double jacquard_minhash = Jaccard.jaccard(
+        double jacquard_minhash = jaccard.distance(
                 toCollection(MinHash.createMinHashSignature( input1, DEFAULTSIGNATURESIZE_TEST, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2, DEFAULTSIGNATURESIZE_TEST, 2)));
 
@@ -78,12 +82,12 @@ public class MinHashTest {
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "Jul. O Romeo, 12345! wherefore art thou Romeo?";
 
-        Set<String> input1_2grams = MinHash.ngrams(input1,2);
-        Set<String> input2_2grams = MinHash.ngrams(input2,2);
+        Set<String> input1_2grams = Shingle.ngrams(input1,2);
+        Set<String> input2_2grams = Shingle.ngrams(input2,2);
 
-        double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
+        double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
 
-        double jacquard_minhash = Jaccard.jaccard(
+        double jacquard_minhash = jaccard.distance(
                 toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 
@@ -99,12 +103,12 @@ public class MinHashTest {
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "This is a totally different string than above!";
 
-        Set<String> input1_2grams = MinHash.ngrams(input1,2);
-        Set<String> input2_2grams = MinHash.ngrams(input2,2);
+        Set<String> input1_2grams = Shingle.ngrams(input1,2);
+        Set<String> input2_2grams = Shingle.ngrams(input2,2);
 
-        double jacquard_ngrams = Jaccard.jaccard(MinHash.ngrams(input1, 2), MinHash.ngrams(input2, 2));
+        double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
 
-        double jacquard_minhash = Jaccard.jaccard(
+        double jacquard_minhash = jaccard.distance(
                 toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 

@@ -16,6 +16,10 @@
  */
 package uk.ac.standrews.cs.utilities.all_pairs;
 
+import uk.ac.standrews.cs.utilities.metrics.Cosine;
+import uk.ac.standrews.cs.utilities.metrics.FeatureVector;
+import uk.ac.standrews.cs.utilities.metrics.KeyFreqPair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -72,6 +76,8 @@ public class AllPairs {
 
     private List<SimilarityPair> find_matches(FeatureVector x, String document) {
 
+        Cosine cos = new Cosine();
+
         HashMap<String, Double> A = new HashMap<>(); // maps from Document (should be id) to weights - empty map from vector id to weight
 
         List<SimilarityPair> result = new ArrayList<>(); // M←∅
@@ -85,7 +91,7 @@ public class AllPairs {
             if( candidates != null ) {
                 for (DocumentFeaturePair y : indexMap.get(i.qgram)) { // foreach(y,y[i])∈Ii do  for each document in the indexMap that exists for that feature
 
-                    double similarity = calculate_cosine(x, y.feature_vector); // calculate cosing similarity between x and y
+                    double similarity = cos.distance(x, y.feature_vector); // calculate cosing similarity between x and y
 
                     A.put(y.document, similarity);   // Add
 
@@ -99,25 +105,6 @@ public class AllPairs {
             }
         }
         return result;
-    }
-
-    private double calculate_cosine(FeatureVector x, FeatureVector y) {
-        double dot_product = 0.0d;
-
-        for( KeyFreqPair xs : x.getFeatures() ) {
-            //lookup
-            dot_product += xs.frequency * y.getFrequency(xs.qgram);
-        }
-
-        return (dot_product / (magnitude(x) * magnitude(y)));
-    }
-
-    private double magnitude(FeatureVector x) {
-        double result = 0.0d;
-        for( KeyFreqPair xs : x.getFeatures() ) {
-            result += xs.frequency;
-        }
-        return Math.sqrt(result);
     }
 
     private void add_to_all_matches(List<SimilarityPair> matches) {

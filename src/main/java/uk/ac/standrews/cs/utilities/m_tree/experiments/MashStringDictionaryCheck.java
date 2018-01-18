@@ -47,10 +47,10 @@ public class MashStringDictionaryCheck {
 
         long starttime = System.currentTimeMillis();
 
-        unixDictionarySizeTest();
-//        allNearestNeighbours();
-        nearestN();
-        range();
+//        unixDictionarySizeTest();
+        allNearestNeighbours();
+//        nearestN();
+//        range();
         System.out.println( "Mash time taken = " + ( System.currentTimeMillis() - starttime ) / 1000.0 );
     }
 

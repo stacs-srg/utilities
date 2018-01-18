@@ -16,6 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
+import uk.ac.standrews.cs.utilities.metrics.Jaccard;
+import uk.ac.standrews.cs.utilities.metrics.Shingle;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -103,8 +106,8 @@ public class MinHashExample2 {
             int[] hash = mh.createMinHashSignature( sentence, 50, 2);
             for( String key : map.keySet() ) {
 
-                Set<String> sentence_2grams = MinHash.ngrams(sentence,2);
-                Set<String> key_2grams = MinHash.ngrams(key,2);
+                Set<String> sentence_2grams = Shingle.ngrams(sentence,2);
+                Set<String> key_2grams = Shingle.ngrams(key,2);
 
                 int[] sentence_minHashSignature = MinHash.createMinHashSignature( sentence, 50, 2 );
                 int[] key_minHashSignature = MinHash.createMinHashSignature( key, 50, 2 );
@@ -113,9 +116,9 @@ public class MinHashExample2 {
                 System.out.println( "Sentence 2 = " + key );
                 Set intersection = Jaccard.intersection(sentence_2grams, key_2grams);
                 System.out.println( "2grams intersection = " + intersection + " size = " + intersection.size() + ", union = " + Jaccard.union( sentence_2grams, key_2grams ).size() );
-                System.out.println( "Jaccard (ngrams) = " + Jaccard.jaccard(sentence_2grams,key_2grams ) );
+                System.out.println( "Jaccard (ngrams) = " + new Jaccard().distance(sentence_2grams,key_2grams ) );
                 System.out.println( "minhash intersection = " + Jaccard.intersection( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() + ", union = " + Jaccard.union( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() );
-                System.out.println( "Jaccard (minhash) = " + Jaccard.jaccard(toCollection(sentence_minHashSignature), toCollection(key_minHashSignature)) );
+                System.out.println( "Jaccard (minhash) = " + new Jaccard().distance(toCollection(sentence_minHashSignature), toCollection(key_minHashSignature)) );
                 System.out.println( "----" );
 
             }

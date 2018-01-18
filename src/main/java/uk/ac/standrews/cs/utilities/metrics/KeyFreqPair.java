@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.all_pairs;
+package uk.ac.standrews.cs.utilities.metrics;
 
 /**
  * Created by al on 27/09/2017.

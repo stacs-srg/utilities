@@ -133,43 +133,44 @@ public class Mash<T> extends MTree<T> {
         if( hint == null ) { // just lookup normally
             return super.nearestNeighbour( root,null,query );
         }
-        return nearestNeighbour_zoom( hint,query );
+        return super.nearestNeighbour(hint, new DataDistance(hint.data, distance_wrapper.distance(hint.data, query)), query);
+        // return nearestNeighbour_zoom( hint,query );
     }
 
-    private DataDistance<T> nearestNeighbour_zoom(Node candidate, T query) {
-        // There are THREE possibilities:
-        //  1. We are at the root - search at the root.
-        //  2. We are outside of the circle - need to move back up the tree until we are inside the first found.
-
-        //  3. We are inside the circle - need to move back up tree to highest enclosing node
-
-        if( candidate == root ) {   // Case 1 easy.
-            return super.nearestNeighbour(query);
-        }
-
-        float distance_to_target = distance_wrapper.distance(candidate.data, query);
-
-        // Case 2 we are outside the covering radius, so move up the tree till we are inside.
-        if( distance_to_target > candidate.radius ) {
-            while( candidate.parent != null && distance_to_target >= candidate.radius ) {
-                // same code as while loop above but different condition.
-                candidate = candidate.parent; // move back up the tree.
-                distance_to_target = distance_wrapper.distance(candidate.data, query);
-            }
-            return super.nearestNeighbour(candidate, new DataDistance(candidate.data, distance_to_target), query);
-        }
-
-        // if (distance_to_node - node.radius < closest_thus_far.distance)
-        // By definition the parent also satisfies this condition (nesting of radii).
-        // Need to see if parent is closer.
-
-        while(parent_closer(candidate,distance_to_target,query)) {
-                // this look moves us up the tree and stops at root or largest covering radius.
-                candidate = candidate.parent; // move back up the tree.
-                distance_to_target = distance_wrapper.distance(candidate.data, query);
-        }
-        return super.nearestNeighbour(candidate, null , query); // new DataDistance(candidate.data, distance_to_target)
-    }
+//    private DataDistance<T> nearestNeighbour_zoom(Node candidate, T query) {
+//        // There are THREE possibilities:
+//        //  1. We are at the root - search at the root.
+//        //  2. We are outside of the circle - need to move back up the tree until we are inside the first found.
+//
+//        //  3. We are inside the circle - need to move back up tree to highest enclosing node
+//
+//        if( candidate == root ) {   // Case 1 easy.
+//            return super.nearestNeighbour(query);
+//        }
+//
+//        float distance_to_target = distance_wrapper.distance(candidate.data, query);
+//
+//        // Case 2 we are outside the covering radius, so move up the tree till we are inside.
+//        if( distance_to_target > candidate.radius ) {
+//            while( candidate.parent != null && distance_to_target >= candidate.radius ) {
+//                // same code as while loop above but different condition.
+//                candidate = candidate.parent; // move back up the tree.
+//                distance_to_target = distance_wrapper.distance(candidate.data, query);
+//            }
+//            return super.nearestNeighbour(candidate, new DataDistance(candidate.data, distance_to_target), query);
+//        }
+//
+//        // if (distance_to_node - node.radius < closest_thus_far.distance)
+//        // By definition the parent also satisfies this condition (nesting of radii).
+//        // Need to see if parent is closer.
+//
+//        while(parent_closer(candidate,distance_to_target,query)) {
+//                // this look moves us up the tree and stops at root or largest covering radius.
+//                candidate = candidate.parent; // move back up the tree.
+//                distance_to_target = distance_wrapper.distance(candidate.data, query);
+//        }
+//        return super.nearestNeighbour(candidate, null , query); // new DataDistance(candidate.data, distance_to_target)
+//    }
 
 
     /**

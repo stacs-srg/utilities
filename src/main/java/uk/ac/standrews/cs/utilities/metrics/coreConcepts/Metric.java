@@ -14,22 +14,16 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.all_pairs;
-
-import uk.ac.standrews.cs.utilities.metrics.FeatureVector;
 
 /**
- * Created by al on 27/09/2017.
+ * @author Richard Connor richard.connor@strath.ac.uk
+ *
  */
-public class DocumentFeaturePair {
+package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-    public final String document;
-    public final int count;    // of feature
-    public final FeatureVector feature_vector;
+public interface Metric<T> {
 
-    public DocumentFeaturePair(String document, FeatureVector fv, int count) {
-        this.document = document;
-        this.feature_vector = fv;
-        this.count = count;
-    }
+    public double distance(T x, T y);
+
+    public String getMetricName();
 }

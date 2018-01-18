@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.all_pairs;
+package uk.ac.standrews.cs.utilities.metrics;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public class FeatureVector {
         return state;
     }
 
-    Iterator<KeyFreqPair> getFeatureIterator() {
+    public Iterator<KeyFreqPair> getFeatureIterator() {
         return state.iterator();
     }
 

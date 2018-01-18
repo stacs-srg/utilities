@@ -1,3 +1,20 @@
+/*
+ * Copyright 2017 Systems Research Group, University of St Andrews:
+ * <https://github.com/stacs-srg>
+ *
+ * This file is part of the module utilities.
+ *
+ * utilities is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * utilities is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with utilities. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.standrews.cs.utilities.m_tree;
 
 import uk.ac.standrews.cs.utilities.lsh.MinHash;
@@ -112,6 +129,7 @@ public class TopDownMashHelper<T> {
 
     }
 
+
     private MTree<T>.Node chooseBest(Set<MTree<T>.Node> closest_set, T data ) {
 
         // We have some help so try and jump to the right place.
@@ -125,38 +143,46 @@ public class TopDownMashHelper<T> {
             return null;
         } else {
             System.out.println( closest_set.size() + " matches found in lsh");
-            return refine( closest_set.iterator().next(),data ); // TODO Refine once working.
+
+            // return takeFirst( closest_set, data );
+            return examineAllCandidates( closest_set, data );
         }
     }
 
-    private class DataCount implements Comparable<DataCount> {
-        public MTree<T>.Node node;
-        public int count;
+    private MTree<T>.Node takeFirst( Set<MTree<T>.Node> closest_set, T query ) {
+        return refine( closest_set.iterator().next(),query ); // TODO variation 2: choose first in list.
+    }
 
-        public DataCount( MTree<T>.Node node, int count ) {
-            this.node = node;
-            this.count = count;
+
+    private MTree<T>.Node examineAllCandidates( Set<MTree<T>.Node> closest_set, T query ) {
+
+        MTree<T>.Node closest = null;
+        float closest_distance = Float.MAX_VALUE;
+        boolean enclosing = false;
+
+        for (MTree<T>.Node node : closest_set) {
+
+            final float distanceNodeToQ = distance_wrapper.distance(node.data, query);
+
+            if (distanceNodeToQ < closest_distance && ( Math.abs(distanceNodeToQ - distanceNodeToQ) <= MTree.EPSILON) ) { // node is closer and the query is in this circle.
+                closest = node;
+                closest_distance = distanceNodeToQ;
+                enclosing = true;
+                System.out.println("Found closer pivot = " + node.data + " r= " + node.radius + " d = " + distanceNodeToQ);
+            } else if (!enclosing && distanceNodeToQ < closest_distance) { // didn't find an enclosing query but closer than so far
+                closest = node;
+                closest_distance = distanceNodeToQ;
+                System.out.println("Found a non-enclosing pivot = " + node.data + " r= " + node.radius + " d = " + distanceNodeToQ);
+            }
+        }
+        if( enclosing ) {
+            System.out.println("Closest pivot: " + closest.data + " r= " + closest.radius + " d = " + closest_distance);
+            return closest;
+        } else {
+            System.out.println("Didn't find close pivot - refining result");
+            return refine(closest, query);
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            DataCount dataCount = (DataCount) o;
-            return count == dataCount.count &&
-                    Objects.equals(node, dataCount.node);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return Objects.hash(node, count);
-        }
-
-        @Override
-        public int compareTo(DataCount other) {
-            return this.count == other.count ? 0 : this.count < other.count ? -1 : 1; // want lowest count first.
-        }
     }
 
     private MTree<T>.Node refine(MTree<T>.Node candidate, T query) {
@@ -215,5 +241,33 @@ public class TopDownMashHelper<T> {
         return parent_distance <= distance_to_node && parent_distance < parent.radius;
     }
 
+    private class DataCount implements Comparable<DataCount> {
+        public MTree<T>.Node node;
+        public int count;
 
+        public DataCount( MTree<T>.Node node, int count ) {
+            this.node = node;
+            this.count = count;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DataCount dataCount = (DataCount) o;
+            return count == dataCount.count &&
+                    Objects.equals(node, dataCount.node);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return Objects.hash(node, count);
+        }
+
+        @Override
+        public int compareTo(DataCount other) {
+            return this.count == other.count ? 0 : this.count < other.count ? -1 : 1; // want lowest count first.
+        }
+    }
 }

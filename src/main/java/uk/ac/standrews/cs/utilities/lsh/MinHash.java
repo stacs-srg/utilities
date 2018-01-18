@@ -16,6 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
+import uk.ac.standrews.cs.utilities.metrics.Shingle;
+
 import java.util.*;
 
 /**
@@ -44,20 +46,6 @@ public class MinHash<Data> {
         this.shingle_size = shingle_size;
         this.signature_size = num_bands * band_size;
         this.band_size = band_size;
-    }
-
-    /**
-     * Create all the ngrams of length n of the source
-     *
-     * @param n      - the length of the ngrams that are required.
-     * @param source - the string from which the ngrams are created
-     * @return the ngrams of the input string
-     */
-    public static Set<String> ngrams(String source, int n) {
-        HashSet<String> ngrams = new HashSet<String>();
-        for (int i = 0; i < source.length() - n + 1; i++)
-            ngrams.add(source.substring(i, i + n));
-        return ngrams;
     }
 
     public MinHashStructure showStructure() {
@@ -90,7 +78,7 @@ public class MinHash<Data> {
     public static int[] createMinHashSignature(String src, int sig_size, int shingle_size) {
 //        String stripped = src.replaceAll( "\\s","" ). // replace all whitespace with nothing.
 //                replaceAll("[.,~{}()!\\\\]", ""); // replace other punctuation stops with nothing
-        Set<String> set_ngrams = ngrams(src, shingle_size);
+        Set<String> set_ngrams = Shingle.ngrams(src, shingle_size);
 
         //Create a min hash array initialized to all int max values
         int[] signature = new int[sig_size];

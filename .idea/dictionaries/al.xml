@@ -2367,6 +2367,7 @@
       <w>implicitGeneric</w>
       <w>importIntoEnv</w>
       <w>in.out</w>
+      <w>in.zoom</w>
       <w>inSide</w>
       <w>infert</w>
       <w>influence</w>
@@ -2378,6 +2379,7 @@
       <w>initRefFields</w>
       <w>initial.sp</w>
       <w>initialize</w>
+      <w>inout.zoom</w>
       <w>insertClassMethods</w>
       <w>insertMethod</w>
       <w>insertSource</w>
@@ -2810,6 +2812,7 @@
       <w>mosaicplot</w>
       <w>motor</w>
       <w>motors</w>
+      <w>move.to.click.zoom</w>
       <w>moveToGrob</w>
       <w>mroot</w>
       <w>mtcars</w>
@@ -2840,6 +2843,7 @@
       <w>naprint</w>
       <w>naresid</w>
       <w>nargs</w>
+      <w>navigation.zoom</w>
       <w>nb</w>
       <w>nchar</w>
       <w>nclass.FD</w>
@@ -2944,6 +2948,7 @@
       <w>order</w>
       <w>order.dendrogram</w>
       <w>ordered</w>
+      <w>out.zoom</w>
       <w>outer</w>
       <w>ovarian</w>
       <w>p.adjust</w>
@@ -3595,6 +3600,7 @@
       <w>seq_len</w>
       <w>sequence</w>
       <w>serialize</w>
+      <w>session.zoom</w>
       <w>sessionInfo</w>
       <w>set.seed</w>
       <w>setAs</w>
@@ -3764,6 +3770,7 @@
       <w>splitIndices</w>
       <w>splom</w>
       <w>sprintf</w>
+      <w>sq.zoom</w>
       <w>sqrt</w>
       <w>srcfile</w>
       <w>srcfilealias</w>
@@ -4227,6 +4234,9 @@
       <w>ziP</w>
       <w>zip</w>
       <w>ziplss</w>
+      <w>zm</w>
+      <w>zoom</w>
+      <w>zoomplot.zoom</w>
     </words>
   </dictionary>
 </component>
