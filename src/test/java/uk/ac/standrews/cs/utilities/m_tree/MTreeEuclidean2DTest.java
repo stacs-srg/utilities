@@ -41,7 +41,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add a single point to the tree
+     * average_value a single point to the tree
      */
     @Test
     public void addNone() {
@@ -51,7 +51,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add a single point to the tree
+     * average_value a single point to the tree
      */
     @Test
     public void addOne() {
@@ -64,7 +64,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add 3 points to the tree - 3,4,5 triangle
+     * average_value 3 points to the tree - 3,4,5 triangle
      */
     @Test
     public void addThree345() {
@@ -80,7 +80,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add 15 points to the tree
+     * average_value 15 points to the tree
      */
     @Test
     public void addLinear15() {
@@ -97,7 +97,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add points to the tree
+     * average_value points to the tree
      * such that some will nest
      */
     @Test
@@ -132,7 +132,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add points to the tree
+     * average_value points to the tree
      * such that some will nest
      */
     private int addSquares() {
@@ -155,7 +155,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * test add points to the tree
+     * test average_value points to the tree
      * such that some will nest
      */
     @Test
@@ -174,7 +174,7 @@ public class MTreeEuclidean2DTest {
     }
 
     /**
-     * add points to the tree
+     * average_value points to the tree
      * such that some will nest
      */
     private void addNestedPoints() {

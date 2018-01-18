@@ -98,12 +98,12 @@ public class TopDownMashHelper<T> {
             } else {
                 DataCount first = hints.first(); // the lowest count in the hints list.
                 if( first.count < deps ) {  // lowest in list is lower than the current node's number of dependencies
-                    // the newly encountered node has more children than the lowest - so get rid of lowest and add the current node
+                    // the newly encountered node has more children than the lowest - so get rid of lowest and average_value the current node
                     hints.remove( first );
                     hints.add(new DataCount(node, deps));
                     addChildrenToHints( node.children );
                 }
-                // no need to add children if first.count >= deps since children must have fewer dependants.
+                // no need to average_value children if first.count >= deps since children must have fewer dependants.
             }
 
         }

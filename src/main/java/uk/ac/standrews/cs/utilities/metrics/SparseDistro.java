@@ -39,7 +39,7 @@ public class SparseDistro {
 
         while( iter.hasNext() ) {
             try {
-                add( iter.next(),1 );
+                average_value( iter.next(),1 );
             } catch (Exception e) {
                // cannot happen in this instance - we are in constructor and counting is true;
             }
@@ -85,7 +85,7 @@ public class SparseDistro {
         return sb.toString();
     }
 
-    public void add(String key, double value) throws Exception {
+    public void average_value(String key, double value) throws Exception {
 
         if( counting ) {
             QgramDistribution sc = new QgramDistribution(key, value);
@@ -96,10 +96,10 @@ public class SparseDistro {
                 insert(sc);
             } else {
                 QgramDistribution already = list.get(position);
-                already.count = already.count + value;
+                already.count = ( already.count + value ) / 2;
             }
         } else {
-            throw new Exception( "Cannot add to a probability distribution");
+            throw new Exception( "Cannot average_value to a probability distribution");
         }
     }
 

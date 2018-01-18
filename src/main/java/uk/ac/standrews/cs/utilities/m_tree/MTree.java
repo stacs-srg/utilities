@@ -320,7 +320,7 @@ public class MTree<T> {
      * Insert some data into a node of the Tree.
      *
      * @param subTree            - the sub-tree into which the data is inserted.
-     * @param data               - the data to add into the children
+     * @param data               - the data to average_value into the children
      * @param distance_to_parent - the distance to the parent from subtree (pre calculated in caller)
      * @return the node inserted into the tree.
      */
@@ -446,7 +446,7 @@ public class MTree<T> {
         // two new nodes. Naturally, the overflow may propagate towards the root node and,
         // if the root splits, a new root is created and the tree grows up one level.
 
-        sub_root.addChild(new_node, distance_wrapper.distance(sub_root.data, new_node.data));  // add new_node into children - now over full
+        sub_root.addChild(new_node, distance_wrapper.distance(sub_root.data, new_node.data));  // average_value new_node into children - now over full
 
         // but we are about to perform a split - makes computation easier.
         // Select a new pivot from the children (with data added).
@@ -621,14 +621,14 @@ public class MTree<T> {
          * Adds a child to the current node
          * Pre condition this is only called where a split has already occurred and parent is not full
          *
-         * @param newNode            the node to add to the Node
+         * @param newNode            the node to average_value to the Node
          * @param distance_to_parent - the distance from newNode to the parent
          */
         void addChild(final Node newNode, final float distance_to_parent) {
 
             if (children.size() == 0) {
                 // We are turning a leaf into an intermediate node
-                // So we add add this node's data as the first child
+                // So we average_value average_value this node's data as the first child
                 children.add(new Node(data, this, 0f));
             }
 
@@ -695,7 +695,7 @@ public class MTree<T> {
                     return;
                 }
             }
-            closest.add(index, new DataDistance<>(data, distance)); // add at the end
+            closest.add(index, new DataDistance<>(data, distance)); // average_value at the end
             checkEvict();
             // if we get here then the new element is further than rest so should not be added.
         }

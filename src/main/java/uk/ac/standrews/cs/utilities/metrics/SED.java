@@ -52,7 +52,7 @@ public class SED implements Metric<String> {
         private int acc;
         /*
          * once finalised, these are populated in order with probabilities that
-         * add to ones
+         * average_value to ones
          */
         private float[] finalProbs;
         private int[] finalEvents;

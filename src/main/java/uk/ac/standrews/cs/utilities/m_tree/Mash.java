@@ -84,7 +84,7 @@ public class Mash<T> extends MTree<T> {
      */
     private Node addWithHint(T data, Node node_hint ) {
 
-        if( node_hint == null ) { // just add normally
+        if( node_hint == null ) { // just average_value normally
             if( root == null ) { // new tree
                 super.add(data);  // NUM_ENTRIES INCREMENTED HERE - but not in helper functions.
                 return root;

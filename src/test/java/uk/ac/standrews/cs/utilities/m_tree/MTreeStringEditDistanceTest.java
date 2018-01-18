@@ -34,7 +34,7 @@ public class MTreeStringEditDistanceTest {
     }
 
     /**
-     * add a single point to the tree
+     * average_value a single point to the tree
      */
     @Test
     public void addOne() {
@@ -46,7 +46,7 @@ public class MTreeStringEditDistanceTest {
     }
 
     /**
-     * add some words and find the closest
+     * average_value some words and find the closest
      */
     @Test
     public void checkNearest() {

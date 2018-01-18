@@ -113,11 +113,11 @@ public class JensenShannon implements Metric<String> {
             throw new Exception( "Can only average counting distributions" );
         }
         SparseDistro ave = new SparseDistro( xx ); // a copy of the first distribution.
-        // now add in the records from the second
+        // now average_value in the records from the second
         Iterator<QgramDistribution> yy_iter = yy.getIterator();
         while( yy_iter.hasNext() ) {
             QgramDistribution nxt = yy_iter.next();
-            ave.add( nxt.key, nxt.count );
+            ave.average_value( nxt.key, nxt.count );
         }
         return ave;
     }
@@ -172,6 +172,7 @@ public class JensenShannon implements Metric<String> {
 //        System.out.println( js.distance( "ABX", "ABC" ) );
 
         System.out.println("JS:" );
+        System.out.println( "mclauchlan/mclauchlan: " + js.distance( "mclauchlan", "mclauchlan" ) );
         System.out.println( "pillar/caterpillar: " + js.distance( "pillar", "caterpillar" ) );  //  6/11 correct
         System.out.println( "bat/cat: " + js.distance( "bat", "cat" ) );
         System.out.println( "cat/cart: " + js.distance( "cat", "cart" ) );

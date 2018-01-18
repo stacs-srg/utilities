@@ -56,7 +56,7 @@ public class MIFile2DTest {
     }
 
     /**
-     * add a single point to the file
+     * average_value a single point to the file
      */
     @Test
     public void addNone() {
@@ -66,7 +66,7 @@ public class MIFile2DTest {
     }
 
     /**
-     * add a single point to the file
+     * average_value a single point to the file
      */
     @Test
     public void addOne() throws Exception {
@@ -79,7 +79,7 @@ public class MIFile2DTest {
    }
 
     /**
-     * add a triangle point to the file
+     * average_value a triangle point to the file
      */
     @Test
     public void addThree345() throws Exception {
@@ -95,7 +95,7 @@ public class MIFile2DTest {
     }
 
     /**
-     * add a triangle point to the file
+     * average_value a triangle point to the file
      * and look for NN.
      */
     @Test
@@ -123,7 +123,7 @@ public class MIFile2DTest {
     }
 
     /**
-     * add 15 points to the file
+     * average_value 15 points to the file
      */
     @Test
     public void addLinear15() throws Exception {
@@ -143,7 +143,7 @@ public class MIFile2DTest {
 
 
     /**
-     * add points to the file
+     * average_value points to the file
      * such that some will nest
      */
     @Test
@@ -178,7 +178,7 @@ public class MIFile2DTest {
     }
 
     /**
-     * add points to the file
+     * average_value points to the file
      * such that some will nest
      */
     private int addSquares() throws Exception {
@@ -201,7 +201,7 @@ public class MIFile2DTest {
     }
 
     /**
-     * test add points to the file
+     * test average_value points to the file
      * such that some will nest
      */
     @Test
