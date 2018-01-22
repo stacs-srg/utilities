@@ -110,6 +110,7 @@ public class SED implements Metric<String> {
                 if (ar1Ptr == ar1.finalEvents.length) {
                     ar1Event = Integer.MAX_VALUE;
                 } else {
+
                     ar1Event = ar1.finalEvents[ar1Ptr];
                 }
                 if (ar2Ptr == ar2.finalEvents.length) {
@@ -122,7 +123,7 @@ public class SED implements Metric<String> {
             }
             double k = (1 - (simAcc / log2) / 2);
             // return (float) Math.sqrt(k); // This is JS according to Richard!
-            return (float) Math.pow(Math.pow(2, k) - 1, 0.486);
+            return (float) Math.pow(Math.pow(2, Math.max(0,k)) - 1, 0.486);
         }
     }
 
