@@ -43,24 +43,30 @@ public class Cosine implements Metric<String> {
         Iterator<QgramDistribution> q_iter = q.getIterator();
 
         double dot_product = 0.0d;
+        double p_squared = 0.0d;
+        double q_squared = 0.0d;
+
 
         while (p_iter.hasNext()) {
 
             QgramDistribution pi = p_iter.next();
+            p_squared = p_squared + pi.count * pi.count;
             QgramDistribution qi;
             if( q_iter.hasNext() ) {
                 qi = q_iter.next();
+                q_squared = q_squared + qi.count * qi.count;
             } else {  // at the end of q
-                return dot_product;
+                break;
             }
             if( pi.compareTo(qi) < 0 ) {
                 // qi is missing - just keep going - 0 contribution to dot_product.
             } else {
-                // qi > pi - have extra values in q_distro - need to eat them up - these all contribute zero to the comparison - p[i] == 0 and q[i] != 0.
+                // qi > pi - have extra values in q_distro - need to eat them up - these all contribute zero to the calculation - p[i].q[i]
                 while( qi != null && pi.compareTo(qi) > 0 ) {
 
                     try {
                         qi = q_iter.next();
+                        q_squared = q_squared + qi.count * qi.count;
                     } catch (NoSuchElementException e) { // at the end of q
                         qi = null;
                     }
@@ -71,7 +77,7 @@ public class Cosine implements Metric<String> {
             }
         }
 
-        return dot_product; // (dot_product / (magnitude(x) * magnitude(y)));
+        return 1 - dot_product / ( Math.sqrt(p_squared) * Math.sqrt(q_squared) );   // distance not similarity
     }
 
     @Override

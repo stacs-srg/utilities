@@ -185,6 +185,7 @@ public class SED implements Metric<String> {
     public static void main(String[] a) {
         SED sed = new SED(255);
         System.out.println("SED:" );
+        System.out.println("cat/cat: " + sed.distance("cat", "cat"));
         System.out.println( "pillar/caterpillar: " +  sed.distance( "pillar", "caterpillar" ) );  //  6/11 correct
         System.out.println( "bat/cat: " + sed.distance( "bat", "cat" ) );
         System.out.println( "cat/cart: " + sed.distance( "cat", "cart" ) );
