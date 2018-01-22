@@ -47,6 +47,17 @@ public class SparseDistro {
     }
 
     /**
+     * Convertor Constructor to convert between formats used.
+     * @param fv
+     */
+    public SparseDistro(FeatureVector fv) {
+        for( KeyFreqPair kf : fv.getFeatures() ) {
+            QgramDistribution new_sc = new QgramDistribution( kf.qgram, kf.frequency );
+            list.add( new_sc );
+        }
+    }
+
+    /**
      * Constructor that makes a copy of another SparseDistro
      * @param source - the distro to be copied.
      */

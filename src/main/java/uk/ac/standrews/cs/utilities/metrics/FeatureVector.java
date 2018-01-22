@@ -25,7 +25,7 @@ import java.util.*;
 public class FeatureVector {
 
     private List<KeyFreqPair> state = new Vector<>();
-    HashMap<String,KeyFreqPair> frequencies = new HashMap<>();
+    private HashMap<String,KeyFreqPair> frequencies = new HashMap<>();
 
     private String document;
 
