@@ -20,7 +20,6 @@ package uk.ac.standrews.cs.utilities.metrics;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 public class Cosine implements Metric<String> {
 
@@ -40,44 +39,22 @@ public class Cosine implements Metric<String> {
         q = q.toProbability();
 
         Iterator<QgramDistribution> p_iter = p.getIterator();
-        Iterator<QgramDistribution> q_iter = q.getIterator();
 
         double dot_product = 0.0d;
-        double p_squared = 0.0d;
-        double q_squared = 0.0d;
-
 
         while (p_iter.hasNext()) {
 
             QgramDistribution pi = p_iter.next();
-            p_squared = p_squared + pi.count * pi.count;
-            QgramDistribution qi;
-            if( q_iter.hasNext() ) {
-                qi = q_iter.next();
-                q_squared = q_squared + qi.count * qi.count;
-            } else {  // at the end of q
-                break;
-            }
-            if( pi.compareTo(qi) < 0 ) {
-                // qi is missing - just keep going - 0 contribution to dot_product.
-            } else {
-                // qi > pi - have extra values in q_distro - need to eat them up - these all contribute zero to the calculation - p[i].q[i]
-                while( qi != null && pi.compareTo(qi) > 0 ) {
 
-                    try {
-                        qi = q_iter.next();
-                        q_squared = q_squared + qi.count * qi.count;
-                    } catch (NoSuchElementException e) { // at the end of q
-                        qi = null;
-                    }
-                }
-            }
-            if (pi.equals(qi)) {     // keys are the same so do product calculation
+            QgramDistribution qi = q.getEntry( pi.key );
+            if( qi != null  ) {
                 dot_product += pi.count * qi.count;
             }
         }
 
-        return 1 - dot_product / ( Math.sqrt(p_squared) * Math.sqrt(q_squared) );   // distance not similarity
+       return 1 - dot_product / ( p.magnitude() * q.magnitude());
+
+        //return Math.acos( dot_product / ( Math.sqrt(p.magnitude()) * Math.sqrt(q.magnitude()) ) ) / (2 * Math.PI );
     }
 
     @Override
@@ -101,13 +78,17 @@ public class Cosine implements Metric<String> {
         Cosine cos = new Cosine();
 
         System.out.println("Cosine:");
+        System.out.println("a/a: " + cos.distance("a", "a"));
         System.out.println("mclauchlan/mclauchlan: " + cos.distance("mclauchlan", "mclauchlan"));
         System.out.println("pillar/caterpillar: " + cos.distance("pillar", "caterpillar"));  //  6/11 correct
         System.out.println("bat/cat: " + cos.distance("bat", "cat"));
-        System.out.println("cat/cart: " + cos.distance("cat", "cart"));
+        System.out.println("cat/bat: " + cos.distance("cat", "bat"));        System.out.println("cat/cart: " + cos.distance("cat", "cart"));
         System.out.println("cat/caterpillar: " + cos.distance("cat", "caterpillar"));
+        System.out.println("caterpillar/cat: " + cos.distance("caterpillar", "cat"));
         System.out.println("cat/zoo: " + cos.distance("cat", "zoo"));
         System.out.println("n/zoological: " + cos.distance("n", "zoological"));
+        System.out.println("abcdefghijklmnopqrstuvwxyz/zyxwvutsrqponmlkjihgfedcba: " + cos.distance("abcdefghijklmnopqrstuvwxyz", "zyxwvutsrqponmlkjihgfedcba"));
+
 
     }
 

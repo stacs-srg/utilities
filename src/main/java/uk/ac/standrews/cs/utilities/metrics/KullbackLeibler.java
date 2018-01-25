@@ -128,7 +128,7 @@ public class KullbackLeibler {
                 }
             }
             if (pi.equals(qi)) {     // keys are the same so do comparison
-                divergence += pi.count * Math.log10(pi.count / qi.count);
+                divergence += pi.count * log2(pi.count / qi.count); //**** This is wrong.
             }
 
         }
@@ -137,6 +137,13 @@ public class KullbackLeibler {
         // May have unmatched elements left in distro_q but these don't matter since if (p[i] == 0) then the contribution is 0.
 
         return divergence;
+    }
+
+    private static double log2 = Math.log( 2 );
+
+    // Logb x = Loga x/Loga b
+    private static double log2( double x ) {
+        return Math.log( x ) / log2;
     }
 
     //---------------------------- utility code ----------------------------//

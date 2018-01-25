@@ -44,7 +44,7 @@ public class SED implements Metric<String> {
         return h(d1) + h(d2) - h(d1 + d2);
     }
 
-    private static class SparseProbabilityArray {
+    protected static class SparseProbabilityArray {
         /*
          * used to build up the structure event by event, counting cardinalities
          */
@@ -86,7 +86,19 @@ public class SED implements Metric<String> {
             this.cardMap = null;
         }
 
-        public static float distance(SparseProbabilityArray ar1,
+        public static float SEDistance(SparseProbabilityArray ar1,
+                                     SparseProbabilityArray ar2) {
+            double k = doCalc( ar1,ar2 );
+            return (float) Math.pow(Math.pow(2, Math.max(0,k)) - 1, 0.486);
+        }
+
+        public static float JSDistance(SparseProbabilityArray ar1,
+                                       SparseProbabilityArray ar2) {
+            double k = doCalc( ar1,ar2 );
+            return (float) Math.sqrt(Math.max(0,k));
+        }
+
+        private static double doCalc(SparseProbabilityArray ar1,
                                      SparseProbabilityArray ar2) {
             int ar1Ptr = 0;
             int ar2Ptr = 0;
@@ -122,8 +134,7 @@ public class SED implements Metric<String> {
                         && ar2Ptr == ar2.finalEvents.length;
             }
             double k = (1 - (simAcc / log2) / 2);
-            // return (float) Math.sqrt(k); // This is JS according to Richard!
-            return (float) Math.pow(Math.pow(2, Math.max(0,k)) - 1, 0.486);
+            return k;
         }
     }
 
@@ -138,7 +149,7 @@ public class SED implements Metric<String> {
         this.memoTable = new HashMap<>();
     }
 
-    private SparseProbabilityArray stringToSparseArray(String s) {
+    protected SparseProbabilityArray stringToSparseArray(String s) {
         if (this.memoTable.containsKey(s)) {
             return this.memoTable.get(s);
         } else {
@@ -175,7 +186,7 @@ public class SED implements Metric<String> {
     public double distance(String x, String y) {
         SparseProbabilityArray s1 = stringToSparseArray(x);
         SparseProbabilityArray s2 = stringToSparseArray(y);
-        return SparseProbabilityArray.distance(s1, s2);
+        return SparseProbabilityArray.SEDistance(s1, s2);
     }
 
     @Override
@@ -185,7 +196,9 @@ public class SED implements Metric<String> {
 
     public static void main(String[] a) {
         SED sed = new SED(255);
+
         System.out.println("SED:" );
+
         System.out.println("cat/cat: " + sed.distance("cat", "cat"));
         System.out.println( "pillar/caterpillar: " +  sed.distance( "pillar", "caterpillar" ) );  //  6/11 correct
         System.out.println( "bat/cat: " + sed.distance( "bat", "cat" ) );

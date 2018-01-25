@@ -93,6 +93,9 @@ public class JensenShannon implements Metric<String> {
         p2_distro = p2_distro.toProbability();
         average = average.toProbability();
 
+        double kl1 = kullbackLeiblerDivergence(p1_distro, average);
+        double kl2 = kullbackLeiblerDivergence(p2_distro, average);
+
         return (kullbackLeiblerDivergence(p1_distro, average) + kullbackLeiblerDivergence(p2_distro, average))/2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
     }
 
@@ -172,12 +175,13 @@ public class JensenShannon implements Metric<String> {
 //        System.out.println( js.distance( "ABX", "ABC" ) );
 
         System.out.println("JS:" );
+        System.out.println( "cat/zoo: " + js.distance( "cat", "zoo" ) );
+
         System.out.println( "mclauchlan/mclauchlan: " + js.distance( "mclauchlan", "mclauchlan" ) );
         System.out.println( "pillar/caterpillar: " + js.distance( "pillar", "caterpillar" ) );  //  6/11 correct
         System.out.println( "bat/cat: " + js.distance( "bat", "cat" ) );
         System.out.println( "cat/cart: " + js.distance( "cat", "cart" ) );
         System.out.println( "cat/caterpillar: " + js.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + js.distance( "cat", "zoo" ) );
         System.out.println( "n/zoological: " + js.distance( "n", "zoological" ) );
 
     }

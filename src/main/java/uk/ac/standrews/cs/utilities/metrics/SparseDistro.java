@@ -160,7 +160,27 @@ public class SparseDistro {
         return total;
     }
 
+    public QgramDistribution getEntry(String key) {
+        for(  QgramDistribution entry : list ) {
 
+            int compare = key.compareTo(entry.key);
+            if( compare == 0 ) {
+                // found it
+                return entry;
+            }
+            else if( compare < 1 )  {
+                // past it - it isn't there
+                return null;
+            }
+        }
+        return null; // not found it and at end
+    }
 
-
+    public double magnitude() {
+        double sumsq = 0.0;
+        for( QgramDistribution distro : list ) {
+            sumsq+= distro.count * distro.count;
+        }
+        return Math.sqrt( sumsq );
+    }
 }
