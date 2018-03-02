@@ -72,7 +72,7 @@ public class JensenShannon implements Metric<String> {
     public double jensenShannonDivergence(double[] p1, double[] p2) {
         assert(p1.length == p2.length);
         double[] average = new double[p1.length];
-        for (int i = 0; i < p1.length; ++i) {
+        for (int i = 0; i < p1.length; i++) {
             average[i] += (p1[i] + p2[i])/2;      // average of the two arrays.
         }
         return (kullbackLeiblerDivergence(p1, average) + kullbackLeiblerDivergence(p2, average))/2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
@@ -96,7 +96,7 @@ public class JensenShannon implements Metric<String> {
         double kl1 = kullbackLeiblerDivergence(p1_distro, average);
         double kl2 = kullbackLeiblerDivergence(p2_distro, average);
 
-        return (kullbackLeiblerDivergence(p1_distro, average) + kullbackLeiblerDivergence(p2_distro, average))/2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
+        return (kl1 + kl2)/2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
     }
 
     //---------------------------- utility code ----------------------------//
@@ -169,20 +169,16 @@ public class JensenShannon implements Metric<String> {
 //         System.out.println( kl.kullbackLeiblerDivergence( "ABC", "CDE" ) );
 //         System.out.println( kl.kullbackLeiblerDivergence( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ) );
 
-//        System.out.println( js.distance( "ABC", "ABC" ) );
-//        System.out.println( js.distance( "PQR", "ABC" ) );
-//        System.out.println( js.distance( "ABC", "ABX" ) );
-//        System.out.println( js.distance( "ABX", "ABC" ) );
 
         System.out.println("JS:" );
         System.out.println( "cat/zoo: " + js.distance( "cat", "zoo" ) );
-
         System.out.println( "mclauchlan/mclauchlan: " + js.distance( "mclauchlan", "mclauchlan" ) );
         System.out.println( "pillar/caterpillar: " + js.distance( "pillar", "caterpillar" ) );  //  6/11 correct
+        System.out.println( "cat/bat: " + js.distance( "cat", "bat" ) );
         System.out.println( "bat/cat: " + js.distance( "bat", "cat" ) );
         System.out.println( "cat/cart: " + js.distance( "cat", "cart" ) );
         System.out.println( "cat/caterpillar: " + js.distance( "cat", "caterpillar" ) );
         System.out.println( "n/zoological: " + js.distance( "n", "zoological" ) );
-
+        System.out.println( "a/hi: " + js.distance( "a", "hej" ));
     }
 }

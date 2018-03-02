@@ -93,7 +93,7 @@ public class KullbackLeibler {
      * Implements the kullbackLeiblerDivergence described in the method of the same name over sparse representations.
      * @return the Kullback–Leibler divergence
      */
-    public static double kullbackLeiblerDivergence(SparseDistro distro_p, SparseDistro distro_q ) {
+    public static double kullbackLeiblerDivergence22(SparseDistro distro_p, SparseDistro distro_q ) {
 
         Iterator<QgramDistribution> p_iter = distro_p.getIterator();
         Iterator<QgramDistribution> q_iter = distro_q.getIterator();
@@ -136,6 +136,31 @@ public class KullbackLeibler {
         // We have exhausted p_iter in while loop.
         // May have unmatched elements left in distro_q but these don't matter since if (p[i] == 0) then the contribution is 0.
 
+        return divergence;
+    }
+
+    /**
+     * Implements the kullbackLeiblerDivergence described in the method of the same name over sparse representations.
+     * @return the Kullback–Leibler divergence
+     */
+    public static double kullbackLeiblerDivergence(SparseDistro distro_p, SparseDistro distro_q ) {
+
+        Iterator<QgramDistribution> p_iter = distro_p.getIterator();
+
+        double divergence = 0.0;
+
+        while (p_iter.hasNext()) {
+
+            QgramDistribution pi = p_iter.next();
+            QgramDistribution qi = distro_q.getEntry(pi.key);
+
+            if( qi == null ) {
+                // no coresponding bigram in q
+                return Double.POSITIVE_INFINITY;
+            }
+            // keys are the same so do comparison
+            divergence += pi.count * log2(pi.count / qi.count); //**** This is wrong!   // is it ? Math.log (natural).
+        }
         return divergence;
     }
 
