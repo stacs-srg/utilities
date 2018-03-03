@@ -39,12 +39,12 @@ public class PlotResults {
     private Set<Point> reference_objects;
     private int setup_distance_calcs;
     private float[][] radii = new float[][]{
-            new float[]{0.1F, 0.3F, 0.6F, 0.7F, 0.8F},           // sparse and wide
-            new float[]{0.4F, 0.5F, 0.6F, 0.7F, 0.8F},          // few, far out
+//            new float[]{0.1F, 0.3F, 0.6F, 0.7F, 0.8F},           // sparse and wide
+//            new float[]{0.4F, 0.5F, 0.6F, 0.7F, 0.8F},          // few, far out
             new float[]{0.1F, 0.2F, 0.3F, 0.4F, 0.6F, 0.7F, 0.8F},           // even large spread
             new float[]{0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F},           // even v.large spread
             new float[]{0.00625F, 0.0125F, 0.025F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F}, // few in close and then a few far out
-            new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F, 0.6F, 0.7F, 0.8F} // big spread
+            new float[]{0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F, 0.6F, 0.7F, 0.8F} // big spread
     }; // a set of different pool configs to try.
 
 
@@ -69,10 +69,10 @@ public class PlotResults {
         // will get total coverage of unit square (proved by Denes Nagy) http://www2.stetson.edu/~efriedma/circovsqu/
         // This is a cheat but will eliminate lack of coverage as a problem.
         // TODO revisit this.
-        pts.add( new Point(0.25F,0.25F ) );
-        pts.add( new Point(0.25F,0.75F ) );
-        pts.add( new Point(0.75F,0.25F ) );
-        pts.add( new Point(0.75F,0.75F ) );
+//        pts.add( new Point(0.25F,0.25F ) );
+//        pts.add( new Point(0.25F,0.75F ) );
+//        pts.add( new Point(0.75F,0.25F ) );
+//        pts.add( new Point(0.75F,0.75F ) );
         return pts;
     }
 
@@ -113,7 +113,8 @@ public class PlotResults {
 
         for (Query<Point> query : queries) {
 
-            Set<Point> results = dream_pool.rangeSearchWithHyperplane(query.query, query.threshold, query ); // last parameter for debug only.
+            // Set<Point> results = dream_pool.rangeSearchWithHyperplane(query.query, query.threshold, query ); // last parameter for debug only.
+            Set<Point> results = dream_pool.rangeSearch(query.query, query.threshold ); // last parameter for debug only.
 
             query.validate(results);
 
@@ -155,7 +156,7 @@ public class PlotResults {
 
         int num_datums = 10000;
 
-        for( int ref_objs = 20; ref_objs < 100 ; ref_objs+= 10 ) {
+        for( int ref_objs = 80; ref_objs < 200 ; ref_objs+= 10 ) {
             for(int radii_index = 0; radii_index < radii.length; radii_index++ ) {
                 initialise(num_datums, ref_objs, radii[radii_index]);
                 Set<Query<Point>> queries = generateQueries(20);
