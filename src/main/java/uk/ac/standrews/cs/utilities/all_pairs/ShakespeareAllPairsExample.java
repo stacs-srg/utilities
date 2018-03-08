@@ -25,35 +25,36 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * TODO - move this class in the tests
+ *
  * Created by al on 08/09/2017.
  */
 public class ShakespeareAllPairsExample {
 
-    public static String FILENAME = "Shakespeare.txt";
+    private static String FILENAME = "Shakespeare.txt";
 
+    private static void loadupdata(AllPairs ap, String filename) throws IOException {
 
-    public static void loadupdata(AllPairs ap, String filename ) throws IOException {
+        File file = new File(Resources.getResource(filename).getFile());
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
 
-        File f  = new File(Resources.getResource(filename).getFile());
-
-        BufferedReader b = new BufferedReader(new FileReader(f));
-
-        String readLine = "";
-        int count = 0;
-
-        while ((readLine = b.readLine()) != null) {
-            ap.add( readLine );         // map stripped string to original (not used)
-            count++;
+            int count = 0;
+            String readLine;
+            while ((readLine = bufferedReader.readLine()) != null) {
+                ap.add(readLine); // map stripped string to original (not used)
+                count++;
+            }
+            System.out.println("Read in " + count + " lines");
         }
-        System.out.println( "Read in " + count + " lines" );
     }
 
-    public static void lookupSomedata(AllPairs ap, String[] sentences ) {
-        for( int i = 0; i < sentences.length; i++ ) {
-            System.out.println( "looking up: " + sentences[i] );
-            List<SimilarityPair> matches = ap.getMatches(sentences[i]);
+    private static void lookupSomedata(AllPairs ap, String[] sentences) {
 
-            System.out.println( "Found: size = " + matches.size() + " " + matches );
+        for (String sentence : sentences) {
+            System.out.println("Looking up: " + sentence);
+            List<SimilarityPair> matches = ap.getMatches(sentence);
+
+            System.out.println("Found: size = " + matches.size() + " " + matches);
         }
     }
 
@@ -72,13 +73,13 @@ public class ShakespeareAllPairsExample {
             "Jul. O Romeo, 12345! wherefore art thou Romeo?",           // edit distance of 5 - contiguous
             "GLOUCESTER. Now is the 123456 of our discontent" };        // edit distance of 5 - contiguous
 
-    public static void main( String[] args ) throws IOException {
+    public static void main(String[] args) throws IOException {
 
-        AllPairs ap = new AllPairs( 0.2f );
-        loadupdata( ap,FILENAME );
+        AllPairs ap = new AllPairs(0.2f);
+        loadupdata(ap, FILENAME);
 
-        lookupSomedata( ap,exact_matches );
-        lookupSomedata( ap,almost_matches );
+        lookupSomedata(ap, exact_matches);
+        lookupSomedata(ap, almost_matches);
 
     }
 }
