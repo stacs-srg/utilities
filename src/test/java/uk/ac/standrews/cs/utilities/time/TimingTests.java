@@ -14,10 +14,13 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.archive;
+package uk.ac.standrews.cs.utilities.time;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import uk.ac.standrews.cs.utilities.archive.Diagnostic;
+import uk.ac.standrews.cs.utilities.archive.StopLoopingException;
+import uk.ac.standrews.cs.utilities.archive.UndefinedDiagnosticLevelException;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;

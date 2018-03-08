@@ -23,6 +23,8 @@ import java.util.*;
 /**
  * Provides methods to manipulate dates represented as integers containing number of days elapsed since a fixed start date.
  *
+ * TODO - move in time package
+ *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
 public class DateManipulation {

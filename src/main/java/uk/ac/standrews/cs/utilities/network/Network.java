@@ -17,7 +17,7 @@
 /*
  * Created on 26-Oct-2004
  */
-package uk.ac.standrews.cs.utilities.archive;
+package uk.ac.standrews.cs.utilities.network;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

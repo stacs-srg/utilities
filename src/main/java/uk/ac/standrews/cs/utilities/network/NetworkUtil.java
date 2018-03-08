@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.archive;
+package uk.ac.standrews.cs.utilities.network;
+
+import uk.ac.standrews.cs.utilities.archive.Diagnostic;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.Collections;
 import java.util.Enumeration;
 
 /**
@@ -26,6 +27,7 @@ import java.util.Enumeration;
  *
  * @author Stuart Norcross (stuart@cs.st-andrews.ac.uk)
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
+ * @author Simone Conte (sic2@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
 public final class NetworkUtil {
@@ -37,10 +39,21 @@ public final class NetworkUtil {
     public static final int UNDEFINED_PORT = -1;
 
     /**
-     * Returns the first non-loopback IPv4 address (Inet4Address) that can be found for an interface on the local host.
+     * Returns the first valid public point-to-point IPv4 address (Inet4Address) that can be found for an interface on the local host.
      * This method should be used in place of InetAddress.getLocalHost(), which may return an Inet6Address object
      * corresponding to the IPv6 address of a local interface. The bind operation is not supported by this
      * address family.
+     *
+     *
+     * https://stackoverflow.com/a/9482369/2467938
+     *
+     - Any address in the range 127.xxx.xxx.xxx is a "loopback" address. It is only visible to "this" host.
+     - Any address in the range 192.168.xxx.xxx is a private (aka site local) IP address. These are reserved for use within an organization.
+     The same applies to 10.xxx.xxx.xxx addresses, and 172.16.xxx.xxx (see RFC 1918)
+     - Addresses in the range 169.254.xxx.xxx are link local IP addresses. These are reserved for use on a single network segment.
+     - Addresses in the range 224.xxx.xxx.xxx through 239.xxx.xxx.xxx are multicast addresses.
+     - The address 255.255.255.255 is the broadcast address.
+     - Anything else should be a valid public point-to-point IPv4 address.
      *
      * @return the first IPv4 address found
      * @throws UnknownHostException if no IPv4 address can be found
@@ -48,11 +61,10 @@ public final class NetworkUtil {
     @SuppressWarnings("WeakerAccess")
     public static InetAddress getLocalIPv4Address() throws UnknownHostException {
 
-        final InetAddress default_local_address = InetAddress.getLocalHost();
+        final InetAddress local_address = InetAddress.getLocalHost();
 
-        // Return the default local address if it's an IPv4 address and isn't the loopback address. This will work in most cases.
-        if (default_local_address instanceof Inet4Address && !default_local_address.isLoopbackAddress()) {
-            return default_local_address;
+        if (isIPV4(local_address) && !isLoopback(local_address)) {
+            return local_address;
         }
 
         // Otherwise, look for an IPv4 address among the other interfaces.
@@ -62,24 +74,29 @@ public final class NetworkUtil {
             final Enumeration<NetworkInterface> interfaces_enumeration = NetworkInterface.getNetworkInterfaces();
 
             if (interfaces_enumeration != null) {
-                for (final NetworkInterface network_interface : Collections.list(interfaces_enumeration)) {
-                    for (final InetAddress address : Collections.list(network_interface.getInetAddresses())) {
-                        if (address instanceof Inet4Address) {
-                            // Found an IPv4 address. Return it if it's not loopback, otherwise remember it.
-                            if (!address.isLoopbackAddress()) {
-                                return address;
-                            }
-                            loopback_address = address;
+                while (interfaces_enumeration.hasMoreElements()) {
+
+                    NetworkInterface network_interface = interfaces_enumeration.nextElement();
+                    Enumeration<InetAddress> inet_addresses = network_interface.getInetAddresses();
+                    while (inet_addresses.hasMoreElements()) {
+
+                        InetAddress address = inet_addresses.nextElement();
+                        if (isIPV4(address) && !isLoopback(address) && !isPrivate(address) &&
+                                !isLinkLocal(address) && !isMulticast(address) && !isBroadcast(address)) {
+                            return address;
                         }
+
+                        loopback_address = address;
                     }
                 }
             }
 
-            // Haven't found any non-loopback IPv4 address, so return loopback if available.
+            // Haven't found any valid public IPv4 address, so return any other address if available.
             if (loopback_address != null) {
                 return loopback_address;
             }
-        } catch (final SocketException e) {
+
+        } catch (SocketException e) {
             // Ignore.
         }
 
@@ -377,6 +394,36 @@ public final class NetworkUtil {
     }
 
     //---------------------------------------------------------
+
+    private static boolean isLoopback(InetAddress address) {
+
+        return address.isLoopbackAddress();
+    }
+
+    private static boolean isPrivate(InetAddress address) {
+
+        return address.isSiteLocalAddress();
+    }
+
+    private static boolean isLinkLocal(InetAddress address) {
+
+        return address.isLinkLocalAddress();
+    }
+
+    private static boolean isMulticast(InetAddress address) {
+
+        return address.isMulticastAddress();
+    }
+
+    private static boolean isBroadcast(InetAddress address) {
+
+        return address.getHostAddress().equals("255.255.255.255");
+    }
+
+    private static boolean isIPV4(InetAddress address) {
+
+        return address instanceof Inet4Address;
+    }
 
     private static String getName(final String host) {
 

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.archive;
+package uk.ac.standrews.cs.utilities.time;
 
 import java.io.Serializable;
 import java.util.HashMap;
