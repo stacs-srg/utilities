@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -20,7 +20,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class MTreeEuclidean2DSystematicSmallTest extends MTreeEuclidean2DSystematicTest {

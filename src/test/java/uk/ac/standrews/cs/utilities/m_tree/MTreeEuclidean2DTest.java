@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -23,9 +23,7 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class MTreeEuclidean2DTest {
