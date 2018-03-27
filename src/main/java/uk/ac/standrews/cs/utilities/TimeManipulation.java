@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -18,6 +18,7 @@ package uk.ac.standrews.cs.utilities;
 
 import static java.util.concurrent.TimeUnit.*;
 
+// TODO - move in time package
 @SuppressWarnings("unused")
 public class TimeManipulation {
 

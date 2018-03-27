@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -17,7 +17,7 @@
 /*
  * Created on 26-Oct-2004
  */
-package uk.ac.standrews.cs.utilities.archive;
+package uk.ac.standrews.cs.utilities.network;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -42,7 +42,7 @@ public class AllPairs {
     private HashMap<String,List<DocumentFeaturePair>> indexMap = new HashMap<>(); // maps from a qgram (a feature) to those docs that have that feature.
     private HashMap<String,List<SimilarityPair>> all_matches =  new HashMap<>(); // indexed by orginal string.
 
-    public AllPairs(double similarity ) {
+    public AllPairs(double similarity) {
         this.similarity_threshold = similarity;
     }
 

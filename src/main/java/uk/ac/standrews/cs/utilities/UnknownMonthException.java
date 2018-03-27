@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities;
 
+// TODO - move in time package
 @SuppressWarnings("WeakerAccess")
 public class UnknownMonthException extends Exception {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,14 +14,17 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.archive;
+package uk.ac.standrews.cs.utilities.time;
+
+import uk.ac.standrews.cs.utilities.archive.Diagnostic;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Wrapper for fixed thread pool executor allowing actions to be executed subject to timeout.The method {@link #shutdown()} should be called before disposing of an instance, to avoid thread leakage.
+ * Wrapper for fixed thread pool executor allowing actions to be executed subject to timeout.
+ * The method {@link #shutdown()} should be called before disposing of an instance, to avoid thread leakage.
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Systems Research Group, University of St Andrews:
+ * Copyright 2018 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -22,6 +22,8 @@ import java.util.*;
 
 /**
  * Provides methods to manipulate dates represented as integers containing number of days elapsed since a fixed start date.
+ *
+ * TODO - move in time package
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
