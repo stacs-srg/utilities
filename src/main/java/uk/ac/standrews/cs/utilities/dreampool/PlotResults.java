@@ -17,6 +17,8 @@
 
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import uk.ac.standrews.cs.utilities.PercentageProgressIndicator;
+import uk.ac.standrews.cs.utilities.ProgressIndicator;
 import uk.ac.standrews.cs.utilities.dataset.DataSet;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
@@ -38,13 +40,43 @@ public class PlotResults {
     private ArrayList<Point> datums;
     private Set<Point> reference_objects;
     private int setup_distance_calcs;
+
+    // Configuration parameters
+
+    private boolean perform_validation = true;          // SET perform_validation TO TRUE TO PERFORM CHECKING
+
+    //private int num_datums =    100; //1 hundred
+    private int num_datums =    1000; //1 thousand
+    //private int num_datums =    10000; //10 thousand
+    //private int num_datums =    50000; //50 thousand
+    //private int num_datums =    100000; //100 thousand
+    //private int num_datums =  1000000; // 1 million
+
     private float[][] radii = new float[][]{
+
+          //  new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
+            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F,0.3F, 0.4F }   // , 0.61F } //, 0.6F }
+
+//            new float[]{ 0.000004125976563F, 0.000008251953125F, 0.00001650390625F, 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.4F, 0.5F },
+//            new float[]{ 0.000004125976563F, 0.000008251953125F, 0.00001650390625F, 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F },
+//            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
+//            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.4F },
+
 //            new float[]{0.1F, 0.3F, 0.6F, 0.7F, 0.8F},           // sparse and wide
 //            new float[]{0.4F, 0.5F, 0.6F, 0.7F, 0.8F},          // few, far out
-            new float[]{0.1F, 0.2F, 0.3F, 0.4F, 0.6F, 0.7F, 0.8F},           // even large spread
-            new float[]{0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F},           // even v.large spread
-            new float[]{0.00625F, 0.0125F, 0.025F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F}, // few in close and then a few far out
-            new float[]{0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F, 0.6F, 0.7F, 0.8F} // big spread
+            //new float[]{0.1F, 0.2F, 0.3F, 0.4F, 0.6F, 0.7F, 0.8F},           // even large spread
+            //new float[]{0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F},           // even v.large spread
+            // new float[]{0.00625F, 0.0125F, 0.025F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F}, // few in close and then a few far out
+//            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
+//            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
+//            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F },
+//            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.4F },
+//            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.5F },
+
+//            new float[]{0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
+//            new float[]{0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F },
+//            new float[]{0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.5F }, //not any after ).45
+            //new float[]{0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F, 0.6F, 0.7F, 0.8F} // big spread
     }; // a set of different pool configs to try.
 
 
@@ -64,15 +96,7 @@ public class PlotResults {
             pts.add( newpoint(r) );
 
         }
-        // provided that circles are sufficiently large
-        // unit circles cover square of side 2√2
-        // will get total coverage of unit square (proved by Denes Nagy) http://www2.stetson.edu/~efriedma/circovsqu/
-        // This is a cheat but will eliminate lack of coverage as a problem.
-        // TODO revisit this.
-//        pts.add( new Point(0.25F,0.25F ) );
-//        pts.add( new Point(0.25F,0.75F ) );
-//        pts.add( new Point(0.75F,0.25F ) );
-//        pts.add( new Point(0.75F,0.75F ) );
+
         return pts;
     }
 
@@ -81,10 +105,14 @@ public class PlotResults {
         Random r = new Random(787819234L);  // always use same rand to create datums
         datums = new ArrayList<>();
 
+        ProgressIndicator pi = new PercentageProgressIndicator( 10 );
+        pi.setTotalSteps(count);
+
         for (float pos = 0; pos < count ; pos++ ) {
             Point p = newpoint(r);
             datums.add( p );
             dream_pool.add(p);
+            pi.progressStep();
         }
     }
 
@@ -92,12 +120,19 @@ public class PlotResults {
 
         HashSet<Query<Point>> result = new HashSet<>();
 
-        Random r = new Random(1926373034L); // do same doQueries each call of doQueries.
+        Random r = new Random(1926373034L); // do same queries each call of doQueries.
+
+        ProgressIndicator pi = new PercentageProgressIndicator( 10 );
+        pi.setTotalSteps(num_queries);
 
         for (int i = 0; i < num_queries; i++) {
+
             for (float range = 2.0F; range <= 32.0F; range *= 4.0F) {     // gives different threshold ranges 0..1/2,1/8,1/32 x,y plane
                 float threshold = r.nextFloat() / range;
-                result.add(new Query(newpoint(r), threshold, datums, dream_pool.pools, validate_distance));
+
+                Point p = newpoint(r);
+                result.add(new Query(p, threshold, datums, dream_pool.pools, validate_distance, perform_validation));
+                pi.progressStep();
             }
         }
 
@@ -111,10 +146,14 @@ public class PlotResults {
         int start_calcs = CountingWrapper.counter;
         int total_calcs = 0;
 
+        ProgressIndicator pi = new PercentageProgressIndicator( 100 );
+        pi.setTotalSteps(queries.size());
+
+        int count = 0;
+
         for (Query<Point> query : queries) {
 
-            // Set<Point> results = dream_pool.rangeSearchWithHyperplane(query.query, query.threshold, query ); // last parameter for debug only.
-            Set<Point> results = dream_pool.rangeSearch(query.query, query.threshold ); // last parameter for debug only.
+            Set<Point> results = dream_pool.rangeSearch(query.query, query.threshold,query ); // last parameter for debug only.
 
             query.validate(results);
 
@@ -122,7 +161,10 @@ public class PlotResults {
             total_calcs += distance_calcs;
             start_calcs = CountingWrapper.counter;
 
+            pi.progressStep();
+
             addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, distance_calcs, results.size());
+
         }
     }
 
@@ -154,29 +196,34 @@ public class PlotResults {
 
     private void doExperiment(DataSet dataset) throws Exception {
 
-        int num_datums = 10000;
+        // for( int ref_objs = 60; ref_objs < 65 ; ref_objs+= 1 ) {
 
-        for( int ref_objs = 80; ref_objs < 200 ; ref_objs+= 10 ) {
-            for(int radii_index = 0; radii_index < radii.length; radii_index++ ) {
+        int ref_objs = 62;
+        int radii_index = 0;
+
+            // for(int radii_index = 0; radii_index < radii.length; radii_index++ ) {
+
+
+                System.out.println( "Initialising..." );
                 initialise(num_datums, ref_objs, radii[radii_index]);
-                Set<Query<Point>> queries = generateQueries(20);
+                System.out.println( "Generating queries..." );
+                Set<Query<Point>> queries = generateQueries(100);
+                System.out.println( "Performing queries..." );
                 doQueries(dataset, queries, ref_objs, radii_index);
-            }
-        }
+        //    }
+        // }
     }
 
     private void oneExperiment(DataSet dataset) throws Exception {
-
-        int num_datums = 10000;
 
         int ref_objs = 30;
         int radii_index = 1;
 
         initialise(num_datums, ref_objs, radii[radii_index]);
 
-        Query<Point> q = new Query<>( new Point( 0.74204534F,0.058961034F ),0.21586731F, datums, dream_pool.pools, validate_distance );
+        Query<Point> q = new Query<>( new Point( 0.74204534F,0.058961034F ),0.21586731F, datums, dream_pool.pools, validate_distance, perform_validation );
 
-        Set<Point> results = dream_pool.rangeSearchWithHyperplane(q.query, q.threshold, q ); // last parameter for debug only.
+        Set<Point> results = dream_pool.rangeSearch(q.query, q.threshold,q ); // , q );last parameter for debug only.
 
         q.validate(results);
     }
@@ -184,7 +231,15 @@ public class PlotResults {
 
     private static Point newpoint(Random r) {
 
-        return new Point( r.nextFloat(), r.nextFloat() );
+        float x;
+        float y;
+
+        do {
+            x = r.nextFloat();
+            y = r.nextFloat();
+        } while( Math.sqrt( Math.pow( 0.5 - x, 2 ) + Math.pow( 0.5 - y, 2 ) ) > 0.5f ); // all points 0.5 away from 0.5,0.5 = unit circle
+
+        return new Point( x, y );
     }
 
     private void addRow(DataSet data, float queryx, float queryy, float threshold,  int count_ros, int radii_index, int count_calcs, int num_results) {
@@ -195,9 +250,10 @@ public class PlotResults {
     public static void main(String[] args) throws Exception {
 
         System.out.println( "Plotting results...");
+        long time = System.currentTimeMillis();
         PlotResults pr = new PlotResults();
         pr.plot("RESULTS");
-        System.out.println( "finished");
+        System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
     }
 
 

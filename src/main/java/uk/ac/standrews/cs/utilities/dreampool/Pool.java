@@ -17,6 +17,8 @@
 
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import uk.ac.standrews.cs.utilities.m_tree.Distance;
+
 /**
  * A pool is a pivot (centroid) plus a collection of rings
  * This therefore maps from a pivot to a set of rings containing data points
@@ -24,25 +26,28 @@ package uk.ac.standrews.cs.utilities.dreampool;
 
 public class Pool<T> {
 
-    private final T pivot;
+    final T pivot;
 
-    private static final float[] DEFAULT_RADII = new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F, 0.5F};    // TODO make more efficient later
+    public static final float[] DEFAULT_RADII = new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F }; //, 0.5F};    // TODO make more efficient later
 
     public final float[] radii;
+    private final Distance<T> distance_wrapper;
     private Ring<T>[] rings;
     private int last_index;
     private float max_radius;
 
-    public Pool(T pivot) {
-        this(pivot,DEFAULT_RADII);
+    public Pool(T pivot, Distance<T> distance) {
+        this(pivot,DEFAULT_RADII, distance);
     }
 
-    public Pool(T pivot, float[] radii) {
+    public Pool(T pivot, float[] radii, Distance<T> distance_wrapper) {
 
         this.pivot = pivot;
         this.radii = radii;
+        this.distance_wrapper = distance_wrapper;
         initialise_rings();
     }
+
 
     private void initialise_rings() {
         Ring r = null;
@@ -63,13 +68,13 @@ public class Pool<T> {
         return radii[index-1];
     }
 
-    public void add(T data, float distance) throws Exception {
+    public void add(T datum) throws Exception {
 
-        if (distance > max_radius) {
-            throw new Exception("Distance > max R");
+        float distance = distance_wrapper.distance(pivot,datum);
+        if( distance < maxR() ) {
+            Ring<T> ring = findEnclosingRing(distance);
+            ring.add(datum);
         }
-        Ring<T> ring = findEnclosingRing(distance);
-        ring.add(data, distance);
     }
 
     public Ring<T> findEnclosingRing(float distance) throws Exception {
@@ -93,18 +98,22 @@ public class Pool<T> {
      * @param threshold            - the threshold around the query.
      * @return an enclosing ring that overlaps with query at threshold, or null if there is no overlap
      */
-    public Ring findIncludeRing(float distance_query_pivot, float threshold) {
+    public Ring<T> findIncludeRing(float distance_query_pivot, float threshold) {
 
         if (distance_query_pivot <= max_radius - threshold) {
-            // if we get past here the outer ring overlaps the query, that is outer ring covers query
-            // trying to find one that does not.
+            // if we get past here the outer ring overlaps the query,
+            // that is outer ring covers query
+            // trying to find the smallest one that covers the query
+
+            Ring<T> result = rings[last_index]; // we know this is a good result from above
 
             // search from outside - find the smallest
-            for (int index = last_index; index >= 0; index--) { // TODO make more efficient later
-                if (distance_query_pivot <= radii[index] - threshold) {
-                    return rings[index];
+            for (int valid_index = last_index; valid_index >= 0; valid_index--) {
+                if (distance_query_pivot <= rings[valid_index].getRmax() - threshold) {
+                    result = rings[valid_index];
                 }
             }
+            return result;
         }
         return null;
     }
@@ -173,4 +182,5 @@ public class Pool<T> {
 //            }
         }
     }
+
 }

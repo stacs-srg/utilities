@@ -39,7 +39,7 @@ public class SimpleTest {
 
         distance = new CountingWrapper( new EuclideanDistance() );
         Set<Point> ros = createReferenceObjects();
-        dream_pool = new MPool<>( distance, ros );
+        dream_pool = new MPool<Point>( distance, ros );
 //        System.out.println( "Distance calculations (during ro initialisation): " + CountingWrapper.counter );
         add_data();
         setup_distance_calcs = CountingWrapper.counter;

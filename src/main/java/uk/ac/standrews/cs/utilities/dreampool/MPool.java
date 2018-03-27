@@ -23,58 +23,48 @@ import java.util.*;
 
 public class MPool<T> { // aka DreamPool
 
-    final Distance<T> distance_wrapper;
     private final Set<T> pivots;
+    private final Distance<T> distance_wrapper;
 
     List<Pool<T>> pools = new ArrayList<>();
+    private Ring<T> universal_ring = new Ring<T>(null,0,0.0f, 1.0F, null ); // a ring containing all the objects in the universe
 
     /**
-     *
-     * @param d - distance wrapper
      * @param pivots
-     */
-    public MPool(Distance<T> d, Set<T> pivots ) throws Exception {
-
-        this( d,pivots,null);
-    }
-
-    /**
+     * @param radii
      *
-     * @param d - distance wrapper
-     * @param pivots
      */
-    public MPool(Distance<T> d, Set<T> pivots, float[] radii ) throws Exception {
+    public MPool(Distance<T> distance_wrapper, Set<T> pivots, float[] radii) throws Exception {
 
-        this.distance_wrapper = d;
         this.pivots = pivots;
+        this.distance_wrapper = distance_wrapper;
 
-        initialise(radii);
+        initialise(radii,distance_wrapper);
     }
 
-    private void initialise(float[] radii) {
+    public MPool(Distance<T>  distance, Set<T> ros) throws Exception {
+        this( distance, ros, Pool.DEFAULT_RADII );
+    }
+
+
+    private void initialise(float[] radii, Distance<T> distance_wrapper) throws Exception {
 
         for( T pivot : pivots ) {
             if( radii == null ) {
-                pools.add(new Pool(pivot));
+                pools.add(new Pool(pivot,distance_wrapper));
             } else {
-                pools.add(new Pool(pivot,radii));
+                pools.add(new Pool(pivot,radii,distance_wrapper));
             }
         }
-        check_coverage( pools );
     }
 
-    private void check_coverage(List<Pool<T>> pools) {
-
-    }
 
     public void add(T datum) throws Exception {
 
         for( Pool<T> pool : pools ) {
-            float distance = distance_wrapper.distance( datum, pool.getPivot() );
-            if( distance < pool.maxR() ) {
-                pool.add(datum,distance);
-            }
+            pool.add(datum);
         }
+        universal_ring.add(datum);
     }
 
     /**
@@ -90,131 +80,38 @@ public class MPool<T> { // aka DreamPool
      * Then exclude the rings that do not.
      *
      */
-    public Set<T> rangeSearch(final T query, final float threshold) { // , Query<T> query_obj) { // TODO query_obj only for validation
+    public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj) { // , Query<T> query_obj) { // TODO query_obj only for validation
 
         List<Ring<T>> include_list = new ArrayList<>(); // circles that cover query and may contain soln
         List<Ring<T>> exclude_list = new ArrayList<>(); // circles that do not cover query and may are not part of soln
 
-        for( Pool<T> pool : pools ) {
-            float distance_query_pivot = distance_wrapper.distance(query, pool.getPivot());
+        for (Pool<T> pool : pools) {
+            float distance_query_pivot = distance_wrapper.distance(pool.getPivot(),query);
 
             // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
             // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
-            Ring r1 = pool.findIncludeRing(distance_query_pivot,threshold);
-            if( r1 != null ) {
+
+            Ring<T> r1 = pool.findIncludeRing(distance_query_pivot, threshold);
+
+            if (r1 != null) {
                 // any circles that are added to include_list cover query.
                 include_list.add(r1);
             }
-            // was else { but that does not exclude inner rings!
-            // TODO check and tidy format if correct
-                // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
-                // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
-                Ring r2 = pool.findExcludeRing(distance_query_pivot,threshold);
-                if( r2 != null ) {
-                    exclude_list.add(r2); // to be refined below.
-                }
-            // }
-
-        }
-//        System.out.println( "Rings in range of query " + query + "threshold: " + threshold + " are:" );
-//        showRings(include_list);
-
-//        System.err.println( "Checking intersections, included pools:");
-//
-//        for( Ring<T> p : include_list ) {
-//
-//            System.err.println( "ring pivot: " + p.getOwner().getPivot() + " r max: " + p.getRmax() + " d: " + distance_wrapper.distance(query, p.getOwner().getPivot() ) );
-//        }
-
-//        query_obj.validateIncludeList(include_list);
-
-        Set<T> candidates = intersections(include_list); //,query_obj);
-
-//        query_obj.validateOmissions(candidates,include_list);
-
- //       System.out.println( "Number of inclusion candidate points: " + candidates.size() );
-
-        int excluded = exclude( candidates, exclude_list );
-
-//        System.out.println( "Removed " + excluded + " candidate points");
-
-//        System.out.println( "Number of candidate points left for checking: " + candidates.size() );
-
-        int count = filter( candidates, query, threshold );
-
-//        System.out.println( "Number of true real_solutions to query: " + count );
-
-        return candidates;
-    }
-
-    /**
-     * Find the nodes within range r of query.
-     *
-     * @param query - some data for which to find the neighbours within distance r
-     *
-     * @return all those nodes within r of @param T.
-     *
-     * General technique - find the rings that overlap with the query then do exclusion
-     * using pivot exclusion.
-     *
-     * Then exclude the rings that do not.
-     *
-     */
-    public Set<T> rangeSearchWithHyperplane(final T query, final float threshold, Query<T> query_obj) { // TODO query_obj only for validation
-
-        List<DataDistance<Ring<T>>> include_list = new ArrayList<>();
-        List<DataDistance<Ring<T>>> exclude_list = new ArrayList<>();
-
-        for( Pool<T> pool : pools ) {
-            float distance_query_pivot = distance_wrapper.distance(query, pool.getPivot());
-
-            // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
-            // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
-            Ring r1 = pool.findIncludeRing(distance_query_pivot,threshold);
-            if( r1 != null ) {
-                include_list.add(new DataDistance<Ring<T>>(r1,distance_query_pivot));
+            // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
+            // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
+            Ring r2 = pool.findExcludeRing(distance_query_pivot, threshold);
+            if (r2 != null) {
+                exclude_list.add(r2); // to be refined below.
             }
-                // was else { but that does not exclude inner rings!
-                // TODO check and tidy format if correct
 
-                // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
-                // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
-                Ring r2 = pool.findExcludeRing(distance_query_pivot,threshold);
-                if( r2 != null ) {
-                    exclude_list.add(new DataDistance<Ring<T>>(r2,distance_query_pivot));; // to be refined below.
-                }
-            // }
         }
-        Set<T> hyperplane_exclude_list = performHPExclusion( exclude_list, threshold, query_obj );
 
-//        System.out.println( "Rings in range of query " + query + "threshold: " + threshold + " are:" );
-//        showRings(include_list);
-
-//        System.err.println( "Checking intersections, included pools:");
-//
-//        for( Ring<T> p : include_list ) {
-//
-//            System.err.println( "ring pivot: " + p.getOwner().getPivot() + " r max: " + p.getRmax() + " d: " + distance_wrapper.distance(query, p.getOwner().getPivot() ) );
-//        }
-
-//        query_obj.validateIncludeList(include_list);
-
-        Set<T> candidates = intersections( extractTsFromDDs( include_list ) ); // TODO fix later - decide on DD or T. // include_list); //,query_obj);
-
-//        query_obj.validateOmissions(candidates,include_list);
-
-        //       System.out.println( "Number of inclusion candidate points: " + candidates.size() );
-
-        int excluded = exclude( candidates, extractTsFromDDs( exclude_list ) ); // TODO fix later - decide on DD or T.
-
-//        System.out.println( "Removed " + excluded + " candidate points");
-
-//        System.out.println( "Number of candidate points left for checking: " + candidates.size() );
-
+        include_list.add( universal_ring );
+        query_obj.validateIncludeList(include_list, query_obj);
+        Set<T> candidates = intersections(include_list,query_obj);
+        query_obj.validateOmissions(candidates,include_list);
+        int excluded = exclude( candidates, exclude_list );
         int count = filter( candidates, query, threshold );
-
-//        System.out.println( "Number of true real_solutions to query: " + count );
-
         return candidates;
     }
 
@@ -230,65 +127,20 @@ public class MPool<T> { // aka DreamPool
     /*********************************** private methods ***********************************/
 
 
-
     /**
-     * hyperplane exclusion For reference points p1, p2 ∈ U , if d(q, p1) − d(q, p2) > 2t,
-     * then no element of {s ∈ S | d(s,p1) ≤ d(s,p2)} can be a solution to the query
+     * Attemts to find an inner ring that does not overlap with the query
+     * @param ring
+     * @param distance_query_pivot
+     * @param threshold
+     * @param query_obj
+     * @return an inner ring that does not overlap with the query, if there is one and null overwise
      */
-    private Set<T> performHPExclusion(List<DataDistance<Ring<T>>> pivots_and_distances, float threshold, Query<T> query_obj) {
+    private Ring<T> uncover(Ring<T> ring, float distance_query_pivot , float threshold, Query<T> query_obj) {
 
-        Set<T> hp_exclude_set = new HashSet<>(); // to do make this filter the include set.
-
-        for( int index1 = 0; index1 < pivots_and_distances.size() - 1; index1++ ) {
-            for( int index2 = index1 + 1; index2 < pivots_and_distances.size(); index2++ ) {
-
-                DataDistance<Ring<T>> dd1 = pivots_and_distances.get(index1);
-                Ring<T> r1 = dd1.value;
-                DataDistance<Ring<T>> dd2 = pivots_and_distances.get(index2);
-                Ring<T> r2 = pivots_and_distances.get(index2).value;
-
-                if( r1.getRing_number() != r2.getRing_number() ) {
-
-                    // no point in looking if rings are the same size.
-
-                    float distance1 = dd1.distance;
-                    float distance2 = dd2.distance;
-
-                    do_hp_exclusion(threshold, query_obj, hp_exclude_set, r1, distance1, r2, distance2);
-                    do_hp_exclusion(threshold, query_obj, hp_exclude_set, r2, distance2, r1, distance1);
-                }
-            }
-
+        while( ring != null && distance_query_pivot - ring.getRmax() < threshold ) { // there is overlap
+            ring = ring.getInnerRing();
         }
-        return hp_exclude_set;
-    }
-
-    private void do_hp_exclusion(float threshold, Query<T> query_obj, Set<T> hp_exclude_set, Ring<T> r1, float distance1, Ring<T> r2, float distance2) {
-
-        if( distance1 - distance2 > ( 2 * threshold ) ) {
-
-            System.err.println( "HP" );
-
-            // d(s,p1) ≤ d(s,p2)}
-            if( r1.getRmax() < r2.getRmin() ) {
-                System.err.println( "Min" );
-                ArrayList<T> elements2 = r2.getAllContents();
-                for( T element : r1.getAllContents() ) {
-                    if( elements2.contains(element) ) {
-                        hp_exclude_set.add(element);
-                        if( query_obj.real_solutions.contains(element)) {
-                            System.err.println( "Illegal HP exclusion for: " + element );
-                        } else {
-                            System.err.println( "Added HP exclusion for: " + element );
-                        }
-
-                    } else {
-                        System.err.println( "X" );
-                    }
-                }
-            }
-
-        }
+        return ring;
     }
 
 
@@ -306,9 +158,9 @@ public class MPool<T> { // aka DreamPool
         System.out.println( "-------");
     }
 
-    private Set<T> intersections(List<Ring<T>> include_list) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
+    private Set<T> intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
         if( include_list.isEmpty() ) {
-            return null;
+            return new HashSet<T>();
         } else {
             int index = findSmallestSetIndex( include_list );
             Set<T> result = new HashSet<T>( include_list.get(index).getAllContents() );
@@ -320,7 +172,7 @@ public class MPool<T> { // aka DreamPool
             } else {
                 // otherwise do the intersection of all the enclosing rings.
                 for (Ring<T> remaining_rings : include_list) {
-                    result = intersection(result, remaining_rings.getAllContents()); // ,query_obj );
+                    result = intersection(result, remaining_rings.getAllContents(),query_obj); // ,query_obj );
                 }
             }
             return result;
@@ -331,9 +183,11 @@ public class MPool<T> { // aka DreamPool
         int count = 0;
         for( Ring<T> ring : exclude_list ) {
             ArrayList<T> ring_contents = ring.getAllContents();
-            for ( T candidate : ring_contents ) {
-                if( candidates.remove(candidate) ) {
-                    count++;
+            if( candidates != null && ! candidates.isEmpty() ) {
+                for (T candidate : ring_contents) {
+                    if (candidates.remove(candidate)) {
+                        count++;
+                    }
                 }
             }
         }
@@ -347,14 +201,16 @@ public class MPool<T> { // aka DreamPool
 
         Set<T> dropset = new HashSet<>();
 
-        for( T candidate : candidates ) {
-            distance_calcs++;
+        if( candidates != null && ! candidates.isEmpty() ) {
+            for (T candidate : candidates) {
+                distance_calcs++;
 
-            if ( distance_wrapper.distance( query,candidate ) > threshold ) {
-                dropset.add(candidate);     // How do you write this without ConcurrentModificationException ??
-                false_positives++;
-            } else {
-                true_positives++;
+                if (distance_wrapper.distance(query, candidate) > threshold) {
+                    dropset.add(candidate);     // How do you write this without ConcurrentModificationException ??
+                    false_positives++;
+                } else {
+                    true_positives++;
+                }
             }
         }
         for( T member : dropset ) {
@@ -367,21 +223,25 @@ public class MPool<T> { // aka DreamPool
         return true_positives;
     }
 
+    int intersection_count = 1;
 
-    public Set<T> intersection(Collection<T> a, Collection<T> b) { // }, Query<T> query_obj) { // TODO query_obj only for debug
+    public Set<T> intersection(Collection<T> a, Collection<T> b, Query<T> query_obj) { // }, Query<T> query_obj) { // TODO query_obj only for debug
         Set<T> result = new HashSet<>();
         for( T next : a ) {
             if( b.contains( next ) ) {
-                result.add( next );
-            }
-// was for debug:
-//            else {
+                result.add( next );  // point in a and b => add to intersection.
+            } else {                 // excluding an item
+                // TODO DEBUG
+                float d = distance_wrapper.distance(query_obj.query, next);
+                if (d <= query_obj.threshold) {
+                    System.err.println(intersection_count + " # Wrongly excluding item: " + next + " within threshold " + query_obj.threshold + " d = " + d);
+                }
 //                if( query_obj.real_solutions.contains(next)) {
 //                    System.err.println( "Eliminating point that should be part of soln space: " + next );
-//
 //                }
-//            }
+            }
         }
+        intersection_count++;
         return result;
     }
 
@@ -411,5 +271,4 @@ public class MPool<T> { // aka DreamPool
         }
         return result;
     }
-
 }

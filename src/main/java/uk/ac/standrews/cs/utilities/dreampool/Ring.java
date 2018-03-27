@@ -21,7 +21,6 @@ import java.util.List;
 
 /**
  * Maintains a ring of data (points at some distance bounds from the centroid).
- * Data is held in a distance ordered list
  *
  * Created by al on 26/2/2018.
  */
@@ -43,11 +42,16 @@ public class Ring<T> {
         this.inner_ring = inner_ring;
     }
 
-    public void add(T object,  float dist) {
+    public void add(T object) {
 
-        // TODO could check dist - used to be used when this was a tree map data structure as in MIFile.
         contents.add(object);
     }
+
+    public void add(List<T> objects) {
+
+        contents.addAll(objects);
+    }
+
 
     public int size() {
         if( inner_ring == null ) {
