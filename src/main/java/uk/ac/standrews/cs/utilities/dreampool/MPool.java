@@ -28,6 +28,7 @@ public class MPool<T> { // aka DreamPool
 
     List<Pool<T>> pools = new ArrayList<>();
     private Ring<T> universal_ring = new Ring<T>(null,0,0.0f, 1.0F, null ); // a ring containing all the objects in the universe
+    // The universal ring is a catchall in case of lack of coverage when performing inclusion: the rings may not be big enough to cover the query.
 
     /**
      * @param pivots
@@ -78,7 +79,6 @@ public class MPool<T> { // aka DreamPool
      * using pivot exclusion.
      *
      * Then exclude the rings that do not.
-     *
      */
     public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj) { // , Query<T> query_obj) { // TODO query_obj only for validation
 

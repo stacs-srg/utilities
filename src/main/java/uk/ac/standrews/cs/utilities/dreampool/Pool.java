@@ -118,7 +118,6 @@ public class Pool<T> {
         return null;
     }
 
-
     /**
      * Uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
      * if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query

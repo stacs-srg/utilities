@@ -96,19 +96,6 @@ public class Ring<T> {
         return contents.contains(element);
     }
 
-
-    public boolean outwardlyContains(T element) {
-        Ring<T>[] rings = owner.getRings();
-
-        for( int i = rings.length - 1; i >= ring_number; i-- ) {
-            if( rings[i].contains(element) ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     //-------------------------------------------------------------
 
     private List<T> addRecursiveContents( List<T> result ) {

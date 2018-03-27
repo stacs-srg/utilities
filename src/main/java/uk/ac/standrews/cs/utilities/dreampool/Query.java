@@ -90,9 +90,6 @@ public class Query<T> {
                     total_correct_count++;
                 } else {
                     System.out.println("Q empty - error: " + real_solutions.size() + " missing" );
-//                    for( T soln : real_solutions ){
-//
-//                    }
 
                 }
             }
