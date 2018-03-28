@@ -16,8 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import java.util.ArrayList;
-import java.util.List;
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 
 /**
  * Maintains a ring of data (points at some distance bounds from the centroid).
@@ -26,15 +25,18 @@ import java.util.List;
  */
 public class Ring<T> {
 
-    private final List<T> contents;
+    // private final List<T> contents;
+    private ConciseSet contents;
     private final Pool owner;
     private final int ring_number;
     private final float r_min;
     private final float r_max;
     private final Ring inner_ring;
+    private boolean consolodated = false; // have the contents from this ring been consolodated (merged) with inner rings.
 
     public Ring( Pool owner, int ring_number, float r_min, float r_max, Ring inner_ring) {
-        contents = new ArrayList<>();
+        // contents = new ArrayList<>();
+        contents = new ConciseSet();
         this.ring_number = ring_number;
         this.owner = owner;
         this.r_min = r_min;
@@ -42,15 +44,20 @@ public class Ring<T> {
         this.inner_ring = inner_ring;
     }
 
-    public void add(T object) {
 
-        contents.add(object);
+    public void add( int index ) {
+        contents.add(index);
     }
 
-    public void add(List<T> objects) {
-
-        contents.addAll(objects);
-    }
+//    public void add(T object) {
+//
+//        contents.add(object);
+//    }
+//
+//    public void add(List<T> objects) {
+//
+//        contents.addAll(objects);
+//    }
 
 
     public int size() {
@@ -81,30 +88,76 @@ public class Ring<T> {
         return inner_ring;
     }
 
-    public List<T> getRingContents() {
+
+//    public ConciseSet getRingContents() {
+//        // public List<T> getRingContents() {
+//        return contents;
+//    }
+
+//    /**
+//     * @return the contents of this ring and all inner rings
+//     */
+//    public ConciseSet getContents() {
+//        //public ArrayList<T> getContents() {
+//        // ArrayList<T> result = new ArrayList<>();
+//        ConciseSet result = new ConciseSet();
+//        addRecursiveContents( result );
+//        return result;
+//    }
+
+    public ConciseSet getContents() {
         return contents;
     }
 
 
-    public ArrayList<T> getAllContents() {
-        ArrayList<T> result = new ArrayList<>();
-        addRecursiveContents( result );
-        return result;
-    }
+//    /**
+//     * @return the contents of this ring and all inner rings
+//     */
+//      public ArrayList<T> getContents() {
+//         ArrayList<T> result = new ArrayList<>();
+//         addRecursiveContents( result );
+//         return result;
+//    }
 
-    private boolean contains(T element) {
-        return contents.contains(element);
-    }
+//    private boolean contains(T element) {
+//        return contents.contains(element);
+//    }
 
     //-------------------------------------------------------------
 
-    private List<T> addRecursiveContents( List<T> result ) {
-        result.addAll( contents );
-        if( inner_ring != null ) {
-            inner_ring.addRecursiveContents(result);
+//    private List<T> addRecursiveContents( List<T> result ) {
+//        result.addAll( contents );
+//        if( inner_ring != null ) {
+//            inner_ring.addRecursiveContents(result);
+//        }
+//        return result;
+//    }
+
+//    private ConciseSet addRecursiveContents( ConciseSet result ) {
+//        result.addAll( contents );
+//        if( inner_ring != null ) {
+//            inner_ring.addRecursiveContents(result);
+//        }
+//        return result;
+//    }
+
+    /**
+     * Folds the sets from the inner rings into the set for this ring.
+     * Must always be done from inner to outer.
+     */
+
+    public void consolidateSets() throws Exception {
+        if( consolodated ) {
+            throw new Exception( "Ring is consolidated" );
         }
-        return result;
+        if( inner_ring != null ) {
+
+            if (!inner_ring.consolodated) {
+                throw new Exception("Inner ring has not been consolidated");
+            }
+
+            contents.addAll(inner_ring.contents);
+        }
+        consolodated = true;
     }
-
-
 }

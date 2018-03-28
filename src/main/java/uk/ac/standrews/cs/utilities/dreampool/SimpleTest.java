@@ -33,12 +33,13 @@ public class SimpleTest {
     private static Random r = new Random(787819234L);
     private static ArrayList<Point> points = new ArrayList<>();
     private static int setup_distance_calcs;
+    private static Set<Point> ros;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
         distance = new CountingWrapper( new EuclideanDistance() );
-        Set<Point> ros = createReferenceObjects();
+        ros = createReferenceObjects();
         dream_pool = new MPool<Point>( distance, ros );
 //        System.out.println( "Distance calculations (during ro initialisation): " + CountingWrapper.counter );
         add_data();
@@ -58,29 +59,22 @@ public class SimpleTest {
     }
 
     public static void add_data() throws Exception {
-        for (float pos = 0; pos < 10000 ; pos++ ) {
+        for (int pos = 0; pos < 10000 ; pos++ ) {
             Point p = newpoint();
             points.add( p );
-            dream_pool.add(p);
+            dream_pool.add(p,pos);
         }
-     //   show();
+        dream_pool.completeInitialisation();
     }
 
-    @Test
-    public void check_integrity() {
-        // check points and pools etc.
-        // TODO make this into an assertion all points in right ring and closer than max etc.
-    }
 
     @Test
     public void queryOnce() throws Exception {
         Point query = new Point(0.5f, 0.5f);
         float threshold = 0.05f;
+        Query q = new Query( query, threshold, points, dream_pool.pools, distance, true );
         System.out.println("Query: " + query + " Threshold: " + threshold);
-       // Set<Point> results = dream_pool.rangeSearch(query, threshold, query ); TODO UNCOMMENT ONCE FINISHED MESSING.
-//        for( Point p : results ) {
-//            System.out.println( p );
-//        }
+        Set<Point> results = dream_pool.rangeSearch(query, threshold, q );
         System.out.println("Total Distance calculations: " + CountingWrapper.counter);
         System.out.println("Distance calculations (query only): " + (CountingWrapper.counter - setup_distance_calcs));
     }

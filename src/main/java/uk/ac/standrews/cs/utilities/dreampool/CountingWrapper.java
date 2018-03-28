@@ -18,19 +18,18 @@
 package uk.ac.standrews.cs.utilities.dreampool;
 
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
-import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
-public class CountingWrapper implements Distance<Point> {
+public class CountingWrapper<T> implements Distance<T> {
 
-    private final Distance<Point> inner;
+    private final Distance<T> inner;
     public static int counter = 0;
 
-    public CountingWrapper(Distance<Point> inner ) {
+    public CountingWrapper(Distance<T> inner ) {
         this.inner = inner;
     }
 
     @Override
-    public float distance(Point a, Point b) {
+    public float distance(T a, T b) {
         counter++;
         return inner.distance( a,b );
     }

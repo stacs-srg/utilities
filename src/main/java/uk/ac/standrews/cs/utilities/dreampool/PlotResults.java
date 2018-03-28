@@ -42,12 +42,12 @@ public class PlotResults {
 
     // Configuration parameters
 
-    private boolean perform_validation = false;          // SET perform_validation TO TRUE TO PERFORM CHECKING
+    private boolean perform_validation = true;          // SET perform_validation TO TRUE TO PERFORM CHECKING
 
     //private int num_datums =    100; //1 hundred
     //private int num_datums =    1000; //1 thousand
-    //private int num_datums =    10000; //10 thousand
-    private int num_datums =    50000; //50 thousand
+    private int num_datums =    10000; //10 thousand
+    //private int num_datums =    50000; //50 thousand
     //private int num_datums =    100000; //100 thousand
     //private int num_datums =  1000000; // 1 million
 
@@ -107,12 +107,13 @@ public class PlotResults {
         ProgressIndicator pi = new PercentageProgressIndicator( 10 );
         pi.setTotalSteps(count);
 
-        for (float pos = 0; pos < count ; pos++ ) {
+        for (int pos = 0; pos < count ; pos++ ) {
             Point p = newpoint(r);
             datums.add( p );
-            dream_pool.add(p);
+            dream_pool.add(p,pos);
             pi.progressStep();
         }
+        dream_pool.completeInitialisation();
     }
 
     public Set<Query<Point>> generateQueries(int num_queries) {
@@ -142,13 +143,13 @@ public class PlotResults {
     public void doQueries(DataSet dataset, Set<Query<Point>> queries, int num_ros, int pool_index) throws Exception {
         int distance_calcs = 0;
 
-        int start_calcs = CountingWrapper.counter;
-        int total_calcs = 0;
+        int initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
+        int start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
 
         ProgressIndicator pi = new PercentageProgressIndicator( 100 );
         pi.setTotalSteps(queries.size());
 
-        int count = 0;
+        long start_time = System.currentTimeMillis();
 
         for (Query<Point> query : queries) {
 
@@ -156,15 +157,16 @@ public class PlotResults {
 
             query.validate(results);
 
-            distance_calcs = CountingWrapper.counter - start_calcs;
-            total_calcs += distance_calcs;
-            start_calcs = CountingWrapper.counter;
-
             pi.progressStep();
 
-            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, distance_calcs, results.size());
+            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, CountingWrapper.counter - start_calcs, results.size());
+
+            start_calcs = CountingWrapper.counter;
 
         }
+        long elapsed_time = System.currentTimeMillis() - start_time;
+
+        System.out.println( "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
     }
 
     /************** Private **************/

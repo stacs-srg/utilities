@@ -68,12 +68,12 @@ public class Pool<T> {
         return radii[index-1];
     }
 
-    public void add(T datum) throws Exception {
+    public void add(T datum, int index) throws Exception {
 
         float distance = distance_wrapper.distance(pivot,datum);
         if( distance < maxR() ) {
             Ring<T> ring = findEnclosingRing(distance);
-            ring.add(datum);
+            ring.add(index); // was datum
         }
     }
 
@@ -82,7 +82,7 @@ public class Pool<T> {
         if (distance > max_radius) {
             return null;
         }
-        for (int index = 0; index <= last_index; index++) { // TODO make more efficient later
+        for (int index = 0; index <= last_index; index++) {
             if (distance < radii[index]) {
                 return rings[index];
             }
@@ -158,14 +158,6 @@ public class Pool<T> {
         return max_radius;
     }
 
-    public float[] getRadii() { // TODO Remove debug method only
-        return radii;
-    }
-
-    public Ring<T>[] getRings() {
-        return rings;
-    }
-
     //--------------------
 
 
@@ -181,5 +173,12 @@ public class Pool<T> {
 //            }
         }
     }
+
+    public void completeInitialisation() throws Exception {
+        for( Ring<T> ring : rings ) {
+            ring.consolidateSets();
+        }
+    }
+
 
 }

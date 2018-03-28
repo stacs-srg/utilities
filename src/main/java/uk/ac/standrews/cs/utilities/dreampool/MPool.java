@@ -16,6 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
+import it.uniroma3.mat.extendedset.intset.IntSet;
 import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
@@ -28,6 +30,7 @@ public class MPool<T> { // aka DreamPool
 
     List<Pool<T>> pools = new ArrayList<>();
     private Ring<T> universal_ring = new Ring<T>(null,0,0.0f, 1.0F, null ); // a ring containing all the objects in the universe
+    private TreeMap<Integer,T> values = new TreeMap<>(); // used to store mappings from indices to values.
     // The universal ring is a catchall in case of lack of coverage when performing inclusion: the rings may not be big enough to cover the query.
 
     /**
@@ -50,9 +53,10 @@ public class MPool<T> { // aka DreamPool
 
     private void initialise(float[] radii, Distance<T> distance_wrapper) throws Exception {
 
+        pivots.size();
         for( T pivot : pivots ) {
             if( radii == null ) {
-                pools.add(new Pool(pivot,distance_wrapper));
+                pools.add(new Pool(pivot,distance_wrapper)); // default radii
             } else {
                 pools.add(new Pool(pivot,radii,distance_wrapper));
             }
@@ -60,12 +64,13 @@ public class MPool<T> { // aka DreamPool
     }
 
 
-    public void add(T datum) throws Exception {
+    public void add(T datum, int index) throws Exception {
 
+        values.put( index,datum );
         for( Pool<T> pool : pools ) {
-            pool.add(datum);
+            pool.add(datum, index );
         }
-        universal_ring.add(datum);
+        universal_ring.add(index); // TODO make efficient - unnecessary - could set all to 1 at end of initialisation - not clear how to do this?
     }
 
     /**
@@ -107,12 +112,31 @@ public class MPool<T> { // aka DreamPool
         }
 
         include_list.add( universal_ring );
-        query_obj.validateIncludeList(include_list, query_obj);
-        Set<T> candidates = intersections(include_list,query_obj);
-        query_obj.validateOmissions(candidates,include_list);
-        int excluded = exclude( candidates, exclude_list );
+        //query_obj.validateIncludeList(include_list, query_obj);
+        // Set<T> candidates = intersections(include_list,query_obj);
+        ConciseSet candidates = intersections(include_list,query_obj);
+        //query_obj.validateOmissions(candidates,include_list);
+        candidates = exclude( candidates, exclude_list );
         int count = filter( candidates, query, threshold );
-        return candidates;
+        return getValues( candidates );
+    }
+
+    private Set<T> getValues(ConciseSet candidates) {
+        Set<T> result = new HashSet<>();
+        IntSet.IntIterator iter = candidates.iterator();
+
+        while( iter.hasNext() ) {
+
+            int next = iter.next();
+            result.add( values.get(next));
+
+        }
+        return result;
+    }
+
+
+    private T getValue( int index ) {
+        return values.get( index );
     }
 
     private List<Ring<T>> extractTsFromDDs(List<DataDistance<Ring<T>>> include_list) {
@@ -121,26 +145,6 @@ public class MPool<T> { // aka DreamPool
             result.add(dd.value);
         }
         return result;
-    }
-
-
-    /*********************************** private methods ***********************************/
-
-
-    /**
-     * Attemts to find an inner ring that does not overlap with the query
-     * @param ring
-     * @param distance_query_pivot
-     * @param threshold
-     * @param query_obj
-     * @return an inner ring that does not overlap with the query, if there is one and null overwise
-     */
-    private Ring<T> uncover(Ring<T> ring, float distance_query_pivot , float threshold, Query<T> query_obj) {
-
-        while( ring != null && distance_query_pivot - ring.getRmax() < threshold ) { // there is overlap
-            ring = ring.getInnerRing();
-        }
-        return ring;
     }
 
 
@@ -158,12 +162,15 @@ public class MPool<T> { // aka DreamPool
         System.out.println( "-------");
     }
 
-    private Set<T> intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
+    private ConciseSet intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
+    // private Set<T> intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
         if( include_list.isEmpty() ) {
-            return new HashSet<T>();
+            //return new HashSet<T>();
+            return new ConciseSet();
         } else {
             int index = findSmallestSetIndex( include_list );
-            Set<T> result = new HashSet<T>( include_list.get(index).getAllContents() );
+            // Set<T> result = new HashSet<T>( include_list.get(index).getContents() );
+            ConciseSet result = include_list.get(index).getContents().clone();
             include_list.remove(index);
 
             if( include_list.size() == 0 ) {
@@ -172,56 +179,94 @@ public class MPool<T> { // aka DreamPool
             } else {
                 // otherwise do the intersection of all the enclosing rings.
                 for (Ring<T> remaining_rings : include_list) {
-                    result = intersection(result, remaining_rings.getAllContents(),query_obj); // ,query_obj );
+                    // result = intersection(result, remaining_rings.getContents(),query_obj); // ,query_obj );
+                    result = result.intersection( remaining_rings.getContents() );
                 }
             }
             return result;
         }
     }
 
-    private int exclude(Set<T> candidates, List<Ring<T>> exclude_list) {
+   // private int exclude(ConciseSet candidates, List<Ring<T>> exclude_list) {
+    private ConciseSet exclude(ConciseSet candidates, List<Ring<T>> exclude_list) {
+        // private int exclude(Set<T> candidates, List<Ring<T>> exclude_list) {
         int count = 0;
+        ConciseSet result = new ConciseSet();
+
         for( Ring<T> ring : exclude_list ) {
-            ArrayList<T> ring_contents = ring.getAllContents();
-            if( candidates != null && ! candidates.isEmpty() ) {
-                for (T candidate : ring_contents) {
-                    if (candidates.remove(candidate)) {
-                        count++;
+            // ArrayList<T> ring_contents = ring.getContents();
+            ConciseSet ring_contents = ring.getContents();
+
+            result = candidates.difference(ring_contents);
+
+//            if( candidates != null && ! candidates.isEmpty() ) {
+//                for (T candidate : ring_contents) {
+//                    if (candidates.remove(candidate)) {
+//                        count++;
+//                    }
+//                }
+//        }
+        }
+        return result;
+    }
+
+    private int filter(ConciseSet candidates, T query, float threshold) {
+        int false_positives = 0;
+        int true_positives = 0;
+
+        Set<Integer> dropset = new HashSet<>();
+
+        if (candidates != null && !candidates.isEmpty()) {
+
+            IntSet.IntIterator iter = candidates.iterator();
+
+            while (iter.hasNext()) {
+
+                int next = iter.next();
+                T candidate = values.get(next);
+                if (candidate != null) {
+                    if (distance_wrapper.distance(query, candidate) > threshold) {
+                        dropset.add(next);
+                        false_positives++;
+                    } else {
+                        true_positives++;
                     }
                 }
             }
-        }
-        return count;
-    }
-
-    private int filter(Set<T> candidates, T query, float threshold) {
-        int false_positives = 0;
-        int true_positives = 0;
-        int distance_calcs = 0;
-
-        Set<T> dropset = new HashSet<>();
-
-        if( candidates != null && ! candidates.isEmpty() ) {
-            for (T candidate : candidates) {
-                distance_calcs++;
-
-                if (distance_wrapper.distance(query, candidate) > threshold) {
-                    dropset.add(candidate);     // How do you write this without ConcurrentModificationException ??
-                    false_positives++;
-                } else {
-                    true_positives++;
-                }
+            for (int member : dropset) {
+                candidates.flip(member);
             }
-        }
-        for( T member : dropset ) {
-            candidates.remove(member);
-        }
 
-//        System.out.println( "True positives (before filtering): " + true_positives );
-//        System.out.println( "False positives (before filtering): " + false_positives );
-//        System.out.println( "Distance calculations (during filtering): " + distance_calcs );
+        }
         return true_positives;
     }
+
+//  private int filter(Set<T> candidates, T query, float threshold) {
+//        int false_positives = 0;
+//        int true_positives = 0;
+//        int distance_calcs = 0;
+//
+//        Set<T> dropset = new HashSet<>();
+//            for (T candidate : candidates) {
+//                distance_calcs++;
+//
+//                if (distance_wrapper.distance(query, candidate) > threshold) {
+//                    dropset.add(candidate);     // How do you write this without ConcurrentModificationException ??
+//                    false_positives++;
+//                } else {
+//                    true_positives++;
+//                }
+//            }
+//        }
+//        for( T member : dropset ) {
+//            candidates.remove(member);
+//        }
+//
+////        System.out.println( "True positives (before filtering): " + true_positives );
+////        System.out.println( "False positives (before filtering): " + false_positives );
+////        System.out.println( "Distance calculations (during filtering): " + distance_calcs );
+//        return true_positives;
+//    }
 
     int intersection_count = 1;
 
@@ -231,7 +276,7 @@ public class MPool<T> { // aka DreamPool
             if( b.contains( next ) ) {
                 result.add( next );  // point in a and b => add to intersection.
             } else {                 // excluding an item
-                // TODO DEBUG
+                // TODO next 4 lines are DEBUG
                 float d = distance_wrapper.distance(query_obj.query, next);
                 if (d <= query_obj.threshold) {
                     System.err.println(intersection_count + " # Wrongly excluding item: " + next + " within threshold " + query_obj.threshold + " d = " + d);
@@ -252,7 +297,14 @@ public class MPool<T> { // aka DreamPool
         return result;
     }
 
-    ////// Private
+    public void completeInitialisation() throws Exception {
+        for( Pool<T> pool : pools ) {
+            pool.completeInitialisation();
+        }
+    }
+
+    /*********************************** private methods ***********************************/
+
 
     /**
      * PRE - include_list is not empty.
@@ -271,4 +323,6 @@ public class MPool<T> { // aka DreamPool
         }
         return result;
     }
+
+
 }
