@@ -215,21 +215,6 @@ public class PlotResults {
         // }
     }
 
-    private void oneExperiment(DataSet dataset) throws Exception {
-
-        int ref_objs = 30;
-        int radii_index = 1;
-
-        initialise(num_datums, ref_objs, radii[radii_index]);
-
-        Query<Point> q = new Query<>( new Point( 0.74204534F,0.058961034F ),0.21586731F, datums, dream_pool.pools, validate_distance, perform_validation );
-
-        Set<Point> results = dream_pool.rangeSearch(q.query, q.threshold,q ); // , q );last parameter for debug only.
-
-        q.validate(results);
-    }
-
-
     private static Point newpoint(Random r) {
 
         float x;
