@@ -100,7 +100,7 @@ public class Colors2 {
             CartesianPoint p = get_next_source_point();
 
             datums.add(p);
-            dream_pool.add(p,pos);
+            dream_pool.add(p);
             pi.progressStep();
         }
 

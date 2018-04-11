@@ -110,7 +110,7 @@ public class PlotResults {
         for (int pos = 0; pos < count ; pos++ ) {
             Point p = newpoint(r);
             datums.add( p );
-            dream_pool.add(p,pos);
+            dream_pool.add(p);
             pi.progressStep();
         }
         dream_pool.completeInitialisation();

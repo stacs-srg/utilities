@@ -98,7 +98,7 @@ public class Colors1 {
                 p = cpfr.randomValue();
             }
             datums.add(p);
-            dream_pool.add(p,pos);
+            dream_pool.add(p);
             pi.progressStep();
         }
 

@@ -18,20 +18,33 @@ package uk.ac.standrews.cs.utilities.dreampool;
 
 import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import it.uniroma3.mat.extendedset.intset.IntSet;
-import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.*;
 
+/**
+ * @author al@st-andrews.ac.uk
+ * @param <T> The type of the elements stored in this data structure.
+ *
+ */
 public class MPool<T> { // aka DreamPool
 
-    private final Set<T> pivots;
-    private final Distance<T> distance_wrapper;
+    private final Set<T> pivots;                            // the set of all pivots in the system.
+    private int num_pools;                                  // number of pools (=number of pivots) in the implementation
+    private final Distance<T> distance_wrapper;             // the distance function used in the implementation.
 
-    List<Pool<T>> pools = new ArrayList<>();
-    private Ring<T> universal_ring = new Ring<T>(null,0,0.0f, 1.0F, null ); // a ring containing all the objects in the universe
-    private TreeMap<Integer,T> values = new TreeMap<>(); // used to store mappings from indices to values.
-    // The universal ring is a catchall in case of lack of coverage when performing inclusion: the rings may not be big enough to cover the query.
+    List<Pool<T>> pools = new ArrayList<>();                // the set of pools containing rings and pivots.
+    private int element_id = 0;                             // an int used to represent each of the elements used in s, used to index values TreeMap.
+    private TreeMap<Integer,T> values = new TreeMap<>();    // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
+
+    private Ring<T> universal_ring =
+            new Ring<T>(null,
+                        this,
+                        0,
+                        0.0f,
+                        1.0F,
+                        null );                    // a ring containing all the objects in the universe (this is a catch all to ensure coverage of all points)
+
 
     /**
      * @param pivots
@@ -41,6 +54,7 @@ public class MPool<T> { // aka DreamPool
     public MPool(Distance<T> distance_wrapper, Set<T> pivots, float[] radii) throws Exception {
 
         this.pivots = pivots;
+        this.num_pools = pivots.size();
         this.distance_wrapper = distance_wrapper;
 
         initialise(radii,distance_wrapper);
@@ -53,24 +67,34 @@ public class MPool<T> { // aka DreamPool
 
     private void initialise(float[] radii, Distance<T> distance_wrapper) throws Exception {
 
-        pivots.size();
+        int pool_id = 0;
+
         for( T pivot : pivots ) {
             if( radii == null ) {
-                pools.add(new Pool(pivot,distance_wrapper)); // default radii
+                pools.add(new Pool(pivot, pool_id, num_pools, this, distance_wrapper)); // default radii
             } else {
-                pools.add(new Pool(pivot,radii,distance_wrapper));
+                pools.add(new Pool(pivot, pool_id, num_pools, radii, this, distance_wrapper));
             }
+            pool_id++;
         }
     }
 
 
-    public void add(T datum, int index) throws Exception {
+    public void add(T datum) throws Exception {
 
-        values.put( index,datum );
-        for( Pool<T> pool : pools ) {
-            pool.add(datum, index );
+        float[] distances_from_datum_to_pivots = new float[num_pools];
+        int distance_index = 0;
+
+        values.put( element_id,datum );         // add to the master index to facilitate lookup from bitmaps to datums.
+        for( Pool<T> pool : pools ) {           // calculate the distances to all the pivots.
+            distances_from_datum_to_pivots[ distance_index++ ] = distance_wrapper.distance(pool.getPivot(),datum);
         }
-        universal_ring.add(index); // TODO make efficient - unnecessary - could set all to 1 at end of initialisation - not clear how to do this?
+        for( Pool<T> pool : pools ) {
+            pool.add(element_id, datum, distances_from_datum_to_pivots );
+        }
+
+        universal_ring.add(element_id);
+        element_id++;
     }
 
     /**
@@ -85,13 +109,17 @@ public class MPool<T> { // aka DreamPool
      *
      * Then exclude the rings that do not.
      */
-    public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj) { // , Query<T> query_obj) { // TODO query_obj only for validation
+    public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj ) { // NOTE query_obj only for validation
 
         List<Ring<T>> include_list = new ArrayList<>(); // circles that cover query and may contain soln
         List<Ring<T>> exclude_list = new ArrayList<>(); // circles that do not cover query and may are not part of soln
 
+        float[] distances_from_query_to_pivots = new float[num_pools];
+        int distance_index = 0;
+
         for (Pool<T> pool : pools) {
             float distance_query_pivot = distance_wrapper.distance(pool.getPivot(),query);
+            distances_from_query_to_pivots[ distance_index++ ] = distance_query_pivot;              // save this for HP exclusion - used below.
 
             // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
             // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
@@ -108,50 +136,56 @@ public class MPool<T> { // aka DreamPool
             if (r2 != null) {
                 exclude_list.add(r2); // to be refined below.
             }
-
         }
 
+        /** Next perform hyperplane exclusion: For a reference point pi ∈ U,
+         ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+         ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
+         **/
+
+        ConciseSet all_hp_exlusions = new ConciseSet();
+
+        for (Pool<T> pool : pools) {
+            ConciseSet next_hp_exlude_set = pool.findHPExclusion(distances_from_query_to_pivots, threshold);
+            query_obj.validateHPExclusions(getValues(next_hp_exlude_set));
+            all_hp_exlusions.addAll(next_hp_exlude_set);
+        }
+
+        System.out.println( " all_hp_exlusions size = " + all_hp_exlusions.size() );
+
         include_list.add( universal_ring );
-        //query_obj.validateIncludeList(include_list, query_obj);
-        // Set<T> candidates = intersections(include_list,query_obj);
+        query_obj.validateIncludeList(include_list, query_obj);
         ConciseSet candidates = intersections(include_list,query_obj);
-        //query_obj.validateOmissions(candidates,include_list);
+
+        System.out.println( " Intersection size = " + candidates.size() );
+
+        query_obj.validateOmissions(getValues(candidates),include_list);
         candidates = exclude( candidates, exclude_list );
+
+        System.out.println( " candidates size (after pivot exclusion) before hp exclusion = " + candidates.size() );
+
+        candidates = candidates.difference(all_hp_exlusions);
+
+        System.out.println( " candidates size after hp exclusion = " + candidates.size() );
+
         int count = filter( candidates, query, threshold );
         return getValues( candidates );
     }
 
-    private Set<T> getValues(ConciseSet candidates) {
+    public T getValue( int index ) {
+        return values.get( index );
+    }
+
+    public Set<T> getValues(ConciseSet candidates) {
         Set<T> result = new HashSet<>();
         IntSet.IntIterator iter = candidates.iterator();
 
         while( iter.hasNext() ) {
 
-            int next = iter.next();
-            result.add( values.get(next));
+            result.add( getValue( iter.next() ) );
 
         }
         return result;
-    }
-
-
-    private T getValue( int index ) {
-        return values.get( index );
-    }
-
-    private List<Ring<T>> extractTsFromDDs(List<DataDistance<Ring<T>>> include_list) {
-        List<Ring<T>> result = new ArrayList<>();
-        for( DataDistance<Ring<T>> dd : include_list ) {
-            result.add(dd.value);
-        }
-        return result;
-    }
-
-
-    public void show_structure() {
-        for( Pool pool : pools ) {
-            pool.show_structure();
-        }
     }
 
     public void showRings( List<Ring<T>> list) {
@@ -162,15 +196,19 @@ public class MPool<T> { // aka DreamPool
         System.out.println( "-------");
     }
 
+    public void show_structure() {
+        for( Pool pool : pools ) {
+            pool.show_structure();
+        }
+    }
+
+
     private ConciseSet intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
-    // private Set<T> intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
         if( include_list.isEmpty() ) {
-            //return new HashSet<T>();
             return new ConciseSet();
         } else {
             int index = findSmallestSetIndex( include_list );
-            // Set<T> result = new HashSet<T>( include_list.get(index).getContents() );
-            ConciseSet result = include_list.get(index).getContents().clone();
+            ConciseSet result = include_list.get(index).getConciseContents().clone();
             include_list.remove(index);
 
             if( include_list.size() == 0 ) {
@@ -179,33 +217,21 @@ public class MPool<T> { // aka DreamPool
             } else {
                 // otherwise do the intersection of all the enclosing rings.
                 for (Ring<T> remaining_rings : include_list) {
-                    // result = intersection(result, remaining_rings.getContents(),query_obj); // ,query_obj );
-                    result = result.intersection( remaining_rings.getContents() );
+                    result = result.intersection( remaining_rings.getConciseContents() );
                 }
             }
             return result;
         }
     }
 
-   // private int exclude(ConciseSet candidates, List<Ring<T>> exclude_list) {
     private ConciseSet exclude(ConciseSet candidates, List<Ring<T>> exclude_list) {
-        // private int exclude(Set<T> candidates, List<Ring<T>> exclude_list) {
-        int count = 0;
         ConciseSet result = new ConciseSet();
 
         for( Ring<T> ring : exclude_list ) {
-            // ArrayList<T> ring_contents = ring.getContents();
-            ConciseSet ring_contents = ring.getContents();
+            ConciseSet ring_contents = ring.getConciseContents();
 
             result = candidates.difference(ring_contents);
 
-//            if( candidates != null && ! candidates.isEmpty() ) {
-//                for (T candidate : ring_contents) {
-//                    if (candidates.remove(candidate)) {
-//                        count++;
-//                    }
-//                }
-//        }
         }
         return result;
     }
@@ -241,33 +267,6 @@ public class MPool<T> { // aka DreamPool
         return true_positives;
     }
 
-//  private int filter(Set<T> candidates, T query, float threshold) {
-//        int false_positives = 0;
-//        int true_positives = 0;
-//        int distance_calcs = 0;
-//
-//        Set<T> dropset = new HashSet<>();
-//            for (T candidate : candidates) {
-//                distance_calcs++;
-//
-//                if (distance_wrapper.distance(query, candidate) > threshold) {
-//                    dropset.add(candidate);     // How do you write this without ConcurrentModificationException ??
-//                    false_positives++;
-//                } else {
-//                    true_positives++;
-//                }
-//            }
-//        }
-//        for( T member : dropset ) {
-//            candidates.remove(member);
-//        }
-//
-////        System.out.println( "True positives (before filtering): " + true_positives );
-////        System.out.println( "False positives (before filtering): " + false_positives );
-////        System.out.println( "Distance calculations (during filtering): " + distance_calcs );
-//        return true_positives;
-//    }
-
     int intersection_count = 1;
 
     public Set<T> intersection(Collection<T> a, Collection<T> b, Query<T> query_obj) { // }, Query<T> query_obj) { // TODO query_obj only for debug
@@ -276,13 +275,10 @@ public class MPool<T> { // aka DreamPool
             if( b.contains( next ) ) {
                 result.add( next );  // point in a and b => add to intersection.
             } else {                 // excluding an item
-                // TODO next 4 lines are DEBUG
-                float d = distance_wrapper.distance(query_obj.query, next);
-                if (d <= query_obj.threshold) {
-                    System.err.println(intersection_count + " # Wrongly excluding item: " + next + " within threshold " + query_obj.threshold + " d = " + d);
-                }
-//                if( query_obj.real_solutions.contains(next)) {
-//                    System.err.println( "Eliminating point that should be part of soln space: " + next );
+                // next 4 lines are DEBUG
+//                float d = distance_wrapper.distance(query_obj.query, next);
+//                if (d <= query_obj.threshold) {
+//                    System.err.println(intersection_count + " # Wrongly excluding item: " + next + " within threshold " + query_obj.threshold + " d = " + d);
 //                }
             }
         }

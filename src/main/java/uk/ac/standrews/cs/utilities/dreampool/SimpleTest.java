@@ -62,7 +62,7 @@ public class SimpleTest {
         for (int pos = 0; pos < 10000 ; pos++ ) {
             Point p = newpoint();
             points.add( p );
-            dream_pool.add(p,pos);
+            dream_pool.add(p);
         }
         dream_pool.completeInitialisation();
     }

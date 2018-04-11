@@ -17,6 +17,7 @@
 
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 /**
@@ -26,26 +27,37 @@ import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 public class Pool<T> {
 
-    final T pivot;
+    public static final float[] DEFAULT_RADII = new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F };    // TODO make more efficient later - Richards suggestion use median distances.
 
-    public static final float[] DEFAULT_RADII = new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F }; //, 0.5F};    // TODO make more efficient later
+    final T pivot;                              // the pivot (the centre) of the pool.
+    public final float[] radii;                 // the array of distances being used to define the size of the rings in this pool
+    private final Distance<T> distance_wrapper; // the distance function being used in this implementation
+    private Ring<T>[] rings;                    // an array of rings, each of which holds the elements drawn from s that are within the ring (rings are inclusive => include the elements in inner rings)
+    private int last_index;                     // last index into the array of rings
+    private float max_radius;                   // the maximum radius of this pool
+    private int pool_id;                        // the index of this pool into (any) array of distances etc. indexed by
+    private int num_pools;                      // number of pools in the system - copied down from MPool - what would Martin Fowler say? [good/bad]- discuss not sure - al.
+    private ConciseSet[] closer_than;           // Used to store information for hyperplane exclusion - see comments in add below.
+    private final MPool<T> owner;               // The MPool to which this pool belongs
 
-    public final float[] radii;
-    private final Distance<T> distance_wrapper;
-    private Ring<T>[] rings;
-    private int last_index;
-    private float max_radius;
-
-    public Pool(T pivot, Distance<T> distance) {
-        this(pivot,DEFAULT_RADII, distance);
+    public Pool(T pivot, int pool_id, int num_pools,  MPool<T> owner, Distance<T> distance) {
+        this(pivot, pool_id, num_pools, DEFAULT_RADII, owner, distance);
     }
 
-    public Pool(T pivot, float[] radii, Distance<T> distance_wrapper) {
+    public Pool(T pivot, int pool_id, int num_pools, float[] radii, MPool<T> owner, Distance<T> distance_wrapper) {
 
         this.pivot = pivot;
+        this.pool_id = pool_id;
+        this.num_pools = num_pools;
         this.radii = radii;
+        this.owner = owner;
         this.distance_wrapper = distance_wrapper;
         initialise_rings();
+
+        closer_than = new ConciseSet[num_pools];
+        for( int i = 0; i < closer_than.length; i++ ) {
+            closer_than[i] = new ConciseSet();
+        }
     }
 
 
@@ -55,7 +67,7 @@ public class Pool<T> {
         last_index = rings.length - 1;
 
         for (int i = 0; i <= last_index; i++ ) {
-            r = new Ring<>(this, i, calc_ring_min( i ), radii[i], r);
+            r = new Ring<>(this, owner, i, calc_ring_min( i ), radii[i], r);
             rings[i] = r;
         }
         max_radius = r.getRmax();
@@ -68,12 +80,27 @@ public class Pool<T> {
         return radii[index-1];
     }
 
-    public void add(T datum, int index) throws Exception {
+    public void add(int element_id, T datum, float[] distances_from_datum_to_pivots) throws Exception {
 
-        float distance = distance_wrapper.distance(pivot,datum);
-        if( distance < maxR() ) {
-            Ring<T> ring = findEnclosingRing(distance);
-            ring.add(index); // was datum
+        float distance_from_datum_to_pivot = distances_from_datum_to_pivots[pool_id];
+
+        // First add this element to the appropriate ring if it datum is within the ball of this pool.
+
+        if( distance_from_datum_to_pivot < maxR() ) {
+            Ring<T> ring = findEnclosingRing(distance_from_datum_to_pivot);
+            ring.add(element_id);
+        }
+
+        /** Next add this element to the hyperplane exclusion data structure
+         *  Uses hyperplance exclusion: For a reference point pi ∈ U,
+         ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+         ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
+         **/
+
+        for( int i = 0; i < num_pools; i++ ) {
+            if( i != pool_id && distance_from_datum_to_pivot <= distances_from_datum_to_pivots[i] ) { // is this pivot closer than the other?  // TODO look at this condition carefully ******* => consequences of self?
+                    closer_than[i].add(element_id);
+            }
         }
     }
 
@@ -158,6 +185,10 @@ public class Pool<T> {
         return max_radius;
     }
 
+    public MPool<T> getOwner() {
+        return owner;
+    }
+
     //--------------------
 
 
@@ -180,5 +211,37 @@ public class Pool<T> {
         }
     }
 
+    /** Uses hyperplance exclusion: For a reference point pi ∈ U,
+     ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+     ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
+     **/
+    public ConciseSet findHPExclusion(float[] distances_from_query_to_pivots, float threshold) {
+        ConciseSet result = new ConciseSet();
 
+        float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
+
+        for( int i = 0; i < num_pools; i++ ) {
+
+            if (i != pool_id && distance_from_query_to_this_pivot - distances_from_query_to_pivots[i] > 2 * threshold) {
+
+                result.addAll(closer_than[i]);
+
+            }
+
+        }
+
+        return result;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+

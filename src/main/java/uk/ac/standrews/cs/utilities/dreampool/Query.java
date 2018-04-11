@@ -103,52 +103,73 @@ public class Query<T> {
         }
     }
 
-//    public void validateOmissions(Set<T> result, List<Ring<T>> include_list) {
-//        if( validate ) {
-//            int correct = 0;
-//            int err = 0;
-//            for (T potential_solution : result) {
-//                if (real_solutions.contains(potential_solution)) {
-//                    correct++;
-//                }
-//            }
-//            if (correct != real_solutions.size()) {
-//                int errors = real_solutions.size() - correct;
-//                System.out.println("validateOmissions: Omission: soln to query " + query + " T: " + threshold + " contains " + errors + " FNs, real solutions = " + real_solutions.size() + " correct = " + correct );
-//
-//
-//                ArrayList<T> clone = (ArrayList<T>) real_solutions.clone();
-//                clone.removeAll(result);
-//                for (T false_neg : clone) {
-//                        System.out.println("\t\tOmission: FN:" + false_neg + " distance: " + validate_distance.distance(false_neg,query) );
-//                }
-//                err += errors;
-//            }
-//        }
-//    }
+    public void validateOmissions(Set<T> result, List<Ring<T>> include_list) {
+        if( validate ) {
+            int correct = 0;
+            int err = 0;
+            for (T potential_solution : result) {
+                if (real_solutions.contains(potential_solution)) {
+                    correct++;
+                }
+            }
+            if (correct != real_solutions.size()) {
+                int errors = real_solutions.size() - correct;
+                System.out.println("validateOmissions: Omission: soln to query " + query + " T: " + threshold + " contains " + errors + " FNs, real solutions = " + real_solutions.size() + " correct = " + correct );
 
-//    public void validateIncludeList(List<Ring<T>> include_list, Query<T> query_obj) {
-//        if (validate) {
-//            ArrayList<T> clone = new ArrayList<T>();
-//            clone.addAll( real_solutions );
-//            for (Ring<T> ring : include_list) {
-//                for (T point : ring.getContents()) {
-//                    clone.remove(point);
-//                }
-//            }
-//            if (!clone.isEmpty()) {
-//                System.out.println("validateIncludeList: Omissions in Include list:" + clone.size());
-//                System.out.println("validateIncludeList: Include list size = " + include_list.size() );
-//                int records_in_soln = 0;
-//                for( Ring<T> ring : include_list ) {
-//                    records_in_soln += ring.getContents().size();
-//                }
-//                System.out.println("validateIncludeList: Include list solution size = " + records_in_soln );
-//                for (T point : clone) {
-//                    //       System.out.println("\t\tOmission include: " + point );
-//                }
+
+                ArrayList<T> clone = (ArrayList<T>) real_solutions.clone();
+                clone.removeAll(result);
+                for (T false_neg : clone) {
+                        System.out.println("\t\tOmission: FN:" + false_neg + " distance: " + validate_distance.distance(false_neg,query) );
+                }
+                err += errors;
+            }
+        }
+    }
+
+    public void validateIncludeList(List<Ring<T>> include_list, Query<T> query_obj) {
+        if (validate) {
+            ArrayList<T> clone = new ArrayList<T>();
+            clone.addAll( real_solutions );
+            for (Ring<T> ring : include_list) {
+                for (T point : ring.getContents()) {
+                    clone.remove(point);
+                }
+            }
+            if (!clone.isEmpty()) {
+                System.out.println("validateIncludeList: Omissions in Include list:" + clone.size());
+                System.out.println("validateIncludeList: Include list size = " + include_list.size() );
+                int records_in_soln = 0;
+                for( Ring<T> ring : include_list ) {
+                    records_in_soln += ring.getContents().size();
+                }
+                System.out.println("validateIncludeList: Include list solution size = " + records_in_soln );
+                for (T point : clone) {
+                    //       System.out.println("\t\tOmission include: " + point );
+                }
+            } else {
+            }
+        }
+    }
+
+    public void validateHPExclusions(Set<T> values) {
+        if( validate ) {
+
+            int error_count = 0;
+
+            for( T value : values ) {
+                if (real_solutions.contains(value)) {
+                    System.out.println("validateHPExclusions: value: " + value + " wrongly excluded" );
+                    error_count++;
+                }
+            }
+//            if( error_count == 0 ) {
+//                System.out.println("validateHPExclusions: OK" );
 //            } else {
+//                System.out.println("validateHPExclusions: errors = " + error_count );
 //            }
-//        }
-//    }
+
+        }
+
+    }
 }
