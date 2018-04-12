@@ -18,9 +18,12 @@ package uk.ac.standrews.cs.utilities.dreampool;
 
 import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import it.uniroma3.mat.extendedset.intset.IntSet;
+import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.*;
+
+import static uk.ac.standrews.cs.utilities.Logging.output;
 
 /**
  * @author al@st-andrews.ac.uk
@@ -37,6 +40,8 @@ public class MPool<T> { // aka DreamPool
     private int element_id = 0;                             // an int used to represent each of the elements used in s, used to index values TreeMap.
     private TreeMap<Integer,T> values = new TreeMap<>();    // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
 
+    private float[][] inter_pivot_distances;
+
     private Ring<T> universal_ring =
             new Ring<T>(null,
                         this,
@@ -47,6 +52,7 @@ public class MPool<T> { // aka DreamPool
 
 
     /**
+     * Create MPool using specified radii
      * @param pivots
      * @param radii
      *
@@ -60,6 +66,12 @@ public class MPool<T> { // aka DreamPool
         initialise(radii,distance_wrapper);
     }
 
+    /**
+     * Create MPool using default radii
+     * @param distance
+     * @param ros
+     * @throws Exception
+     */
     public MPool(Distance<T>  distance, Set<T> ros) throws Exception {
         this( distance, ros, Pool.DEFAULT_RADII );
     }
@@ -77,6 +89,22 @@ public class MPool<T> { // aka DreamPool
             }
             pool_id++;
         }
+        initialise_pivot_distances( pools );
+    }
+
+    private void initialise_pivot_distances(List<Pool<T>> pools) {
+        inter_pivot_distances = new float[num_pools][num_pools];
+        for( Pool<T> p1 : pools ) {
+            for( Pool<T> p2 : pools ) {
+                float d = distance_wrapper.distance(p1.getPivot(),p2.getPivot());
+                inter_pivot_distances[ p1.getPoolId() ][ p2.getPoolId() ] = d;
+                inter_pivot_distances[ p2.getPoolId() ][ p1.getPoolId() ] = d;
+            }
+        }
+    }
+
+    public float getInterPivotDistance(int i, int j) {
+        return inter_pivot_distances[i][j];
     }
 
 
@@ -146,27 +174,27 @@ public class MPool<T> { // aka DreamPool
         ConciseSet all_hp_exlusions = new ConciseSet();
 
         for (Pool<T> pool : pools) {
-            ConciseSet next_hp_exlude_set = pool.findHPExclusion(distances_from_query_to_pivots, threshold);
+            ConciseSet next_hp_exlude_set = pool.findHPExclusion4P(distances_from_query_to_pivots, threshold);
             query_obj.validateHPExclusions(getValues(next_hp_exlude_set));
             all_hp_exlusions.addAll(next_hp_exlude_set);
         }
 
-        System.out.println( " all_hp_exlusions size = " + all_hp_exlusions.size() );
+        output(LoggingLevel.VERBOSE," all_hp_exlusions size = " + all_hp_exlusions.size() );
 
         include_list.add( universal_ring );
         query_obj.validateIncludeList(include_list, query_obj);
         ConciseSet candidates = intersections(include_list,query_obj);
 
-        System.out.println( " Intersection size = " + candidates.size() );
+        output(LoggingLevel.VERBOSE," Intersection size = " + candidates.size() );
 
         query_obj.validateOmissions(getValues(candidates),include_list);
         candidates = exclude( candidates, exclude_list );
 
-        System.out.println( " candidates size (after pivot exclusion) before hp exclusion = " + candidates.size() );
+        output(LoggingLevel.VERBOSE," candidates size (after pivot exclusion) before hp exclusion = " + candidates.size() );
 
         candidates = candidates.difference(all_hp_exlusions);
 
-        System.out.println( " candidates size after hp exclusion = " + candidates.size() );
+        output(LoggingLevel.VERBOSE," candidates size after hp exclusion = " + candidates.size() );
 
         int count = filter( candidates, query, threshold );
         return getValues( candidates );
@@ -203,7 +231,7 @@ public class MPool<T> { // aka DreamPool
     }
 
 
-    private ConciseSet intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // TODO query_obj only for debug
+    private ConciseSet intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // Note query_obj only for debug
         if( include_list.isEmpty() ) {
             return new ConciseSet();
         } else {
@@ -267,32 +295,6 @@ public class MPool<T> { // aka DreamPool
         return true_positives;
     }
 
-    int intersection_count = 1;
-
-    public Set<T> intersection(Collection<T> a, Collection<T> b, Query<T> query_obj) { // }, Query<T> query_obj) { // TODO query_obj only for debug
-        Set<T> result = new HashSet<>();
-        for( T next : a ) {
-            if( b.contains( next ) ) {
-                result.add( next );  // point in a and b => add to intersection.
-            } else {                 // excluding an item
-                // next 4 lines are DEBUG
-//                float d = distance_wrapper.distance(query_obj.query, next);
-//                if (d <= query_obj.threshold) {
-//                    System.err.println(intersection_count + " # Wrongly excluding item: " + next + " within threshold " + query_obj.threshold + " d = " + d);
-//                }
-            }
-        }
-        intersection_count++;
-        return result;
-    }
-
-    public static Set union(Collection a, Collection b) {
-        Set result = new HashSet();
-        result.addAll(a);
-        result.addAll(b);
-        return result;
-    }
-
     public void completeInitialisation() throws Exception {
         for( Pool<T> pool : pools ) {
             pool.completeInitialisation();
@@ -319,6 +321,5 @@ public class MPool<T> { // aka DreamPool
         }
         return result;
     }
-
 
 }

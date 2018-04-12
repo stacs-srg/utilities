@@ -92,13 +92,13 @@ public class Pool<T> {
         }
 
         /** Next add this element to the hyperplane exclusion data structure
-         *  Uses hyperplance exclusion: For a reference point pi ∈ U,
+         *  Uses hyperplane exclusion: For a reference point pi ∈ U,
          ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
          ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
          **/
 
         for( int i = 0; i < num_pools; i++ ) {
-            if( i != pool_id && distance_from_datum_to_pivot <= distances_from_datum_to_pivots[i] ) { // is this pivot closer than the other?  // TODO look at this condition carefully ******* => consequences of self?
+            if( i != pool_id && distance_from_datum_to_pivot <= distances_from_datum_to_pivots[i] ) { // is this pivot closer than the other?
                     closer_than[i].add(element_id);
             }
         }
@@ -160,7 +160,7 @@ public class Pool<T> {
         int candidate = -1;
 
         // search from inside - find the biggest non overlapping
-        for (int index = 0; index <= last_index; index++) { // TODO make for efficent later
+        for (int index = 0; index <= last_index; index++) {
             if (distance_query_pivot >= radii[index] + threshold) {                // no overlap with query
                 // this radius is a solution - may be bigger rings.
                 candidate = index;
@@ -189,6 +189,8 @@ public class Pool<T> {
         return owner;
     }
 
+    public int getPoolId() { return pool_id; }
+
     //--------------------
 
 
@@ -211,11 +213,11 @@ public class Pool<T> {
         }
     }
 
-    /** Uses hyperplance exclusion: For a reference point pi ∈ U,
+    /** Uses 3 point hyperplane exclusion: For a reference point pi ∈ U,
      ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
      ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
      **/
-    public ConciseSet findHPExclusion(float[] distances_from_query_to_pivots, float threshold) {
+    public ConciseSet findHPExclusion3P(float[] distances_from_query_to_pivots, float threshold) {
         ConciseSet result = new ConciseSet();
 
         float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
@@ -232,6 +234,31 @@ public class Pool<T> {
 
         return result;
     }
+
+    /** Uses 4 point hyperplane exclusion: For a reference point pi ∈ U,
+     *
+     ** If ( d(q,p1)2 - d(q,p2)2 ) / 2d(p1,p2) ) > t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+     ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
+     **/
+    public ConciseSet findHPExclusion4P(float[] distances_from_query_to_pivots, float threshold) {
+        ConciseSet result = new ConciseSet();
+
+        float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
+
+        for( int i = 0; i < num_pools; i++ ) {
+
+            if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / owner.getInterPivotDistance( this.pool_id,i )  ) > threshold) {
+
+                result.addAll(closer_than[i]);
+
+            }
+
+        }
+
+        return result;
+    }
+
+    private float square( float a ) { return a * a; }
 }
 
 

@@ -190,7 +190,6 @@ public class CartesianPointFileReader extends ArrayList<CartesianPoint> {
 
 	// @Override
 	public String getDataSetShortName() {
-		// TODO Auto-generated method stub
 		return "no short name...";
 	}
 }

@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.PercentageProgressIndicator;
 import uk.ac.standrews.cs.utilities.ProgressIndicator;
 import uk.ac.standrews.cs.utilities.dataset.DataSet;
@@ -26,6 +27,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
+import static uk.ac.standrews.cs.utilities.Logging.output;
+import static uk.ac.standrews.cs.utilities.Logging.setLoggingLevel;
 
 /**
  * Outputs a CSV file of ...
@@ -63,7 +66,7 @@ public class Colors2 {
 
     public Colors2(String filename ) throws Exception {
 
-        System.out.println("Injesting file " + filename );
+        output( LoggingLevel.SHORT_SUMMARY, "Injesting file " + filename );
         source_data = new CartesianPointFileReader(filename,true);
         source_size = source_data.size();
     }
@@ -73,11 +76,11 @@ public class Colors2 {
     }
 
 
-    private Set<CartesianPoint> createReferenceObjects(int ros) {
+    private Set<CartesianPoint> createSomeObjects(int count) {
 
         reference_objects = new HashSet<>();
 
-        for (float pos = 0; pos <ros; pos++ ) {
+        for (float pos = 0; pos < count; pos++ ) {
 
             CartesianPoint p = get_next_source_point();
 
@@ -90,7 +93,6 @@ public class Colors2 {
 
     public void add_data(int count) throws Exception {
 
-        Random r = new Random(787819234L);  // always use same rand to create datums
         datums = new ArrayList<>();
 
         ProgressIndicator pi = new PercentageProgressIndicator( 10 );
@@ -164,7 +166,7 @@ public class Colors2 {
         }
         long elapsed_time = System.currentTimeMillis() - start_time;
 
-        System.out.println( "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
+        output( LoggingLevel.SHORT_SUMMARY, "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
     }
 
     /************** Private **************/
@@ -187,7 +189,7 @@ public class Colors2 {
 
         validate_distance = new Euc();
         distance = new CountingWrapper<CartesianPoint>( validate_distance );
-        reference_objects = createReferenceObjects(ros);
+        reference_objects = createSomeObjects(ros);
         dream_pool = new MPool<CartesianPoint>( distance, reference_objects, radii );
         add_data(dataset_size);
         setup_distance_calcs = CountingWrapper.counter;
@@ -195,21 +197,21 @@ public class Colors2 {
 
     private void doExperiment(DataSet dataset) throws Exception {
 
-        System.out.println("Initialising...");
+        output( LoggingLevel.SHORT_SUMMARY, "Initialising...");
 
-        int num_ref_objs = 200;
+        int num_ref_objs = 50;
         int num_datums = ( ( source_size - num_ref_objs ) * 3 ) / 10;       // 90% of data after taking out reference objects;
-        int num_queries = 500; //source_size - num_datums - num_ref_objs;      // 10% of the data after taking out reference objects (-1 since index starts at zero)
+        int num_queries = source_size - num_datums - num_ref_objs;          // 10% of the data after taking out reference objects (-1 since index starts at zero)
 
-        System.out.println("source_size = " + source_size );
-        System.out.println("ref objects = " + num_ref_objs );
-        System.out.println("datums = " + num_datums );
-        System.out.println("queries = " + num_queries );
+        output( LoggingLevel.SHORT_SUMMARY, "source_size = " + source_size );
+        output( LoggingLevel.SHORT_SUMMARY, "ref objects = " + num_ref_objs );
+        output( LoggingLevel.SHORT_SUMMARY, "datums = " + num_datums );
+        output( LoggingLevel.SHORT_SUMMARY, "queries = " + num_queries );
 
         initialise(num_datums, num_ref_objs, radii);
-        System.out.println("Generating queries...");
+        output( LoggingLevel.SHORT_SUMMARY, "Generating queries...");
         Set<Query<CartesianPoint>> queries = generateQueries(num_queries);
-        System.out.println("Performing queries...");
+        output( LoggingLevel.SHORT_SUMMARY, "Performing queries...");
         doQueries(dataset, queries, num_ref_objs);
 
     }
@@ -222,11 +224,12 @@ public class Colors2 {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println( "Plotting results...");
+        setLoggingLevel(LoggingLevel.SHORT_SUMMARY);
+        output( LoggingLevel.SHORT_SUMMARY, "Plotting results...");
         long time = System.currentTimeMillis();
         Colors2 pr = new Colors2( "/Users/al/Desktop/colors.txt" );
         pr.plot("colors-RESULTS");
-        System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
+        output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) );
     }
 
 

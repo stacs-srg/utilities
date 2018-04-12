@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.PercentageProgressIndicator;
 import uk.ac.standrews.cs.utilities.ProgressIndicator;
 import uk.ac.standrews.cs.utilities.dataset.DataSet;
@@ -26,6 +27,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
+import static uk.ac.standrews.cs.utilities.Logging.output;
+import static uk.ac.standrews.cs.utilities.Logging.setLoggingLevel;
 
 /**
  * Outputs a CSV file of ...
@@ -66,7 +69,7 @@ public class Colors1 {
     }
 
 
-    private Set<CartesianPoint> createReferenceObjects(int ros) {
+    private Set<CartesianPoint> createSomeObjects(int ros) {
 
         reference_objects = new HashSet<>();
 
@@ -86,7 +89,6 @@ public class Colors1 {
 
     public void add_data(int count) throws Exception {
 
-        Random r = new Random(787819234L);  // always use same rand to create datums
         datums = new ArrayList<>();
 
         ProgressIndicator pi = new PercentageProgressIndicator( 10 );
@@ -164,7 +166,7 @@ public class Colors1 {
         }
         long elapsed_time = System.currentTimeMillis() - start_time;
 
-        System.out.println( "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
+        output( LoggingLevel.SHORT_SUMMARY,"Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
     }
 
     /************** Private **************/
@@ -187,7 +189,7 @@ public class Colors1 {
 
         validate_distance = new Euc();
         distance = new CountingWrapper<CartesianPoint>( validate_distance );
-        reference_objects = createReferenceObjects(ros);
+        reference_objects = createSomeObjects(ros);
         dream_pool = new MPool<CartesianPoint>( distance, reference_objects, radii );
         add_data(dataset_size);
         setup_distance_calcs = CountingWrapper.counter;
@@ -195,15 +197,20 @@ public class Colors1 {
 
     private void doExperiment(DataSet dataset) throws Exception {
 
+        int num_ref_objs = 62;
+        int num_queries = 100;
 
-        int ref_objs = 62;
+        output(LoggingLevel.SHORT_SUMMARY,"Initialising...");
+        initialise(num_datums, num_ref_objs, radii);
+        output(LoggingLevel.SHORT_SUMMARY,"Generating queries...");
+        Set<Query<CartesianPoint>> queries = generateQueries(num_queries);
 
-        System.out.println("Initialising...");
-        initialise(num_datums, ref_objs, radii);
-        System.out.println("Generating queries...");
-        Set<Query<CartesianPoint>> queries = generateQueries(100);
-        System.out.println("Performing queries...");
-        doQueries(dataset, queries, ref_objs);
+        output( LoggingLevel.SHORT_SUMMARY, "ref objects = " + num_ref_objs );
+        output( LoggingLevel.SHORT_SUMMARY, "datums = " + num_datums );
+        output( LoggingLevel.SHORT_SUMMARY, "queries = " + num_queries );
+
+        output(LoggingLevel.SHORT_SUMMARY,"Performing queries...");
+        doQueries(dataset, queries, num_ref_objs);
 
     }
 
@@ -215,11 +222,12 @@ public class Colors1 {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println( "Plotting results...");
+        setLoggingLevel(LoggingLevel.SHORT_SUMMARY);
+        output(LoggingLevel.SHORT_SUMMARY,"Plotting results...");
         long time = System.currentTimeMillis();
         Colors1 pr = new Colors1( "/Users/al/Desktop/colors.txt" );
         pr.plot("colors-RESULTS");
-        System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
+        output(LoggingLevel.SHORT_SUMMARY,"Dp finished in " + ( System.currentTimeMillis() - time ) );
     }
 
 
