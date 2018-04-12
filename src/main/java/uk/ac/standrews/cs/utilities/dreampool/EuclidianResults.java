@@ -136,7 +136,7 @@ public class EuclidianResults {
         }
         long elapsed_time = System.currentTimeMillis() - start_time;
 
-        System.out.println( "Queries performed: " + count + " datums = " + datums.size() + "ms qps = " + ( count * 1000 ) / elapsed_time + " q/s" );
+        System.out.println( "Queries performed: " + count + " datums = " + datums.size() + " qps = " + ( count * 1000 ) / elapsed_time + " q/s" );
     }
 
     /************** Private **************/
