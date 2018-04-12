@@ -16,22 +16,21 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import uk.ac.standrews.cs.utilities.PercentageProgressIndicator;
-import uk.ac.standrews.cs.utilities.ProgressIndicator;
+import uk.ac.standrews.cs.utilities.Logging;
+import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.dataset.DataSet;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-
-import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Outputs a CSV file of ...
  */
-public class PlotResults {
+public class EuclidianResults {
 
     private MPool<Point> dream_pool;
     private CountingWrapper distance;
@@ -80,7 +79,7 @@ public class PlotResults {
 
 
 
-    public PlotResults() {
+    public EuclidianResults() {
     }
 
 
@@ -104,26 +103,22 @@ public class PlotResults {
         Random r = new Random(787819234L);  // always use same rand to create datums
         datums = new ArrayList<>();
 
-        ProgressIndicator pi = new PercentageProgressIndicator( 10 );
-        pi.setTotalSteps(count);
-
         for (int pos = 0; pos < count ; pos++ ) {
             Point p = newpoint(r);
             datums.add( p );
             dream_pool.add(p);
-            pi.progressStep();
         }
         dream_pool.completeInitialisation();
     }
 
-    public Set<Query<Point>> generateQueries(int num_queries) {
 
-        HashSet<Query<Point>> result = new HashSet<>();
+    public void doQueries(int num_queries){
 
         Random r = new Random(1926373034L); // do same queries each call of doQueries.
 
-        ProgressIndicator pi = new PercentageProgressIndicator( 10 );
-        pi.setTotalSteps(num_queries);
+        long start_time = System.currentTimeMillis();
+
+        int count = 0;
 
         for (int i = 0; i < num_queries; i++) {
 
@@ -131,59 +126,20 @@ public class PlotResults {
                 float threshold = r.nextFloat() / range;
 
                 Point p = newpoint(r);
-                result.add(new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation));
-                pi.progressStep();
+                Query query = new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation);
+
+                Set<Point> results = dream_pool.rangeSearch(p, threshold, query); // last parameter for debug only.
+                query.validate( results );
+                count++;
             }
-        }
-
-        return result;
-    }
-
-
-    public void doQueries(DataSet dataset, Set<Query<Point>> queries, int num_ros, int pool_index) throws Exception {
-        int distance_calcs = 0;
-
-        int initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
-        int start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
-
-        ProgressIndicator pi = new PercentageProgressIndicator( 100 );
-        pi.setTotalSteps(queries.size());
-
-        long start_time = System.currentTimeMillis();
-
-        for (Query<Point> query : queries) {
-
-            Set<Point> results = dream_pool.rangeSearch(query.query, query.threshold,query ); // last parameter for debug only.
-
-            query.validate(results);
-
-            pi.progressStep();
-
-            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, CountingWrapper.counter - start_calcs, results.size());
-
-            start_calcs = CountingWrapper.counter;
 
         }
         long elapsed_time = System.currentTimeMillis() - start_time;
 
-        System.out.println( "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
+        System.out.println( "Queries performed: " + count + " datums = " + datums.size() + "ms qps = " + ( count * 1000 ) / elapsed_time + " q/s" );
     }
 
     /************** Private **************/
-
-    private void plot(String fname) throws Exception {
-
-        String results_path = "/Users/al/Desktop/" + fname + ".csv";
-
-        Path path = Paths.get(results_path);
-
-        DataSet dataset = new DataSet(new ArrayList<>(Arrays.asList(new String[]{"query_x", "query_y", "threshold", "ros", "pool_index", "calculations", "num_results"})));
-        doExperiment(dataset);
-        // oneExperiment(dataset);
-
-        createFileIfDoesNotExist(path);
-        dataset.print(path);
-    }
 
     private void initialise(int dataset_size, int ros, float[] radii) throws Exception {
 
@@ -195,24 +151,15 @@ public class PlotResults {
         setup_distance_calcs = CountingWrapper.counter;
     }
 
-    private void doExperiment(DataSet dataset) throws Exception {
-
-        // for( int ref_objs = 60; ref_objs < 65 ; ref_objs+= 1 ) {
+    private void doExperiment() throws Exception {
 
         int ref_objs = 62;
         int radii_index = 0;
 
-            // for(int radii_index = 0; radii_index < radii.length; radii_index++ ) {
-
-
-                System.out.println( "Initialising..." );
-                initialise(num_datums, ref_objs, radii[radii_index]);
-                System.out.println( "Generating queries..." );
-                Set<Query<Point>> queries = generateQueries(100);
-                System.out.println( "Performing queries..." );
-                doQueries(dataset, queries, ref_objs, radii_index);
-        //    }
-        // }
+        System.out.println("Initialising...");
+        initialise(num_datums, ref_objs, radii[radii_index]);
+        System.out.println("Performing queries...");
+        doQueries(100);
     }
 
     private static Point newpoint(Random r) {
@@ -235,10 +182,10 @@ public class PlotResults {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println( "Plotting results...");
+        Logging.setLoggingLevel(LoggingLevel.VERBOSE);
         long time = System.currentTimeMillis();
-        PlotResults pr = new PlotResults();
-        pr.plot("RESULTS");
+        EuclidianResults er = new EuclidianResults();
+        er.doExperiment();
         System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
     }
 

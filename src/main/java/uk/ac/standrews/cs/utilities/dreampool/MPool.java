@@ -146,8 +146,15 @@ public class MPool<T> { // aka DreamPool
         int distance_index = 0;
 
         for (Pool<T> pool : pools) {
+            float distance_query_pivot = distance_wrapper.distance(pool.getPivot(), query);
+            distances_from_query_to_pivots[distance_index++] = distance_query_pivot;              // save this for HP exclusion - used below.
+        }
+
+        ConciseSet exclusions = new ConciseSet();
+
+        for (Pool<T> pool : pools) {
+
             float distance_query_pivot = distance_wrapper.distance(pool.getPivot(),query);
-            distances_from_query_to_pivots[ distance_index++ ] = distance_query_pivot;              // save this for HP exclusion - used below.
 
             // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
             // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
@@ -164,40 +171,39 @@ public class MPool<T> { // aka DreamPool
             if (r2 != null) {
                 exclude_list.add(r2); // to be refined below.
             }
+
+            /** Next perform hyperplane exclusion: For a reference point pi ∈ U,
+             ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+             ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
+             **/
+
+            exclusions = pool.findHPExclusion3P(exclusions, distances_from_query_to_pivots, threshold);
+            query_obj.validateHPExclusions(getValues(exclusions));
         }
 
-        /** Next perform hyperplane exclusion: For a reference point pi ∈ U,
-         ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
-         ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
-         **/
-
-        ConciseSet all_hp_exlusions = new ConciseSet();
-
-        for (Pool<T> pool : pools) {
-            ConciseSet next_hp_exlude_set = pool.findHPExclusion4P(distances_from_query_to_pivots, threshold);
-            query_obj.validateHPExclusions(getValues(next_hp_exlude_set));
-            all_hp_exlusions.addAll(next_hp_exlude_set);
-        }
-
-        output(LoggingLevel.VERBOSE," all_hp_exlusions size = " + all_hp_exlusions.size() );
+        output(LoggingLevel.VERBOSE,"HP exclusions size = " + exclusions.size() );
 
         include_list.add( universal_ring );
         query_obj.validateIncludeList(include_list, query_obj);
-        ConciseSet candidates = intersections(include_list,query_obj);
+        ConciseSet inclusions = intersections(include_list,query_obj);
 
-        output(LoggingLevel.VERBOSE," Intersection size = " + candidates.size() );
+        output(LoggingLevel.VERBOSE,"Intersection size (pivot b) = " + inclusions.size() );
 
-        query_obj.validateOmissions(getValues(candidates),include_list);
-        candidates = exclude( candidates, exclude_list );
+        query_obj.validateOmissions(inclusions,include_list);
 
-        output(LoggingLevel.VERBOSE," candidates size (after pivot exclusion) before hp exclusion = " + candidates.size() );
+        exclusions = exclude( exclusions, exclude_list );
 
-        candidates = candidates.difference(all_hp_exlusions);
+        output(LoggingLevel.VERBOSE,"Pivot exclusions (pivot a) = " + exclusions.size() );
 
-        output(LoggingLevel.VERBOSE," candidates size after hp exclusion = " + candidates.size() );
+        inclusions = inclusions.difference(exclusions);
 
-        int count = filter( candidates, query, threshold );
-        return getValues( candidates );
+        output(LoggingLevel.VERBOSE,"Results requiring filtering " + inclusions.size() + " results " );
+
+        int count = filter( inclusions, query, threshold );
+
+        output(LoggingLevel.VERBOSE,"Result set size = " + inclusions.size() );
+
+        return getValues( inclusions );
     }
 
     public T getValue( int index ) {
@@ -230,7 +236,6 @@ public class MPool<T> { // aka DreamPool
         }
     }
 
-
     private ConciseSet intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // Note query_obj only for debug
         if( include_list.isEmpty() ) {
             return new ConciseSet();
@@ -252,16 +257,15 @@ public class MPool<T> { // aka DreamPool
         }
     }
 
-    private ConciseSet exclude(ConciseSet candidates, List<Ring<T>> exclude_list) {
-        ConciseSet result = new ConciseSet();
+    private ConciseSet exclude(ConciseSet exclusions, List<Ring<T>> exclude_list) { //***************************************
 
         for( Ring<T> ring : exclude_list ) {
             ConciseSet ring_contents = ring.getConciseContents();
 
-            result = candidates.difference(ring_contents);
+            exclusions = exclusions.difference(ring_contents);
 
         }
-        return result;
+        return exclusions;
     }
 
     private int filter(ConciseSet candidates, T query, float threshold) {

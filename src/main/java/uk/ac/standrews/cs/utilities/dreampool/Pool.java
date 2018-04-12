@@ -217,8 +217,7 @@ public class Pool<T> {
      ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
      ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
      **/
-    public ConciseSet findHPExclusion3P(float[] distances_from_query_to_pivots, float threshold) {
-        ConciseSet result = new ConciseSet();
+    public ConciseSet findHPExclusion3P(ConciseSet exclusions, float[] distances_from_query_to_pivots, float threshold) {
 
         float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
 
@@ -226,22 +225,18 @@ public class Pool<T> {
 
             if (i != pool_id && distance_from_query_to_this_pivot - distances_from_query_to_pivots[i] > 2 * threshold) {
 
-                result.addAll(closer_than[i]);
+                exclusions.addAll(closer_than[i]);
 
             }
-
         }
-
-        return result;
+        return exclusions;
     }
 
     /** Uses 4 point hyperplane exclusion: For a reference point pi ∈ U,
-     *
      ** If ( d(q,p1)2 - d(q,p2)2 ) / 2d(p1,p2) ) > t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
      ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
      **/
-    public ConciseSet findHPExclusion4P(float[] distances_from_query_to_pivots, float threshold) {
-        ConciseSet result = new ConciseSet();
+    public ConciseSet findHPExclusion4P(ConciseSet exclusions, float[] distances_from_query_to_pivots, float threshold) {
 
         float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
 
@@ -249,13 +244,11 @@ public class Pool<T> {
 
             if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / owner.getInterPivotDistance( this.pool_id,i )  ) > threshold) {
 
-                result.addAll(closer_than[i]);
+                exclusions.addAll(closer_than[i]);
 
             }
-
         }
-
-        return result;
+        return exclusions;
     }
 
     private float square( float a ) { return a * a; }

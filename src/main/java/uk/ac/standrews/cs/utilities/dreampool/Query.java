@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class Query<T> {
     public static int count = 0;
     public final ArrayList<T> real_solutions;
     private final boolean validate;
+    private final MPool<T> owner;
 
     /**
      * @param query
@@ -38,13 +40,14 @@ public class Query<T> {
      * @param datums
      * @param validate_distance
      */
-    public Query(T query, float threshold, ArrayList<T> datums, List<Pool<T>> pools, Distance<T> validate_distance, boolean validate) {
+    public Query(T query, MPool<T> owner, float threshold, ArrayList<T> datums, List<Pool<T>> pools, Distance<T> validate_distance, boolean validate) {
         this.query = query;
+        this.owner = owner;
         this.threshold = threshold;
         this.validate_distance = validate_distance;
         this.pools = pools;
         this.validate = validate;
-        real_solutions = new ArrayList<>();
+        real_solutions = new ArrayList<>();  // TODO make this a concise set like the others!
 
         if( validate ) {
             // Brute force to provide validation of algorithms - real_solutions are the real real_solutions.
@@ -103,12 +106,15 @@ public class Query<T> {
         }
     }
 
-    public void validateOmissions(Set<T> result, List<Ring<T>> include_list) {
+    public void validateOmissions(ConciseSet result, List<Ring<T>> include_list) {
         if( validate ) {
+
+            Set<T> results = owner.getValues(result);
+
             int correct = 0;
             int err = 0;
-            for (T potential_solution : result) {
-                if (real_solutions.contains(potential_solution)) {
+            for (T proposed_solution : results) {
+                if (real_solutions.contains(proposed_solution)) {
                     correct++;
                 }
             }
@@ -117,8 +123,8 @@ public class Query<T> {
                 System.out.println("validateOmissions: Omission: soln to query " + query + " T: " + threshold + " contains " + errors + " FNs, real solutions = " + real_solutions.size() + " correct = " + correct );
 
 
-                ArrayList<T> clone = (ArrayList<T>) real_solutions.clone();
-                clone.removeAll(result);
+                Set<T> clone = owner.getValues(result); // used to be a real clone but can now get the list again.
+                clone.removeAll(results);
                 for (T false_neg : clone) {
                         System.out.println("\t\tOmission: FN:" + false_neg + " distance: " + validate_distance.distance(false_neg,query) );
                 }
@@ -144,10 +150,6 @@ public class Query<T> {
                     records_in_soln += ring.getContents().size();
                 }
                 System.out.println("validateIncludeList: Include list solution size = " + records_in_soln );
-                for (T point : clone) {
-                    //       System.out.println("\t\tOmission include: " + point );
-                }
-            } else {
             }
         }
     }

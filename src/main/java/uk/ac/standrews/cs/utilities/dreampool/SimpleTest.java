@@ -72,7 +72,7 @@ public class SimpleTest {
     public void queryOnce() throws Exception {
         Point query = new Point(0.5f, 0.5f);
         float threshold = 0.05f;
-        Query q = new Query( query, threshold, points, dream_pool.pools, distance, true );
+        Query q = new Query( query, dream_pool, threshold, points, dream_pool.pools, distance, true );
         System.out.println("Query: " + query + " Threshold: " + threshold);
         Set<Point> results = dream_pool.rangeSearch(query, threshold, q );
         System.out.println("Total Distance calculations: " + CountingWrapper.counter);

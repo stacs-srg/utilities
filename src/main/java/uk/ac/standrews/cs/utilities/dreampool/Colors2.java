@@ -127,7 +127,7 @@ public class Colors2 {
 
                 for (float threshold : thresholds ) {
 
-                    result.add(new Query(p, threshold, datums, dream_pool.pools, validate_distance, perform_validation));
+                    result.add(new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation));
                     pi.progressStep();
                 }
         }
