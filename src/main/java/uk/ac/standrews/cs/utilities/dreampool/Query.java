@@ -16,10 +16,11 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
+import org.roaringbitmap.RoaringBitmap;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -106,7 +107,7 @@ public class Query<T> {
         }
     }
 
-    public void validateOmissions(ConciseSet result, List<Ring<T>> include_list) {
+    public void validateOmissions(RoaringBitmap result, List<Ring<T>> include_list) {
         if( validate ) {
 
             Set<T> results = owner.getValues(result);
@@ -154,12 +155,16 @@ public class Query<T> {
         }
     }
 
-    public void validateHPExclusions(Set<T> values) {
+    public void validateHPExclusions(RoaringBitmap values) {
         if( validate ) {
 
             int error_count = 0;
 
-            for( T value : values ) {
+            Iterator<Integer> iter = values.iterator();
+
+            while( iter.hasNext() ) {
+
+                T value = owner.getValue(iter.next());
                 if (real_solutions.contains(value)) {
                     System.out.println("validateHPExclusions: value: " + value + " wrongly excluded" );
                     error_count++;

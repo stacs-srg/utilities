@@ -16,8 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
-import it.uniroma3.mat.extendedset.intset.IntSet;
+import org.roaringbitmap.RoaringBitmap;
 import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
@@ -38,7 +37,7 @@ public class MPool<T> { // aka DreamPool
 
     List<Pool<T>> pools = new ArrayList<>();                // the set of pools containing rings and pivots.
     private int element_id = 0;                             // an int used to represent each of the elements used in s, used to index values TreeMap.
-    private TreeMap<Integer,T> values = new TreeMap<>();    // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
+    private List<T> values = new ArrayList<>();    // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
 
     private float[][] inter_pivot_distances;
 
@@ -113,7 +112,7 @@ public class MPool<T> { // aka DreamPool
         float[] distances_from_datum_to_pivots = new float[num_pools];
         int distance_index = 0;
 
-        values.put( element_id,datum );         // add to the master index to facilitate lookup from bitmaps to datums.
+        values.add( datum );         // add to the master index to facilitate lookup from bitmaps to datums.
         for( Pool<T> pool : pools ) {           // calculate the distances to all the pivots.
             distances_from_datum_to_pivots[ distance_index++ ] = distance_wrapper.distance(pool.getPivot(),datum);
         }
@@ -150,7 +149,7 @@ public class MPool<T> { // aka DreamPool
             distances_from_query_to_pivots[distance_index++] = distance_query_pivot;              // save this for HP exclusion - used below.
         }
 
-        ConciseSet exclusions = new ConciseSet();
+        RoaringBitmap exclusions = new RoaringBitmap();
 
         for (Pool<T> pool : pools) {
 
@@ -178,30 +177,30 @@ public class MPool<T> { // aka DreamPool
              **/
 
             exclusions = pool.findHPExclusion3P(exclusions, distances_from_query_to_pivots, threshold);
-            query_obj.validateHPExclusions(getValues(exclusions));
+            query_obj.validateHPExclusions(exclusions);
         }
 
-        output(LoggingLevel.VERBOSE,"HP exclusions size = " + exclusions.size() );
+        output(LoggingLevel.VERBOSE,"HP exclusions size = " + exclusions.getCardinality() );
 
         include_list.add( universal_ring );
         query_obj.validateIncludeList(include_list, query_obj);
-        ConciseSet inclusions = intersections(include_list,query_obj);
+        RoaringBitmap inclusions = intersections(include_list,query_obj);
 
-        output(LoggingLevel.VERBOSE,"Intersection size (pivot b) = " + inclusions.size() );
+        output(LoggingLevel.VERBOSE,"Intersection size (pivot b) = " + inclusions.getCardinality() );
 
         query_obj.validateOmissions(inclusions,include_list);
 
         exclusions = exclude( exclusions, exclude_list );
 
-        output(LoggingLevel.VERBOSE,"Pivot exclusions (pivot a) = " + exclusions.size() );
+        output(LoggingLevel.VERBOSE,"Pivot exclusions (pivot a) = " + exclusions.getCardinality() );
 
-        inclusions = inclusions.difference(exclusions);
+        inclusions.andNot(exclusions); // was inclusions = inclusions.difference
 
-        output(LoggingLevel.VERBOSE,"Results requiring filtering " + inclusions.size() + " results " );
+        output(LoggingLevel.VERBOSE,"Results requiring filtering " + inclusions.getCardinality() + " results " );
 
         int count = filter( inclusions, query, threshold );
 
-        output(LoggingLevel.VERBOSE,"Result set size = " + inclusions.size() );
+        output(LoggingLevel.VERBOSE,"Result set size = " + inclusions.getCardinality() );
 
         return getValues( inclusions );
     }
@@ -210,9 +209,9 @@ public class MPool<T> { // aka DreamPool
         return values.get( index );
     }
 
-    public Set<T> getValues(ConciseSet candidates) {
+    public Set<T> getValues(RoaringBitmap candidates) {
         Set<T> result = new HashSet<>();
-        IntSet.IntIterator iter = candidates.iterator();
+        Iterator<Integer> iter = candidates.iterator();
 
         while( iter.hasNext() ) {
 
@@ -236,12 +235,12 @@ public class MPool<T> { // aka DreamPool
         }
     }
 
-    private ConciseSet intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // Note query_obj only for debug
+    private RoaringBitmap intersections(List<Ring<T>> include_list, Query<T> query_obj) { // }, Query<T> query_obj) {  // Note query_obj only for debug
         if( include_list.isEmpty() ) {
-            return new ConciseSet();
+            return new RoaringBitmap();
         } else {
             int index = findSmallestSetIndex( include_list );
-            ConciseSet result = include_list.get(index).getConciseContents().clone();
+            RoaringBitmap result = include_list.get(index).getConciseContents().clone();
             include_list.remove(index);
 
             if( include_list.size() == 0 ) {
@@ -250,25 +249,25 @@ public class MPool<T> { // aka DreamPool
             } else {
                 // otherwise do the intersection of all the enclosing rings.
                 for (Ring<T> remaining_rings : include_list) {
-                    result = result.intersection( remaining_rings.getConciseContents() );
+                    result.and( remaining_rings.getConciseContents() ); // was result = result.intersection
                 }
             }
             return result;
         }
     }
 
-    private ConciseSet exclude(ConciseSet exclusions, List<Ring<T>> exclude_list) { //***************************************
+    private RoaringBitmap exclude(RoaringBitmap exclusions, List<Ring<T>> exclude_list) { //***************************************
 
         for( Ring<T> ring : exclude_list ) {
-            ConciseSet ring_contents = ring.getConciseContents();
+            RoaringBitmap ring_contents = ring.getConciseContents();
 
-            exclusions = exclusions.difference(ring_contents);
+            exclusions.andNot(ring_contents); // was exclusions = exclusions.difference(ring_contents);
 
         }
         return exclusions;
     }
 
-    private int filter(ConciseSet candidates, T query, float threshold) {
+    private int filter(RoaringBitmap candidates, T query, float threshold) {
         int false_positives = 0;
         int true_positives = 0;
 
@@ -276,7 +275,7 @@ public class MPool<T> { // aka DreamPool
 
         if (candidates != null && !candidates.isEmpty()) {
 
-            IntSet.IntIterator iter = candidates.iterator();
+            Iterator<Integer> iter = candidates.iterator();
 
             while (iter.hasNext()) {
 

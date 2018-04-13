@@ -16,7 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
+import org.roaringbitmap.RoaringBitmap;
 
 import java.util.Set;
 
@@ -28,7 +28,7 @@ import java.util.Set;
 public class Ring<T> {
 
     // private final List<T> contents;
-    private ConciseSet contents;
+    private RoaringBitmap contents;
     private final Pool owner;
     private final MPool<T> mpool;
     private final int ring_number;
@@ -39,7 +39,7 @@ public class Ring<T> {
 
     public Ring( Pool owner, MPool<T> mpool, int ring_number, float r_min, float r_max, Ring inner_ring) {
         // contents = new ArrayList<>();
-        contents = new ConciseSet();
+        contents = new RoaringBitmap();
         this.ring_number = ring_number;
         this.owner = owner;
         this.mpool = mpool;
@@ -54,11 +54,7 @@ public class Ring<T> {
     }
 
     public int size() {
-        if( inner_ring == null ) {
-            return contents.size();
-        } else {
-            return contents.size() + inner_ring.size();
-        }
+        return contents.getCardinality();
     }
 
     public int getRing_number() {
@@ -86,7 +82,7 @@ public class Ring<T> {
     }
 
 
-    public ConciseSet getConciseContents() {
+    public RoaringBitmap getConciseContents() {
         return contents;
     }
 
@@ -111,7 +107,7 @@ public class Ring<T> {
                 throw new Exception("Inner ring has not been consolidated");
             }
 
-            contents.addAll(inner_ring.contents);
+            contents.or(inner_ring.contents); // was addAll
         }
         consolodated = true;
     }

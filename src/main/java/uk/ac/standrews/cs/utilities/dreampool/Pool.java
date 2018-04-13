@@ -17,7 +17,7 @@
 
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
+import org.roaringbitmap.RoaringBitmap;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 /**
@@ -37,7 +37,7 @@ public class Pool<T> {
     private float max_radius;                   // the maximum radius of this pool
     private int pool_id;                        // the index of this pool into (any) array of distances etc. indexed by
     private int num_pools;                      // number of pools in the system - copied down from MPool - what would Martin Fowler say? [good/bad]- discuss not sure - al.
-    private ConciseSet[] closer_than;           // Used to store information for hyperplane exclusion - see comments in add below.
+    private RoaringBitmap[] closer_than;        // Used to store information for hyperplane exclusion - see comments in add below.
     private final MPool<T> owner;               // The MPool to which this pool belongs
 
     public Pool(T pivot, int pool_id, int num_pools,  MPool<T> owner, Distance<T> distance) {
@@ -54,9 +54,9 @@ public class Pool<T> {
         this.distance_wrapper = distance_wrapper;
         initialise_rings();
 
-        closer_than = new ConciseSet[num_pools];
+        closer_than = new RoaringBitmap[num_pools];
         for( int i = 0; i < closer_than.length; i++ ) {
-            closer_than[i] = new ConciseSet();
+            closer_than[i] = new RoaringBitmap();
         }
     }
 
@@ -217,7 +217,7 @@ public class Pool<T> {
      ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
      ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
      **/
-    public ConciseSet findHPExclusion3P(ConciseSet exclusions, float[] distances_from_query_to_pivots, float threshold) {
+    public RoaringBitmap findHPExclusion3P(RoaringBitmap exclusions, float[] distances_from_query_to_pivots, float threshold) {
 
         float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
 
@@ -225,7 +225,7 @@ public class Pool<T> {
 
             if (i != pool_id && distance_from_query_to_this_pivot - distances_from_query_to_pivots[i] > 2 * threshold) {
 
-                exclusions.addAll(closer_than[i]);
+                exclusions.or(closer_than[i]); // was addAll
 
             }
         }
@@ -236,15 +236,15 @@ public class Pool<T> {
      ** If ( d(q,p1)2 - d(q,p2)2 ) / 2d(p1,p2) ) > t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
      ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
      **/
-    public ConciseSet findHPExclusion4P(ConciseSet exclusions, float[] distances_from_query_to_pivots, float threshold) {
+    public RoaringBitmap findHPExclusion4P(RoaringBitmap exclusions, float[] distances_from_query_to_pivots, float threshold) {
 
         float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
 
         for( int i = 0; i < num_pools; i++ ) {
 
-            if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / owner.getInterPivotDistance( this.pool_id,i )  ) > threshold) {
+            if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / ( 2 * owner.getInterPivotDistance( this.pool_id,i ) ) ) > threshold) {
 
-                exclusions.addAll(closer_than[i]);
+                exclusions.or(closer_than[i]); // was addAll
 
             }
         }
@@ -252,6 +252,7 @@ public class Pool<T> {
     }
 
     private float square( float a ) { return a * a; }
+
 }
 
 

@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import static uk.ac.standrews.cs.utilities.Logging.output;
+
 /**
  * Outputs a CSV file of ...
  */
@@ -41,7 +43,7 @@ public class EuclidianResults {
 
     // Configuration parameters
 
-    private boolean perform_validation = true;          // SET perform_validation TO TRUE TO PERFORM CHECKING
+    private boolean perform_validation = false;          // SET perform_validation TO TRUE TO PERFORM CHECKING
 
     //private int num_datums =    100; //1 hundred
     //private int num_datums =    1000; //1 thousand
@@ -136,7 +138,7 @@ public class EuclidianResults {
         }
         long elapsed_time = System.currentTimeMillis() - start_time;
 
-        System.out.println( "Queries performed: " + count + " datums = " + datums.size() + " qps = " + ( count * 1000 ) / elapsed_time + " q/s" );
+        output( LoggingLevel.SHORT_SUMMARY, "Queries performed: " + count + " datums = " + datums.size() + " qps = " + ( count * 1000 ) / elapsed_time + " q/s average query time = " + elapsed_time / count + " ms"  );
     }
 
     /************** Private **************/
@@ -156,9 +158,9 @@ public class EuclidianResults {
         int ref_objs = 62;
         int radii_index = 0;
 
-        System.out.println("Initialising...");
+        output( LoggingLevel.VERBOSE, "Initialising...");
         initialise(num_datums, ref_objs, radii[radii_index]);
-        System.out.println("Performing queries...");
+        output( LoggingLevel.VERBOSE, "Performing queries...");
         doQueries(100);
     }
 
@@ -182,11 +184,11 @@ public class EuclidianResults {
 
     public static void main(String[] args) throws Exception {
 
-        Logging.setLoggingLevel(LoggingLevel.VERBOSE);
+        Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);
         long time = System.currentTimeMillis();
         EuclidianResults er = new EuclidianResults();
         er.doExperiment();
-        System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
+        output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
 
 
