@@ -31,7 +31,7 @@ import static uk.ac.standrews.cs.utilities.Logging.output;
 /**
  * Outputs a CSV file of ...
  */
-public class ColorsFull90_10 {
+public class ColorsFull90_10_NoTrace {
 
     private final CartesianPointFileReader source_data;
     private MPool<CartesianPoint> dream_pool;
@@ -64,7 +64,7 @@ public class ColorsFull90_10 {
     int source_index = 0;  // track which datums we have used already
     int source_size;       // size of the dataset
 
-    public ColorsFull90_10(String filename ) throws Exception {
+    public ColorsFull90_10_NoTrace(String filename ) throws Exception {
 
         output( LoggingLevel.SHORT_SUMMARY, "Injesting file " + filename );
         source_data = new CartesianPointFileReader(filename,true);
@@ -223,10 +223,10 @@ public class ColorsFull90_10 {
 
     public static void main(String[] args) throws Exception {
 
-        Logging.setLoggingLevel(LoggingLevel.VERBOSE);
+        Logging.setLoggingLevel(LoggingLevel.NONE);
         output( LoggingLevel.SHORT_SUMMARY, "Plotting results...");
         long time = System.currentTimeMillis();
-        ColorsFull90_10 pr = new ColorsFull90_10( "/Users/al/Desktop/colors.txt" );
+        ColorsFull90_10_NoTrace pr = new ColorsFull90_10_NoTrace( "/Users/al/Desktop/colors.txt" );
         pr.plot("colors-RESULTS");
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }

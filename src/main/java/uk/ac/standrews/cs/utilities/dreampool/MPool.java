@@ -339,7 +339,7 @@ public class MPool<T> {
         for( Ring<T> ring : exclude_list ) {
             RoaringBitmap ring_contents = ring.getConciseContents();
 
-            exclusions.or(ring_contents); // was exclusions = exclusions.difference(ring_contents);  // was andNot - ERROR
+            exclusions.or(ring_contents); // was exclusions = exclusions.difference(ring_contents);
 
         }
         return exclusions;
