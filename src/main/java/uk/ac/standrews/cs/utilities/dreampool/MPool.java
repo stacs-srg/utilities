@@ -29,7 +29,7 @@ import static uk.ac.standrews.cs.utilities.Logging.output;
  * @param <T> The type of the elements stored in this data structure.
  *
  */
-public class MPool<T> { // aka DreamPool
+public class MPool<T> {
 
     private final Set<T> pivots;                            // the set of all pivots in the system.
     private int num_pools;                                  // number of pools (=number of pivots) in the implementation
@@ -37,7 +37,7 @@ public class MPool<T> { // aka DreamPool
 
     List<Pool<T>> pools = new ArrayList<>();                // the set of pools containing rings and pivots.
     private int element_id = 0;                             // an int used to represent each of the elements used in s, used to index values TreeMap.
-    private List<T> values = new ArrayList<>();    // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
+    private List<T> values = new ArrayList<>();             // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
 
     private float[][] inter_pivot_distances;
 
@@ -57,12 +57,19 @@ public class MPool<T> { // aka DreamPool
      *
      */
     public MPool(Distance<T> distance_wrapper, Set<T> pivots, float[] radii) throws Exception {
-
         this.pivots = pivots;
-        this.num_pools = pivots.size();
         this.distance_wrapper = distance_wrapper;
+        this.num_pools = pivots.size();
 
-        initialise(radii,distance_wrapper);
+        initialise_pivot_distances( pivots );
+        if( radii == null ) {
+            radii = calculateRadii(inter_pivot_distances);
+        }
+        System.out.println( "Radii:");
+        for( int i = 0;i < radii.length; i++ ) {
+            System.out.println( "\t" + radii[i] );
+        }
+        initialisePools(radii,distance_wrapper);
     }
 
     /**
@@ -76,45 +83,85 @@ public class MPool<T> { // aka DreamPool
     }
 
 
-    private void initialise(float[] radii, Distance<T> distance_wrapper) throws Exception {
+    /**
+     * Calculates the radii of the pools based on the median inter-pivot distance +/- 3 std devs
+     * @param distances - the distances from all pivots to the datums.
+     * @return a crafted set of radii - { median - 3sd,median - 2sd,median - sd,median,median + sd,median + 2sd,median + 3sd }
+     */
+    private static float[] calculateRadii(float[][] distances) {
 
-        int pool_id = 0;
+        double mean = mean( distances );
+        double sd = stdDev( distances, mean );
 
-        for( T pivot : pivots ) {
-            if( radii == null ) {
-                pools.add(new Pool(pivot, pool_id, num_pools, this, distance_wrapper)); // default radii
-            } else {
-                pools.add(new Pool(pivot, pool_id, num_pools, radii, this, distance_wrapper));
-            }
-            pool_id++;
-        }
-        initialise_pivot_distances( pools );
+        System.out.println( "mean: " + mean);
+        System.out.println( "sd: " + sd);
+
+        double sd_times_point_5 = 0.5 * sd;
+        double sd_times_1_point_5 = 1.5 * sd;
+        double sd_times_2 = 2 * sd;
+        double sd_times_2_point_5 = 2.5 * sd;
+
+        float[] radii = new float[]{
+//                (float)(((float) mean) - sd_times_2_point_5), // TODO look at this skewed distribution.
+//                (float)(((float) mean) - sd_times_2),
+                (float)(((float) mean) - sd_times_1_point_5),
+                (float)(((float) mean) - sd),
+                (float)(((float) mean) - sd_times_point_5),
+                (float) mean,
+                (float)(((float) mean) + sd_times_point_5),
+                (float)(((float) mean) + sd),
+                (float)(((float) mean) + sd_times_1_point_5),
+                (float)(((float) mean) + sd_times_2),
+                (float)(((float) mean) + sd_times_2_point_5),
+        };
+
+        return radii;
     }
 
-    private void initialise_pivot_distances(List<Pool<T>> pools) {
-        inter_pivot_distances = new float[num_pools][num_pools];
-        for( Pool<T> p1 : pools ) {
-            for( Pool<T> p2 : pools ) {
-                float d = distance_wrapper.distance(p1.getPivot(),p2.getPivot());
-                inter_pivot_distances[ p1.getPoolId() ][ p2.getPoolId() ] = d;
-                inter_pivot_distances[ p2.getPoolId() ][ p1.getPoolId() ] = d;
+    /**
+     * @param arrai
+     * @param mean
+     * @return
+     */
+    private static double stdDev( float[][] arrai, double mean ) {
+        double sum = 0;
+        int count = 0;
+
+        for (int i = 0; i < arrai.length - 1; i++) {
+            for (int j = i; j < arrai[i].length; j++) {
+                double difference = arrai[i][j] - mean;
+                sum = sum + difference * difference;
+                count++;
             }
         }
+        double squaredDiffMean = (sum) / count;
+        double standardDev = (Math.sqrt(squaredDiffMean));
+
+        return standardDev;
     }
 
-    public float getInterPivotDistance(int i, int j) {
-        return inter_pivot_distances[i][j];
+    public static double mean(float[][] arrai) {
+        double sum = 0;                             // sum of all the distances between elements
+        int count = 0;
+
+        for (int i = 0; i < arrai.length -1; i++) {
+            for( int j = i; j < arrai[i].length; j++ ) {
+                sum += arrai[i][j];
+                count++;
+            }
+        }
+        return sum / count;
     }
 
 
     public void add(T datum) throws Exception {
 
         float[] distances_from_datum_to_pivots = new float[num_pools];
-        int distance_index = 0;
+        int pivot_index = 0;
 
-        values.add( datum );         // add to the master index to facilitate lookup from bitmaps to datums.
+        values.add( datum );                    // add to the master index to facilitate lookup from bitmaps to datums.
         for( Pool<T> pool : pools ) {           // calculate the distances to all the pivots.
-            distances_from_datum_to_pivots[ distance_index++ ] = distance_wrapper.distance(pool.getPivot(),datum);
+            distances_from_datum_to_pivots[ pivot_index++ ] = distance_wrapper.distance(pool.getPivot(),datum);
         }
         for( Pool<T> pool : pools ) {
             pool.add(element_id, datum, distances_from_datum_to_pivots );
@@ -122,6 +169,37 @@ public class MPool<T> { // aka DreamPool
 
         universal_ring.add(element_id);
         element_id++;
+    }
+
+    private void initialisePools(float[] radii, Distance<T> distance_wrapper) throws Exception {
+
+        int pool_id = 0;
+
+        for( T pivot : pivots ) {
+            pools.add(new Pool(pivot, pool_id, num_pools, radii, this, distance_wrapper));
+            pool_id++;
+        }
+
+    }
+
+
+    private void initialise_pivot_distances(Set<T> pivots) {
+        inter_pivot_distances = new float[num_pools][num_pools];
+        int i = 0;
+        for( T p1 : pivots ) {
+            int j = 0;
+            for( T p2 : pivots ) {
+                float d = distance_wrapper.distance(p1,p2);
+                inter_pivot_distances[ i ][ j ] = d;
+                inter_pivot_distances[ j ][ i ] = d;
+                j++;
+            }
+            i++;
+        }
+    }
+
+    public float getInterPivotDistance(int i, int j) {
+        return inter_pivot_distances[i][j];
     }
 
     /**
@@ -176,7 +254,7 @@ public class MPool<T> { // aka DreamPool
              ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
              **/
 
-            exclusions = pool.findHPExclusion3P(exclusions, distances_from_query_to_pivots, threshold);
+            exclusions = pool.findHPExclusion4P(exclusions, distances_from_query_to_pivots, threshold);
             query_obj.validateHPExclusions(exclusions);
         }
 
@@ -261,7 +339,7 @@ public class MPool<T> { // aka DreamPool
         for( Ring<T> ring : exclude_list ) {
             RoaringBitmap ring_contents = ring.getConciseContents();
 
-            exclusions.andNot(ring_contents); // was exclusions = exclusions.difference(ring_contents);
+            exclusions.or(ring_contents); // was exclusions = exclusions.difference(ring_contents);  // was andNot - ERROR
 
         }
         return exclusions;

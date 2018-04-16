@@ -30,7 +30,7 @@ public class Pool<T> {
     public static final float[] DEFAULT_RADII = new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F };    // TODO make more efficient later - Richards suggestion use median distances.
 
     final T pivot;                              // the pivot (the centre) of the pool.
-    public final float[] radii;                 // the array of distances being used to define the size of the rings in this pool
+    public float[] radii;                       // the array of distances being used to define the size of the rings in this pool
     private final Distance<T> distance_wrapper; // the distance function being used in this implementation
     private Ring<T>[] rings;                    // an array of rings, each of which holds the elements drawn from s that are within the ring (rings are inclusive => include the elements in inner rings)
     private int last_index;                     // last index into the array of rings
@@ -92,9 +92,7 @@ public class Pool<T> {
         }
 
         /** Next add this element to the hyperplane exclusion data structure
-         *  Uses hyperplane exclusion: For a reference point pi ∈ U,
-         ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
-         ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
+         *  Uses hyperplane exclusion
          **/
 
         for( int i = 0; i < num_pools; i++ ) {
@@ -177,6 +175,10 @@ public class Pool<T> {
 
     }
 
+    public void setRadii(float[] radii) {
+        this.radii = radii;
+    }
+
     public T getPivot() {
         return pivot;
     }
@@ -242,7 +244,7 @@ public class Pool<T> {
 
         for( int i = 0; i < num_pools; i++ ) {
 
-            if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / ( 2 * owner.getInterPivotDistance( this.pool_id,i ) ) ) > threshold) {
+            if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / owner.getInterPivotDistance( this.pool_id,i ) ) > 2 * threshold) {
 
                 exclusions.or(closer_than[i]); // was addAll
 
@@ -252,7 +254,6 @@ public class Pool<T> {
     }
 
     private float square( float a ) { return a * a; }
-
 }
 
 

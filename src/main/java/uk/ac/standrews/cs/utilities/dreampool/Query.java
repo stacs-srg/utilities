@@ -41,7 +41,7 @@ public class Query<T> {
      * @param datums
      * @param validate_distance
      */
-    public Query(T query, MPool<T> owner, float threshold, ArrayList<T> datums, List<Pool<T>> pools, Distance<T> validate_distance, boolean validate) {
+    public Query(T query, MPool<T> owner, float threshold, List<T> datums, List<Pool<T>> pools, Distance<T> validate_distance, boolean validate) {
         this.query = query;
         this.owner = owner;
         this.threshold = threshold;

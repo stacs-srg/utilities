@@ -43,7 +43,7 @@ public class EuclidianResults {
 
     // Configuration parameters
 
-    private boolean perform_validation = false;          // SET perform_validation TO TRUE TO PERFORM CHECKING
+    private boolean perform_validation = true;          // SET perform_validation TO TRUE TO PERFORM CHECKING
 
     //private int num_datums =    100; //1 hundred
     //private int num_datums =    1000; //1 thousand
@@ -184,7 +184,7 @@ public class EuclidianResults {
 
     public static void main(String[] args) throws Exception {
 
-        Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);
+        Logging.setLoggingLevel(LoggingLevel.VERBOSE);
         long time = System.currentTimeMillis();
         EuclidianResults er = new EuclidianResults();
         er.doExperiment();
