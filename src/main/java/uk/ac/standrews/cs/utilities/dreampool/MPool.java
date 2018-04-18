@@ -17,12 +17,9 @@
 package uk.ac.standrews.cs.utilities.dreampool;
 
 import org.roaringbitmap.RoaringBitmap;
-import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.*;
-
-import static uk.ac.standrews.cs.utilities.Logging.output;
 
 /**
  * @author al@st-andrews.ac.uk
@@ -182,7 +179,11 @@ public class MPool<T> {
 
     }
 
-
+    /**
+     * @param pivots - the set of pivots being used in this instance
+     *
+     * initialises an 2D array of inter pivot distances called inter_pivot_distances
+     */
     private void initialise_pivot_distances(Set<T> pivots) {
         inter_pivot_distances = new float[num_pools][num_pools];
         int i = 0;
@@ -198,6 +199,12 @@ public class MPool<T> {
         }
     }
 
+    /**
+     *
+     * @param i - the ith pivot
+     * @param j - the jth pivot
+     * @return the distance( pivot i, pivot j )
+     */
     public float getInterPivotDistance(int i, int j) {
         return inter_pivot_distances[i][j];
     }
@@ -205,14 +212,16 @@ public class MPool<T> {
     /**
      * Find the nodes within range r of query.
      *
-     * @param query - some data for which to find the neighbours within distance r
+     * @param query - some data for which to find the neighbours within the distance specified by threshold
+     * @param threshold - the threshold distance specifying the size of the query ball
+     * @param query_obj - the query being performed (for diagnostics) - permits extra data to be passed in and out and validation
      *
-     * @return all those nodes within r of @param T.
+     * @return all those nodes from S within @param threshold
      *
-     * General technique - find the rings that overlap with the query then do exclusion
-     * using pivot exclusion.
-     *
-     * Then exclude the rings that do not.
+     * General technique - find the rings that overlap with the query then do inclusion,
+     * find the rings that do not overlap using and do exclusion,
+     * finally perform hyperplane exclusion,
+     * filter the results to exclude false positives.
      */
     public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj ) { // NOTE query_obj only for validation
 
@@ -258,35 +267,46 @@ public class MPool<T> {
             query_obj.validateHPExclusions(exclusions);
         }
 
-        output(LoggingLevel.VERBOSE,"HP exclusions size = " + exclusions.getCardinality() );
+        int hp_exclusions = exclusions.getCardinality();
+        query_obj.setHPexclusions( hp_exclusions );
 
         include_list.add( universal_ring );
         query_obj.validateIncludeList(include_list, query_obj);
         RoaringBitmap inclusions = intersections(include_list,query_obj);
 
-        output(LoggingLevel.VERBOSE,"Intersection size (pivot b) = " + inclusions.getCardinality() );
+        int pivot_inclusions = inclusions.getCardinality();
+        query_obj.setPivotInclusions( pivot_inclusions );
 
         query_obj.validateOmissions(inclusions,include_list);
 
         exclusions = exclude( exclusions, exclude_list );
 
-        output(LoggingLevel.VERBOSE,"Pivot exclusions (pivot a) = " + exclusions.getCardinality() );
+        int pivot_exclusions = exclusions.getCardinality();
+        query_obj.setPivotExclusions( pivot_exclusions );
 
         inclusions.andNot(exclusions); // was inclusions = inclusions.difference
 
-        output(LoggingLevel.VERBOSE,"Results requiring filtering " + inclusions.getCardinality() + " results " );
+        query_obj.setRequiringFiltering( inclusions.getCardinality() );
 
         int count = filter( inclusions, query, threshold );
-
-        output(LoggingLevel.VERBOSE,"Result set size = " + inclusions.getCardinality() );
 
         return getValues( inclusions );
     }
 
-    public T getValue( int index ) {
-        return values.get( index );
+    /**
+     *
+     * @param i - an index into the set of datums
+     * @return the ith datum in the set
+     */
+    public T getValue( int i ) {
+        return values.get( i );
     }
 
+    /**
+     *
+     * @param candidates - a bitmap representing a set of values drawn from S
+     * @return the set of values of type T which are represented by the bitmap
+     */
     public Set<T> getValues(RoaringBitmap candidates) {
         Set<T> result = new HashSet<>();
         Iterator<Integer> iter = candidates.iterator();
@@ -297,14 +317,6 @@ public class MPool<T> {
 
         }
         return result;
-    }
-
-    public void showRings( List<Ring<T>> list) {
-        int i = 1;
-        for( Ring<T> ring : list ) {
-            System.out.println( i++ + ": " + ring.getOwner().getPivot() + " ring: " + ring.getRing_number() + " size: " + ring.size() );
-        }
-        System.out.println( "-------");
     }
 
     public void show_structure() {
@@ -361,7 +373,7 @@ public class MPool<T> {
                 T candidate = values.get(next);
                 if (candidate != null) {
                     if (distance_wrapper.distance(query, candidate) > threshold) {
-                        dropset.add(next);
+                        dropset.add(next); // TODO this is not necessary!! ****** FIXME
                         false_positives++;
                     } else {
                         true_positives++;
@@ -369,7 +381,7 @@ public class MPool<T> {
                 }
             }
             for (int member : dropset) {
-                candidates.flip(member);
+                candidates.flip(member);  // TODO this is not necessary!! ****** FIXME
             }
 
         }
@@ -387,7 +399,7 @@ public class MPool<T> {
 
     /**
      * PRE - include_list is not empty.
-     * @param include_list
+     * @param include_list - a list of Rings
      * @return
      */
     private int findSmallestSetIndex(List<Ring<T>> include_list) {

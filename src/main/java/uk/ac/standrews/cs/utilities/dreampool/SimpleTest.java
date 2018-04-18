@@ -32,7 +32,7 @@ public class SimpleTest {
     private static CountingWrapper distance;
     private static Random r = new Random(787819234L);
     private static ArrayList<Point> points = new ArrayList<>();
-    private static int setup_distance_calcs;
+    private static long setup_distance_calcs;
     private static Set<Point> ros;
 
     @BeforeClass

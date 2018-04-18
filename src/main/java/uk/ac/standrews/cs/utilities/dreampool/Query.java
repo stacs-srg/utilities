@@ -35,6 +35,11 @@ public class Query<T> {
     private final boolean validate;
     private final MPool<T> owner;
 
+    private int count_hp_exclusions = 0;
+    private int count_pivot_inclusions = 0;
+    private int count_pivot_exclusions = 0;
+    private int requiring_filtering = 0;
+
     /**
      * @param query
      * @param threshold
@@ -155,6 +160,27 @@ public class Query<T> {
         }
     }
 
+    public void checkSolutions(Set<T> result) {
+        int correct_solns = 0;
+        boolean errors = false;
+        if (result != null && !result.isEmpty()) {
+            for (T potential_solution : result) {
+
+                float d = validate_distance.distance( potential_solution,query );
+
+                if( d > threshold ) {
+                    System.out.println("checkSolutions: Error: soln to query " + query + " at distance = " + d + " > threshold " + threshold );
+                    errors = true;
+                } else {
+                    correct_solns++;
+                }
+            }
+        }
+        if( ! errors ) {
+            System.out.println("QOK " + correct_solns );
+        }
+    }
+
     public void validateHPExclusions(RoaringBitmap values) {
         if( validate ) {
 
@@ -179,4 +205,37 @@ public class Query<T> {
         }
 
     }
+
+    public void setHPexclusions(int HPexclusions) {
+        this.count_hp_exclusions = HPexclusions;
+    }
+
+    public void setPivotInclusions(int pivotInclusions) {
+        this.count_pivot_inclusions = pivotInclusions;
+    }
+
+    public void setPivotExclusions(int pivotExclusions) {
+        this.count_pivot_exclusions = pivotExclusions;
+    }
+
+    public void setRequiringFiltering(int requiringFiltering) {
+        this.requiring_filtering = requiringFiltering;
+    }
+
+    public int getHPExclusions() {
+        return count_hp_exclusions;
+    }
+
+    public int getPivotInclusions() {
+        return count_pivot_inclusions;
+    }
+
+    public int getPivotExclusions() {
+        return count_pivot_exclusions;
+    }
+
+    public int getRequiringFiltering() {
+        return requiring_filtering;
+    }
+
 }

@@ -22,11 +22,11 @@ import uk.ac.standrews.cs.utilities.dataset.DataSet;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
+import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
 import static uk.ac.standrews.cs.utilities.Logging.output;
 
 /**
@@ -39,7 +39,7 @@ public class EuclidianResults {
     private EuclideanDistance validate_distance; // used to check results.
     private ArrayList<Point> datums;
     private Set<Point> reference_objects;
-    private int setup_distance_calcs;
+    private long setup_distance_calcs;
 
     // Configuration parameters
 
@@ -114,11 +114,12 @@ public class EuclidianResults {
     }
 
 
-    public void doQueries(int num_queries){
+    public void doQueries(DataSet dataset, int num_queries, int num_ros ){
 
         Random r = new Random(1926373034L); // do same queries each call of doQueries.
 
         long start_time = System.currentTimeMillis();
+        long start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
 
         int count = 0;
 
@@ -132,6 +133,10 @@ public class EuclidianResults {
 
                 Set<Point> results = dream_pool.rangeSearch(p, threshold, query); // last parameter for debug only.
                 query.validate( results );
+
+                addRow(dataset, p.x, p.y, query.threshold, num_ros, (int)(CountingWrapper.counter - start_calcs),
+                        query.getHPExclusions(),query.getPivotInclusions(),query.getPivotExclusions(),query.getRequiringFiltering(), results.size());
+
                 count++;
             }
 
@@ -143,6 +148,19 @@ public class EuclidianResults {
 
     /************** Private **************/
 
+    private void plot(String fname) throws Exception {
+
+        String results_path = "/Users/al/Desktop/" + fname + ".csv";
+
+        Path path = Paths.get(results_path);
+
+        DataSet dataset = new DataSet(new ArrayList<>(Arrays.asList(new String[]{"query x", "query y", "threshold", "ros", "calculations", "hp exlusions", "pivot inclusions", "pivot exclusions", "requiring filtering", "num_results"})));
+        doExperiment(dataset);
+
+        createFileIfDoesNotExist(path);
+        dataset.print(path);
+    }
+
     private void initialise(int dataset_size, int ros, float[] radii) throws Exception {
 
         validate_distance = new EuclideanDistance();
@@ -153,7 +171,7 @@ public class EuclidianResults {
         setup_distance_calcs = CountingWrapper.counter;
     }
 
-    private void doExperiment() throws Exception {
+    private void doExperiment( DataSet dataset ) throws Exception {
 
         int ref_objs = 62;
         int radii_index = 0;
@@ -161,7 +179,7 @@ public class EuclidianResults {
         output( LoggingLevel.VERBOSE, "Initialising...");
         initialise(num_datums, ref_objs, radii[radii_index]);
         output( LoggingLevel.VERBOSE, "Performing queries...");
-        doQueries(100);
+        doQueries( dataset, 100, ref_objs);
     }
 
     private static Point newpoint(Random r) {
@@ -177,9 +195,9 @@ public class EuclidianResults {
         return new Point( x, y );
     }
 
-    private void addRow(DataSet data, float queryx, float queryy, float threshold,  int count_ros, int radii_index, int count_calcs, int num_results) {
+    private void addRow(DataSet data, float queryx, float queryy, float threshold, int count_ros, int count_calcs, int hp_exlude, int pivot_include, int pivot_exclude, int requiring_filtering, int num_results) {
 
-        data.addRow(Float.toString(queryx), Float.toString(queryy), Float.toString(threshold),Integer.toString(count_ros), Integer.toString(radii_index), Integer.toString(count_calcs), Integer.toString(num_results));
+        data.addRow(Float.toString(queryx), Float.toString(queryy), Float.toString(threshold),Integer.toString(count_ros), Integer.toString(count_calcs), Integer.toString(hp_exlude), Integer.toString(pivot_include), Integer.toString(pivot_exclude),Integer.toString(requiring_filtering),Integer.toString(num_results));
     }
 
     public static void main(String[] args) throws Exception {
@@ -187,7 +205,7 @@ public class EuclidianResults {
         Logging.setLoggingLevel(LoggingLevel.VERBOSE);
         long time = System.currentTimeMillis();
         EuclidianResults er = new EuclidianResults();
-        er.doExperiment();
+        er.plot("Euclidian-RESULTS");
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
 

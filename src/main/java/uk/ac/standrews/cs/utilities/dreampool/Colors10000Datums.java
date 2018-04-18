@@ -45,7 +45,7 @@ public class Colors10000Datums {
     private ArrayList<CartesianPoint> queries;
     private Set<CartesianPoint> reference_objects;
 
-    private int setup_distance_calcs = 0;
+    private long setup_distance_calcs = 0;
 
     // Configuration parameters
 
@@ -139,8 +139,8 @@ public class Colors10000Datums {
     public void doQueries(DataSet dataset, Set<Query<CartesianPoint>> queries, int num_ros ) throws Exception {
         int distance_calcs = 0;
 
-        int initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
-        int start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
+        long initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
+        long start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
 
         ProgressIndicator pi = new PercentageProgressIndicator( 100 );
         pi.setTotalSteps(queries.size());
@@ -157,7 +157,7 @@ public class Colors10000Datums {
 
             pi.progressStep();
 
-            addRow(dataset, Integer.toString(count), query.threshold, num_ros, CountingWrapper.counter - start_calcs, results.size());
+            addRow(dataset, Integer.toString(count), query.threshold, num_ros, (int)(CountingWrapper.counter - start_calcs), results.size());
 
             count++;
 

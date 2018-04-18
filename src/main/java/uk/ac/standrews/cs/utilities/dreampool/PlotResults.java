@@ -38,7 +38,7 @@ public class PlotResults {
     private EuclideanDistance validate_distance; // used to check results.
     private ArrayList<Point> datums;
     private Set<Point> reference_objects;
-    private int setup_distance_calcs;
+    private long setup_distance_calcs;
 
     // Configuration parameters
 
@@ -143,8 +143,8 @@ public class PlotResults {
     public void doQueries(DataSet dataset, Set<Query<Point>> queries, int num_ros, int pool_index) throws Exception {
         int distance_calcs = 0;
 
-        int initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
-        int start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
+        long initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
+        long start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
 
         ProgressIndicator pi = new PercentageProgressIndicator( 100 );
         pi.setTotalSteps(queries.size());
@@ -159,7 +159,7 @@ public class PlotResults {
 
             pi.progressStep();
 
-            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, CountingWrapper.counter - start_calcs, results.size());
+            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, (int)(CountingWrapper.counter - start_calcs), results.size());
 
             start_calcs = CountingWrapper.counter;
 

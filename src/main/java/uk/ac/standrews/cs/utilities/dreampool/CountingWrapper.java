@@ -22,7 +22,7 @@ import uk.ac.standrews.cs.utilities.m_tree.Distance;
 public class CountingWrapper<T> implements Distance<T> {
 
     private final Distance<T> inner;
-    public static int counter = 0;
+    public static long counter = 0;
 
     public CountingWrapper(Distance<T> inner ) {
         this.inner = inner;

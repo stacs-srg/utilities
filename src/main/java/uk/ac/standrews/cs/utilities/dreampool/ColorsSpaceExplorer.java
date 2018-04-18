@@ -32,7 +32,7 @@ import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotE
  */
 public class ColorsSpaceExplorer {
 
-    private final CartesianPointFileReader source_data;
+    private CartesianPointFileReader source_data;
     private MPool<CartesianPoint> dream_pool;
 
     private CountingWrapper<CartesianPoint> distance;   // counts number of distance calculations made
@@ -42,25 +42,22 @@ public class ColorsSpaceExplorer {
     private ArrayList<CartesianPoint> queries;
     private Set<CartesianPoint> reference_objects;
 
-    private int setup_distance_calcs = 0;
+    private long setup_distance_calcs = 0;
 
     // Configuration parameters
 
     private boolean perform_validation = false;          // SET perform_validation TO TRUE TO PERFORM CHECKING
 
-    private float[][] radii = new float[][]{
+    private float[][] radii = new float[][] {
+            new float[]{ 0.07119140625F, 0.106787109375F, 0.1601806640625F, 0.24027099609375F, 0.360406494140625F, 0.540609741210938F }, // 6 rings each * 3/2
+            new float[]{ 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F }, // linear 6 far out
+            new float[]{ 0.6F, 0.7F, 0.8F }, // linear 3 far out
+            new float[]{ 0.1F, 0.2F, 0.3F,},  // linear 3 in close
+            new float[]{ 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F }, // linear 6 close in
+            new float[]{ 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F }, // linear 8 rings spread
+            new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F } // geometric 6
+        };
 
-            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
-            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F,0.3F, 0.4F }, // 15 rings
-            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F,0.3F, 0.4F } ,  // , 0.61F } //, 0.6F }
-            new float[]{ 0.00625F, 0.009375F, 0.0140625F, 0.02109375F, 0.031640625F,  0.0474609375F, 0.07119140625F, 0.106787109375F, 0.1601806640625F, 0.24027099609375F, 0.360406494140625F, 0.540609741210938F }, // 12 rings each * 3/2
-            new float[]{ 0.000004125976563F, 0.000008251953125F, 0.00001650390625F, 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.4F, 0.5F },
-            new float[]{ 0.000004125976563F, 0.000008251953125F, 0.00001650390625F, 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F },
-            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F },
-            new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.4F },
-            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F },
-            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.4F },
-            new float[]{ 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F, 0.5F } };
 
 
     // From Richard 28-3-18:
@@ -132,14 +129,14 @@ public class ColorsSpaceExplorer {
 
         for (int i = 0; i < num_queries; i++) {
 
-                CartesianPoint p = get_next_source_point();
+            CartesianPoint p = get_next_source_point();
 
-                for (float threshold : thresholds ) {
+            for (float threshold : thresholds ) {
 
-                    result.add(new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation));
+                result.add(new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation));
 
-                    pi.progressStep();
-                }
+                pi.progressStep();
+            }
         }
 
         return result;
@@ -149,8 +146,8 @@ public class ColorsSpaceExplorer {
     public void doQueries(DataSet dataset, Set<Query<CartesianPoint>> queries, int num_ros, int pool_index ) throws Exception {
         int distance_calcs = 0;
 
-        int initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
-        int start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
+        long initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
+        long start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
 
         ProgressIndicator pi = new PercentageProgressIndicator( 100 );
         pi.setTotalSteps(queries.size());
@@ -167,8 +164,7 @@ public class ColorsSpaceExplorer {
 
             pi.progressStep();
 
-            addRow(dataset, Integer.toString(count), Integer.toString(count), query.threshold, num_ros, pool_index, CountingWrapper.counter - start_calcs, results.size());
-
+            addRow(dataset, Integer.toString(count), Integer.toString(count), query.threshold, num_ros, pool_index, (int)( CountingWrapper.counter - start_calcs ), results.size());
 
             count++;
 
@@ -210,17 +206,12 @@ public class ColorsSpaceExplorer {
 
         System.out.println("Initialising...");
 
-        for( int ref_objs = 50; ref_objs < 300 ; ref_objs+= 20 ) {
+        for( int ref_objs = 20; ref_objs < 150 ; ref_objs+= 40 ) {
 
             for (int radii_index = 0; radii_index < radii.length; radii_index++) {
 
-                int num_datums = ((source_size - ref_objs) * 3) / 10;       // 90% of data after taking out reference objects;
+                int num_datums = ((source_size - ref_objs) * 9) / 10;       // 90% of data after taking out reference objects;
                 int num_queries = source_size - num_datums - ref_objs;      // 10% of the data after taking out reference objects (-1 since index starts at zero)
-
-                System.out.println("source_size = " + source_size);
-                System.out.println("ref objects = " + ref_objs);
-                System.out.println("datums = " + num_datums);
-                System.out.println("queries = " + num_queries);
 
                 initialise(num_datums, ref_objs, radii[radii_index]);
                 System.out.println("Generating queries...");
@@ -243,7 +234,7 @@ public class ColorsSpaceExplorer {
         System.out.println( "Plotting results...");
         long time = System.currentTimeMillis();
         ColorsSpaceExplorer pr = new ColorsSpaceExplorer( "/Users/al/Desktop/colors.txt" );
-        pr.plot("colors-RESULTS");
+        pr.plot("colors-space-RESULTS");
         System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
     }
 

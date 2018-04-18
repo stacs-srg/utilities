@@ -21,11 +21,8 @@ import uk.ac.standrews.cs.utilities.LoggingLevel;
 import uk.ac.standrews.cs.utilities.dataset.DataSet;
 import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
-import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
 import static uk.ac.standrews.cs.utilities.Logging.output;
 
 /**
@@ -43,7 +40,7 @@ public class ColorsFull90_10_NoTrace {
     private ArrayList<CartesianPoint> queries;
     private Set<CartesianPoint> reference_objects;
 
-    private int setup_distance_calcs = 0;
+    private long setup_distance_calcs = 0;
 
     // Configuration parameters
 
@@ -139,7 +136,7 @@ public class ColorsFull90_10_NoTrace {
     }
 
 
-    public void doQueries(DataSet dataset, Set<Query<CartesianPoint>> queries, int num_ros ) throws Exception {
+    public void doQueries(Set<Query<CartesianPoint>> queries, int num_ros ) throws Exception {
         int distance_calcs = 0;
 
         long initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
@@ -147,17 +144,9 @@ public class ColorsFull90_10_NoTrace {
 
         long start_time = System.currentTimeMillis();
 
-        int count = 0;
-
         for (Query<CartesianPoint> query : queries) {
 
             Set<CartesianPoint> results = dream_pool.rangeSearch(query.query, query.threshold,query ); // last parameter for debug only.
-
-            query.validate(results);
-
-            addRow(dataset, Integer.toString(count), query.threshold, num_ros, CountingWrapper.counter - start_calcs, results.size());
-
-            count++;
 
             start_calcs = CountingWrapper.counter;
 
@@ -168,20 +157,6 @@ public class ColorsFull90_10_NoTrace {
     }
 
     /************** Private **************/
-
-    private void plot(String fname) throws Exception {
-
-        String results_path = "/Users/al/Desktop/" + fname + ".csv";
-
-        Path path = Paths.get(results_path);
-
-        DataSet dataset = new DataSet(new ArrayList<>(Arrays.asList(new String[]{"query", "threshold", "ros", "calculations", "num_results"})));
-        doExperiment(dataset);
-        // oneExperiment(dataset);
-
-        createFileIfDoesNotExist(path);
-        dataset.print(path);
-    }
 
     private void initialise(int dataset_size, int ros, float[] radii) throws Exception {
 
@@ -194,11 +169,11 @@ public class ColorsFull90_10_NoTrace {
         setup_distance_calcs = CountingWrapper.counter;
     }
 
-    private void doExperiment(DataSet dataset) throws Exception {
+    private void doExperiment() throws Exception {
 
         output( LoggingLevel.SHORT_SUMMARY, "Initialising...");
 
-        int num_ref_objs = 25;
+        int num_ref_objs = 100;
         int num_datums = ( ( source_size - num_ref_objs ) * 9 ) / 10;       // 90% of data after taking out reference objects;
         int num_queries = source_size - num_datums - num_ref_objs;          // 10% of the data after taking out reference objects (-1 since index starts at zero)
 
@@ -211,7 +186,7 @@ public class ColorsFull90_10_NoTrace {
         output( LoggingLevel.SHORT_SUMMARY, "Generating queries...");
         Set<Query<CartesianPoint>> queries = generateQueries(num_queries);
         output( LoggingLevel.SHORT_SUMMARY, "Performing queries...");
-        doQueries(dataset, queries, num_ref_objs);
+        doQueries(queries, num_ref_objs);
 
     }
 
@@ -223,11 +198,11 @@ public class ColorsFull90_10_NoTrace {
 
     public static void main(String[] args) throws Exception {
 
-        Logging.setLoggingLevel(LoggingLevel.NONE);
+        Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);
         output( LoggingLevel.SHORT_SUMMARY, "Plotting results...");
         long time = System.currentTimeMillis();
         ColorsFull90_10_NoTrace pr = new ColorsFull90_10_NoTrace( "/Users/al/Desktop/colors.txt" );
-        pr.plot("colors-RESULTS");
+        pr.doExperiment();
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
 

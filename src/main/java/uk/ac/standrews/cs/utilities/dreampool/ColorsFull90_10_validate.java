@@ -31,7 +31,7 @@ import static uk.ac.standrews.cs.utilities.Logging.output;
 /**
  * Outputs a CSV file of ...
  */
-public class ColorsFull90_10 {
+public class ColorsFull90_10_validate {
 
     private final CartesianPointFileReader source_data;
     private MPool<CartesianPoint> dream_pool;
@@ -64,7 +64,7 @@ public class ColorsFull90_10 {
     int source_index = 0;  // track which datums we have used already
     int source_size;       // size of the dataset
 
-    public ColorsFull90_10(String filename ) throws Exception {
+    public ColorsFull90_10_validate(String filename ) throws Exception {
 
         output( LoggingLevel.SHORT_SUMMARY, "Injesting file " + filename );
         source_data = new CartesianPointFileReader(filename,true);
@@ -153,6 +153,7 @@ public class ColorsFull90_10 {
 
             Set<CartesianPoint> results = dream_pool.rangeSearch(query.query, query.threshold,query ); // last parameter for debug only.
 
+            query.checkSolutions(results);
             query.validate(results);
 
             addRow(dataset, Integer.toString(count), query.threshold, num_ros, CountingWrapper.counter - start_calcs, query.getHPExclusions(), query.getPivotInclusions(), query.getPivotExclusions(), query.getRequiringFiltering(), results.size());
@@ -226,7 +227,7 @@ public class ColorsFull90_10 {
         Logging.setLoggingLevel(LoggingLevel.VERBOSE);
         output( LoggingLevel.SHORT_SUMMARY, "Plotting results...");
         long time = System.currentTimeMillis();
-        ColorsFull90_10 pr = new ColorsFull90_10( "/Users/al/Desktop/colors.txt" );
+        ColorsFull90_10_validate pr = new ColorsFull90_10_validate( "/Users/al/Desktop/colors.txt" );
         pr.plot("colors-RESULTS");
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
