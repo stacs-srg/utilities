@@ -38,7 +38,7 @@ public class EuclidianResults {
     private CountingWrapper distance;
     private EuclideanDistance validate_distance; // used to check results.
     private ArrayList<Point> datums;
-    private Set<Point> reference_objects;
+    private List<Point> reference_objects;
     private long setup_distance_calcs;
 
     // Configuration parameters
@@ -85,11 +85,11 @@ public class EuclidianResults {
     }
 
 
-    private static Set<Point> createReferenceObjects(int ros) {
+    private static List<Point> createReferenceObjects(int ros) {
 
         Random r = new Random(583119234L);  // always use same rand to create reference objects
 
-        Set<Point> pts = new HashSet<>();
+        List<Point> pts = new ArrayList<>();
 
         for (float pos = 0; pos <ros; pos++ ) {
 
@@ -205,7 +205,7 @@ public class EuclidianResults {
         Logging.setLoggingLevel(LoggingLevel.VERBOSE);
         long time = System.currentTimeMillis();
         EuclidianResults er = new EuclidianResults();
-        er.plot("Euclidian-RESULTS");
+        er.plot("Euclidean-RESULTS");
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
 

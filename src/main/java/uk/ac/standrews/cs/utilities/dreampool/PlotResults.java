@@ -37,7 +37,7 @@ public class PlotResults {
     private CountingWrapper distance;
     private EuclideanDistance validate_distance; // used to check results.
     private ArrayList<Point> datums;
-    private Set<Point> reference_objects;
+    private List<Point> reference_objects;
     private long setup_distance_calcs;
 
     // Configuration parameters
@@ -84,11 +84,11 @@ public class PlotResults {
     }
 
 
-    private static Set<Point> createReferenceObjects(int ros) {
+    private static List<Point> createReferenceObjects(int ros) {
 
         Random r = new Random(583119234L);  // always use same rand to create reference objects
 
-        Set<Point> pts = new HashSet<>();
+        List<Point> pts = new ArrayList<>();
 
         for (float pos = 0; pos <ros; pos++ ) {
 

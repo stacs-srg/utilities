@@ -22,7 +22,7 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistan
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -33,7 +33,7 @@ public class SimpleTest {
     private static Random r = new Random(787819234L);
     private static ArrayList<Point> points = new ArrayList<>();
     private static long setup_distance_calcs;
-    private static Set<Point> ros;
+    private static List<Point> ros;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -47,8 +47,8 @@ public class SimpleTest {
 //        System.out.println( "Distance calculations (after adding data): " + CountingWrapper.counter );
     }
 
-    private static Set<Point> createReferenceObjects() {
-        Set<Point> pts = new HashSet<>();
+    private static List<Point> createReferenceObjects() {
+        List<Point> pts = new ArrayList<>();
 
         for (float pos = 0; pos <30; pos++ ) {
 

@@ -28,7 +28,7 @@ import java.util.*;
  */
 public class MPool<T> {
 
-    private final Set<T> pivots;                            // the set of all pivots in the system.
+    private final List<T> pivots;                            // the set of all pivots in the system.
     private int num_pools;                                  // number of pools (=number of pivots) in the implementation
     private final Distance<T> distance_wrapper;             // the distance function used in the implementation.
 
@@ -49,11 +49,12 @@ public class MPool<T> {
 
     /**
      * Create MPool using specified radii
+     * @param distance_wrapper
      * @param pivots
      * @param radii
      *
      */
-    public MPool(Distance<T> distance_wrapper, Set<T> pivots, float[] radii) throws Exception {
+    public MPool(Distance<T> distance_wrapper, List<T> pivots, float[] radii) throws Exception {
         this.pivots = pivots;
         this.distance_wrapper = distance_wrapper;
         this.num_pools = pivots.size();
@@ -75,7 +76,7 @@ public class MPool<T> {
      * @param ros
      * @throws Exception
      */
-    public MPool(Distance<T>  distance, Set<T> ros) throws Exception {
+    public MPool(Distance<T>  distance, List<T> ros) throws Exception {
         this( distance, ros, Pool.DEFAULT_RADII );
     }
 
@@ -184,7 +185,7 @@ public class MPool<T> {
      *
      * initialises an 2D array of inter pivot distances called inter_pivot_distances
      */
-    private void initialise_pivot_distances(Set<T> pivots) {
+    private void initialise_pivot_distances(List<T> pivots) {
         inter_pivot_distances = new float[num_pools][num_pools];
         int i = 0;
         for( T p1 : pivots ) {
