@@ -66,9 +66,9 @@ public class ColorsFull {
             new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F } // geometric 6
     };
 
-    private float[] radii = new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F,0.3F, 0.4F }; // these work well with Euclidean
+    // private float[] radii = new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F,0.3F, 0.4F }; // these work well with Euclidean
 
-    // private float[] radii = new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F }; // worked best during space exploration
+    private float[] radii = new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F }; // worked best during space exploration
 
 
     // From Richard 28-3-18:
@@ -87,6 +87,7 @@ public class ColorsFull {
         output( LoggingLevel.SHORT_SUMMARY, "check results = " + check_results );
         output( LoggingLevel.SHORT_SUMMARY, "exploring = " + exploring );
         output( LoggingLevel.SHORT_SUMMARY, "parallel = " + parallel );
+        output( LoggingLevel.SHORT_SUMMARY, "plot = " + plot );
         output( LoggingLevel.SHORT_SUMMARY, "Injesting file " + filename );
 
         TestContext tc = new TestContext(TestContext.Context.colors);
