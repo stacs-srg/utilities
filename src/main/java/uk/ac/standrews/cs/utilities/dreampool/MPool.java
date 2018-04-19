@@ -17,11 +17,17 @@
 package uk.ac.standrews.cs.utilities.dreampool;
 
 import org.roaringbitmap.RoaringBitmap;
+import uk.ac.standrews.cs.utilities.archive.ErrorHandling;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
+ *
+ * A Metric datastructure based on pivot exclusion and hyperplane exclusion.
  * @author al@st-andrews.ac.uk
  * @param <T> The type of the elements stored in this data structure.
  *
@@ -49,10 +55,9 @@ public class MPool<T> {
 
     /**
      * Create MPool using specified radii
-     * @param distance_wrapper
-     * @param pivots
-     * @param radii
-     *
+     * @param distance_wrapper - a distance function that determines distance between two Ts
+     * @param pivots - a set of pivots/reference objects to use.
+     * @param radii - a set of radii to form pools (balls) around the pivots.
      */
     public MPool(Distance<T> distance_wrapper, List<T> pivots, float[] radii) throws Exception {
         this.pivots = pivots;
@@ -60,9 +65,7 @@ public class MPool<T> {
         this.num_pools = pivots.size();
 
         initialise_pivot_distances( pivots );
-        if( radii == null ) {
-            radii = calculateRadii(inter_pivot_distances);
-        }
+
         System.out.println( "Radii:");
         for( int i = 0;i < radii.length; i++ ) {
             System.out.println( "\t" + radii[i] );
@@ -78,42 +81,6 @@ public class MPool<T> {
      */
     public MPool(Distance<T>  distance, List<T> ros) throws Exception {
         this( distance, ros, Pool.DEFAULT_RADII );
-    }
-
-
-    /**
-     * Calculates the radii of the pools based on the median inter-pivot distance +/- 3 std devs
-     * @param distances - the distances from all pivots to the datums.
-     * @return a crafted set of radii - { median - 3sd,median - 2sd,median - sd,median,median + sd,median + 2sd,median + 3sd }
-     */
-    private static float[] calculateRadii(float[][] distances) {
-
-        double mean = mean( distances );
-        double sd = stdDev( distances, mean );
-
-        System.out.println( "mean: " + mean);
-        System.out.println( "sd: " + sd);
-
-        double sd_times_point_5 = 0.5 * sd;
-        double sd_times_1_point_5 = 1.5 * sd;
-        double sd_times_2 = 2 * sd;
-        double sd_times_2_point_5 = 2.5 * sd;
-
-        float[] radii = new float[]{
-//                (float)(((float) mean) - sd_times_2_point_5), // TODO look at this skewed distribution.
-//                (float)(((float) mean) - sd_times_2),
-                (float)(((float) mean) - sd_times_1_point_5),
-                (float)(((float) mean) - sd),
-                (float)(((float) mean) - sd_times_point_5),
-                (float) mean,
-                (float)(((float) mean) + sd_times_point_5),
-                (float)(((float) mean) + sd),
-                (float)(((float) mean) + sd_times_1_point_5),
-                (float)(((float) mean) + sd_times_2),
-                (float)(((float) mean) + sd_times_2_point_5),
-        };
-
-        return radii;
     }
 
     /**
@@ -224,7 +191,7 @@ public class MPool<T> {
      * finally perform hyperplane exclusion,
      * filter the results to exclude false positives.
      */
-    public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj ) { // NOTE query_obj only for validation
+    public Set<T> rangeSearch(final T query, final float threshold, Query<T> query_obj) { // NOTE query_obj only for validation
 
         List<Ring<T>> include_list = new ArrayList<>(); // circles that cover query and may contain soln
         List<Ring<T>> exclude_list = new ArrayList<>(); // circles that do not cover query and may are not part of soln
@@ -241,7 +208,7 @@ public class MPool<T> {
 
         for (Pool<T> pool : pools) {
 
-            float distance_query_pivot = distance_wrapper.distance(pool.getPivot(),query);
+            float distance_query_pivot = distances_from_query_to_pivots[pool.getPoolId()]; // distance_wrapper.distance(pool.getPivot(),query);
 
             // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
             // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
@@ -278,7 +245,7 @@ public class MPool<T> {
         int pivot_inclusions = inclusions.getCardinality();
         query_obj.setPivotInclusions( pivot_inclusions );
 
-        query_obj.validateOmissions(inclusions,include_list);
+        query_obj.validateOmissions(inclusions);
 
         exclusions = exclude( exclusions, exclude_list );
 
@@ -292,6 +259,145 @@ public class MPool<T> {
         int count = filter( inclusions, query, threshold );
 
         return getValues( inclusions );
+    }
+
+    /**
+     * Find the nodes within range r of query.
+     *
+     * @param query - some data for which to find the neighbours within the distance specified by threshold
+     * @param threshold - the threshold distance specifying the size of the query ball
+     * @param query_obj - the query being performed (for diagnostics) - permits extra data to be passed in and out and validation
+     *
+     * @return all those nodes from S within @param threshold
+     *
+     * General technique - find the rings that overlap with the query then do inclusion,
+     * find the rings that do not overlap using and do exclusion,
+     * finally perform hyperplane exclusion,
+     * filter the results to exclude false positives.
+     */
+    public Set<T> parallelRangeSearch(final T query, final float threshold, Query<T> query_obj, int PARALLELISM_DEGREE) { // NOTE query_obj only for validation
+
+        RoaringBitmap[] inclusions_vector = new RoaringBitmap[ num_pools ];
+        RoaringBitmap[] exclusions_vector = new RoaringBitmap[ num_pools ];
+        RoaringBitmap[] hp_exclusions_vector = new RoaringBitmap[ num_pools ];
+
+        float[] distances_from_query_to_pivots = new float[num_pools];
+
+
+        int[] pool_indices = new int[num_pools];                // create a set of manifest pool_indices where pool_indices[i] = i
+        for( int index = 0; index < num_pools; index++ ) {      // don't know how to get a lambda for below any other way.
+            pool_indices[index] = index;                        // (variable used in lambda expression should be final or effectively final)
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(PARALLELISM_DEGREE);
+
+        final CountDownLatch latch1 = new CountDownLatch(num_pools) ;
+        // calculate distance_query_pivot in parallel
+        for ( int index : pool_indices ) {
+            executor.submit(() -> {
+
+                float distance_query_pivot = distance_wrapper.distance(pools.get(index).getPivot(), query);
+                distances_from_query_to_pivots[index] = distance_query_pivot;              // save this for HP exclusion - used below
+                latch1.countDown();
+            } );
+        }
+        barrier( latch1 );
+
+        final CountDownLatch latch2 = new CountDownLatch(num_pools) ;
+        // calculate inclusions and exclusions in parallel
+        for ( int index : pool_indices ) {
+
+                executor.submit(() -> {
+
+                    Pool<T> pool = pools.get(index);
+
+                    float distance_query_pivot = distances_from_query_to_pivots[pool.getPoolId()];
+
+                    // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
+                    // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
+
+                    Ring<T> r1 = pool.findIncludeRing(distance_query_pivot, threshold);
+
+                    if (r1 != null) {
+                        // any circles that are added to include_list cover query.
+                        inclusions_vector[index] = r1.getConciseContents();
+                    }
+                    // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
+                    // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
+                    Ring r2 = pool.findExcludeRing(distance_query_pivot, threshold);
+                    if (r2 != null) {
+                        exclusions_vector[index] = r2.getConciseContents();
+                    }
+                    latch2.countDown();
+                } );
+        }
+        barrier( latch2 );
+
+        final CountDownLatch latch3 = new CountDownLatch(num_pools) ;
+        // calculate HP exclusions in parallel
+        for ( int index : pool_indices ){
+            /** Next perform hyperplane exclusion: For a reference point pi ∈ U,
+             ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+             ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
+             **/
+            Pool<T> pool = pools.get(index);
+            hp_exclusions_vector[ index ] = pool.findParallelHPExclusion4P(distances_from_query_to_pivots,threshold);
+            latch3.countDown();
+        }
+        barrier( latch3 );
+
+        RoaringBitmap hp_exclusions = new RoaringBitmap();
+        RoaringBitmap pivot_inclusions  = universal_ring.getConciseContents().clone();
+        RoaringBitmap pivot_exclusions = new RoaringBitmap();
+
+        // At this point we have all the inclusions and exclusion bitmaps and need to reduce them.
+
+        final CountDownLatch latch4 = new CountDownLatch(3) ; // 3 reduces below
+        executor.submit(() -> {
+                    combineOR( hp_exclusions, hp_exclusions_vector );
+                    query_obj.setHPexclusions( hp_exclusions.getCardinality() );
+                    latch4.countDown();
+                } );
+
+        executor.submit(() -> {
+                    combineAND(pivot_inclusions, inclusions_vector);
+                    query_obj.setPivotInclusions(pivot_inclusions.getCardinality());
+                    //query_obj.validateIncludeList(include_list, query_obj);                       // TODO chenge signatures? <<<<<<<<<<<<<<
+                    query_obj.validateOmissions(pivot_inclusions);
+                    latch4.countDown();
+                } );
+        executor.submit(() -> {
+                    combineOR(pivot_exclusions, exclusions_vector);
+                    query_obj.setPivotExclusions(pivot_exclusions.getCardinality());
+                    latch4.countDown();
+                } );
+        barrier( latch4 );
+        executor.shutdown();
+
+        // Now sequential - reduce the 3 bitmaps to 1 bitmap of results
+
+        pivot_inclusions.andNot(pivot_exclusions);
+        pivot_inclusions.andNot(hp_exclusions);
+
+        query_obj.setRequiringFiltering( pivot_inclusions.getCardinality() );
+
+        filter( pivot_inclusions, query, threshold );
+
+        return getValues( pivot_inclusions );
+    }
+
+    private float square( float a ) { return a * a; }
+
+    /**
+     * Blocks until all threads being run by an executor have completed execution.
+     * @param latch - a latch on which to wait
+     */
+    private void barrier(CountDownLatch latch) {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            ErrorHandling.error("Thread interrupted");
+        }
     }
 
     /**
@@ -347,7 +453,37 @@ public class MPool<T> {
         }
     }
 
-    private RoaringBitmap exclude(RoaringBitmap exclusions, List<Ring<T>> exclude_list) { //***************************************
+    /**
+     *
+     * @param initial
+     * @param vector_of_bitmaps
+     * @return the intersection of the bitmaps passed in
+     */
+    private RoaringBitmap combineAND(RoaringBitmap initial, RoaringBitmap[] vector_of_bitmaps) {
+
+        for( RoaringBitmap bm : vector_of_bitmaps ) {
+            if( bm != null ) {
+                initial.and( bm );
+            }
+        }
+        return initial;
+    }
+
+    /**
+     * @param vector_of_bitmaps
+     * @return the OR of all the bitmaps in vector_of_bitmaps - this is REDUCE
+     */
+    private RoaringBitmap combineOR(RoaringBitmap initial, RoaringBitmap[] vector_of_bitmaps) {
+       // RoaringBitmap result = new RoaringBitmap();
+        for( RoaringBitmap bm : vector_of_bitmaps ) {
+            if( bm != null ) {
+                initial.or(bm);
+            }
+        }
+        return initial;
+    }
+
+    private RoaringBitmap exclude(RoaringBitmap exclusions, Collection<Ring<T>> exclude_list) { //***************************************
 
         for( Ring<T> ring : exclude_list ) {
             RoaringBitmap ring_contents = ring.getConciseContents();

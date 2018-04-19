@@ -53,6 +53,8 @@ public class ColorsFull {
     private static boolean brute_force = false;         // do brute force rather than MPool.
     private static boolean check_results = false;       // whether to check results of queries for correctness (less exhaustive than full evaluation).
     private static boolean exploring = false;           // set to perform space exploration (radii and ros).
+    private static boolean parallel = false;            // perform the queries in parallel
+    private static boolean plot = false;                // report results in a csv file
 
     private float[][] exploration_radii = new float[][] {
             new float[]{ 0.07119140625F, 0.106787109375F, 0.1601806640625F, 0.24027099609375F, 0.360406494140625F, 0.540609741210938F }, // 6 rings each * 3/2
@@ -65,6 +67,8 @@ public class ColorsFull {
     };
 
     private float[] radii = new float[]{ 0.0000330078125F, 0.000066015625F, 0.00013203125F, 0.0002640625F, 0.000528125F, 0.00105625F, .003125F, 0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.2F,0.3F, 0.4F }; // these work well with Euclidean
+
+    // private float[] radii = new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F }; // worked best during space exploration
 
 
     // From Richard 28-3-18:
@@ -82,6 +86,7 @@ public class ColorsFull {
         output( LoggingLevel.SHORT_SUMMARY, "brute force = " + brute_force );
         output( LoggingLevel.SHORT_SUMMARY, "check results = " + check_results );
         output( LoggingLevel.SHORT_SUMMARY, "exploring = " + exploring );
+        output( LoggingLevel.SHORT_SUMMARY, "parallel = " + parallel );
         output( LoggingLevel.SHORT_SUMMARY, "Injesting file " + filename );
 
         TestContext tc = new TestContext(TestContext.Context.colors);
@@ -139,15 +144,19 @@ public class ColorsFull {
 
             if( brute_force ) {
                 results = bruteForce( query.query, query.threshold,query );
+            } else if( parallel ) {
+                 results = dream_pool.parallelRangeSearch(query.query, query.threshold, query, 4); // last parameter for debug only.
             } else {
-                results = dream_pool.rangeSearch(query.query, query.threshold,query ); // last parameter for debug only.
+                results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }
             query.validate(results);
             if( check_results ) {
                 query.checkSolutions(results);
             }
 
-            addRow(dataset, Integer.toString(count), query.threshold, num_ros, pool_index, CountingWrapper.counter - start_calcs, query.getHPExclusions(), query.getPivotInclusions(), query.getPivotExclusions(), query.getRequiringFiltering(), results.size());
+            if( plot ) {
+                addRow(dataset, Integer.toString(count), query.threshold, num_ros, pool_index, CountingWrapper.counter - start_calcs, query.getHPExclusions(), query.getPivotInclusions(), query.getPivotExclusions(), query.getRequiringFiltering(), results.size());
+            }
 
             count++;
 
@@ -187,8 +196,10 @@ public class ColorsFull {
             doExperiment(dataset);
         }
 
-        createFileIfDoesNotExist(path);
-        dataset.print(path);
+        if( plot ) {
+            createFileIfDoesNotExist(path);
+            dataset.print(path);
+        }
     }
 
     private void initialise(float[] radii) throws Exception {
@@ -250,20 +261,22 @@ public class ColorsFull {
 
     public static void main(String[] args) throws Exception {
 
-        int num_ref_objs = 25;
-        check_results = true;
+        int num_ref_objs = 100;
+        check_results = false;
         perform_validation = false;
         brute_force = false;
         exploring = false;
+        parallel = true;
+        plot = false;
+        Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);   // choose from NONE, SHORT_SUMMARY, LONG_SUMMARY, VERBOSE
 
-        Logging.setLoggingLevel(LoggingLevel.VERBOSE);
-        output( LoggingLevel.SHORT_SUMMARY, "Plotting results...");
+        if( plot ) {
+            output(LoggingLevel.SHORT_SUMMARY, "Plotting results...");
+        }
         long time = System.currentTimeMillis();
         ColorsFull pr = new ColorsFull( "colors", num_ref_objs );
         pr.plot("colors-RESULTS");
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
-
-
 
 }

@@ -19,10 +19,7 @@ package uk.ac.standrews.cs.utilities.dreampool;
 import org.roaringbitmap.RoaringBitmap;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Query<T> {
     public final T query;
@@ -112,7 +109,7 @@ public class Query<T> {
         }
     }
 
-    public void validateOmissions(RoaringBitmap result, List<Ring<T>> include_list) {
+    public void validateOmissions(RoaringBitmap result) {
         if( validate ) {
 
             Set<T> results = owner.getValues(result);
@@ -139,7 +136,7 @@ public class Query<T> {
         }
     }
 
-    public void validateIncludeList(List<Ring<T>> include_list, Query<T> query_obj) {
+    public void validateIncludeList(Collection<Ring<T>> include_list, Query<T> query_obj) {
         if (validate) {
             ArrayList<T> clone = new ArrayList<T>();
             clone.addAll( real_solutions );

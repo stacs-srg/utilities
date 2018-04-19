@@ -40,10 +40,6 @@ public class PlotResults {
     private List<Point> reference_objects;
     private long setup_distance_calcs;
 
-    // Configuration parameters
-
-    private boolean perform_validation = true;          // SET perform_validation TO TRUE TO PERFORM CHECKING
-
     //private int num_datums =    100; //1 hundred
     //private int num_datums =    1000; //1 thousand
     private int num_datums =    10000; //10 thousand
@@ -116,7 +112,7 @@ public class PlotResults {
         dream_pool.completeInitialisation();
     }
 
-    public Set<Query<Point>> generateQueries(int num_queries) {
+    public Set<Query<Point>> generateQueries(int num_queries, boolean perform_validation) {
 
         HashSet<Query<Point>> result = new HashSet<>();
 
@@ -140,7 +136,7 @@ public class PlotResults {
     }
 
 
-    public void doQueries(DataSet dataset, Set<Query<Point>> queries, int num_ros, int pool_index) throws Exception {
+    public void doQueries(DataSet dataset, Set<Query<Point>> queries, int num_ros, int pool_index, boolean parallel) throws Exception {
         int distance_calcs = 0;
 
         long initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
@@ -153,7 +149,12 @@ public class PlotResults {
 
         for (Query<Point> query : queries) {
 
-            Set<Point> results = dream_pool.rangeSearch(query.query, query.threshold,query ); // last parameter for debug only.
+            Set<Point> results;
+            if( parallel ) {
+                results = dream_pool.parallelRangeSearch(query.query, query.threshold, query, 4); // last parameter for debug only.
+            } else {
+                results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
+            }
 
             query.validate(results);
 
@@ -171,14 +172,14 @@ public class PlotResults {
 
     /************** Private **************/
 
-    private void plot(String fname) throws Exception {
+    private void plot(String fname, boolean in_parallel, boolean validate) throws Exception {
 
         String results_path = "/Users/al/Desktop/" + fname + ".csv";
 
         Path path = Paths.get(results_path);
 
         DataSet dataset = new DataSet(new ArrayList<>(Arrays.asList(new String[]{"query_x", "query_y", "threshold", "ros", "pool_index", "calculations", "num_results"})));
-        doExperiment(dataset);
+        doExperiment(dataset, in_parallel, validate );
         // oneExperiment(dataset);
 
         createFileIfDoesNotExist(path);
@@ -195,7 +196,7 @@ public class PlotResults {
         setup_distance_calcs = CountingWrapper.counter;
     }
 
-    private void doExperiment(DataSet dataset) throws Exception {
+    private void doExperiment(DataSet dataset, boolean parallel, boolean validate) throws Exception {
 
         // for( int ref_objs = 60; ref_objs < 65 ; ref_objs+= 1 ) {
 
@@ -208,9 +209,9 @@ public class PlotResults {
                 System.out.println( "Initialising..." );
                 initialise(num_datums, ref_objs, radii[radii_index]);
                 System.out.println( "Generating queries..." );
-                Set<Query<Point>> queries = generateQueries(100);
+                Set<Query<Point>> queries = generateQueries(100, validate);
                 System.out.println( "Performing queries..." );
-                doQueries(dataset, queries, ref_objs, radii_index);
+                doQueries( dataset, queries, ref_objs, radii_index, parallel );
         //    }
         // }
     }
@@ -238,7 +239,7 @@ public class PlotResults {
         System.out.println( "Plotting results...");
         long time = System.currentTimeMillis();
         PlotResults pr = new PlotResults();
-        pr.plot("RESULTS");
+        pr.plot("RESULTS",false,false);
         System.out.println( "Dp finished in " + ( System.currentTimeMillis() - time ) );
     }
 

@@ -253,7 +253,24 @@ public class Pool<T> {
         return exclusions;
     }
 
+
+    /**
+     * Thread safe version of findHPExclusion4P - no sharing
+     * @param distances_from_query_to_pivots
+     * @param threshold
+     * @return
+     */
+    public RoaringBitmap findParallelHPExclusion4P(float[] distances_from_query_to_pivots, float threshold) {
+
+        RoaringBitmap exclusions = new RoaringBitmap();
+
+        return findHPExclusion4P( exclusions,distances_from_query_to_pivots,threshold);
+
+    }
+
     private float square( float a ) { return a * a; }
+
+
 }
 
 

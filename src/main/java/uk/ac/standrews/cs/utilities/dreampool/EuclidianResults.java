@@ -173,7 +173,7 @@ public class EuclidianResults {
 
     private void doExperiment( DataSet dataset ) throws Exception {
 
-        int ref_objs = 62;
+        int ref_objs = 100;
         int radii_index = 0;
 
         output( LoggingLevel.VERBOSE, "Initialising...");
