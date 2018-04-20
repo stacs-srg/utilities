@@ -184,11 +184,9 @@ public class ColorsFull {
         return result;
     }
 
-    public void plot(String fname) throws Exception {
+    public void plot(String string_path, String fname) throws Exception {
 
-        String results_path = "/Users/al/Desktop/" + fname + ".csv";
-
-        Path path = Paths.get(results_path);
+        Path path = Paths.get(string_path);
 
         DataSet dataset = new DataSet(new ArrayList<>(Arrays.asList(new String[]{"query", "threshold", "ros", "pool index", "calculations", "hp exlusions", "pivot inclusions", "pivot exclusions", "requiring filtering", "num_results"})));
         if( exploring ) {
@@ -276,7 +274,7 @@ public class ColorsFull {
         }
         long time = System.currentTimeMillis();
         ColorsFull pr = new ColorsFull( "colors", num_ref_objs );
-        pr.plot("colors-RESULTS");
+        pr.plot("/Users/al/Desktop/", "colors-RESULTS");
         output( LoggingLevel.SHORT_SUMMARY, "Dp finished in " + ( System.currentTimeMillis() - time ) / 1000 + "s" );
     }
 
