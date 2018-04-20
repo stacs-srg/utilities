@@ -370,7 +370,7 @@ public class MPool<T> {
         query_obj.setRequiringFiltering( pivot_inclusions.getCardinality() );
 
         filter( pivot_inclusions, query, threshold );
-        System.out.println( "done" );
+
         return getValues( pivot_inclusions );
     }
 
