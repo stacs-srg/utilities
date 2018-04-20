@@ -283,7 +283,6 @@ public class MPool<T> {
 
         float[] distances_from_query_to_pivots = new float[num_pools];
 
-
         int[] pool_indices = new int[num_pools];                // create a set of manifest pool_indices where pool_indices[i] = i
         for( int index = 0; index < num_pools; index++ ) {      // don't know how to get a lambda for below any other way.
             pool_indices[index] = index;                        // (variable used in lambda expression should be final or effectively final)
@@ -295,43 +294,32 @@ public class MPool<T> {
         // calculate distance_query_pivot in parallel
         for ( int index : pool_indices ) {
             executor.submit(() -> {
-
+                System.out.println( "index " + index);
                 float distance_query_pivot = distance_wrapper.distance(pools.get(index).getPivot(), query);
                 distances_from_query_to_pivots[index] = distance_query_pivot;              // save this for HP exclusion - used below
+
+                Pool<T> pool = pools.get(index);
+
+                // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
+                // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
+
+                Ring<T> r1 = pool.findIncludeRing(distance_query_pivot, threshold);
+
+                if (r1 != null) {
+                    // any circles that are added to include_list cover query.
+                    inclusions_vector[index] = r1.getConciseContents();
+                }
+                // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
+                // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
+                Ring r2 = pool.findExcludeRing(distance_query_pivot, threshold);
+                if (r2 != null) {
+                    exclusions_vector[index] = r2.getConciseContents();
+                }
                 latch1.countDown();
-            } );
+            });
         }
+        System.out.println( "latch 1" );
         barrier( latch1 );
-
-        final CountDownLatch latch2 = new CountDownLatch(num_pools) ;
-        // calculate inclusions and exclusions in parallel
-        for ( int index : pool_indices ) {
-
-                executor.submit(() -> {
-
-                    Pool<T> pool = pools.get(index);
-
-                    float distance_query_pivot = distances_from_query_to_pivots[pool.getPoolId()];
-
-                    // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
-                    // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
-
-                    Ring<T> r1 = pool.findIncludeRing(distance_query_pivot, threshold);
-
-                    if (r1 != null) {
-                        // any circles that are added to include_list cover query.
-                        inclusions_vector[index] = r1.getConciseContents();
-                    }
-                    // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
-                    // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
-                    Ring r2 = pool.findExcludeRing(distance_query_pivot, threshold);
-                    if (r2 != null) {
-                        exclusions_vector[index] = r2.getConciseContents();
-                    }
-                    latch2.countDown();
-                } );
-        }
-        barrier( latch2 );
 
         final CountDownLatch latch3 = new CountDownLatch(num_pools) ;
         // calculate HP exclusions in parallel
@@ -344,6 +332,7 @@ public class MPool<T> {
             hp_exclusions_vector[ index ] = pool.findParallelHPExclusion4P(distances_from_query_to_pivots,threshold);
             latch3.countDown();
         }
+        System.out.println( "latch 3" );
         barrier( latch3 );
 
         RoaringBitmap hp_exclusions = new RoaringBitmap();
@@ -371,6 +360,7 @@ public class MPool<T> {
                     query_obj.setPivotExclusions(pivot_exclusions.getCardinality());
                     latch4.countDown();
                 } );
+        System.out.println( "latch 4" );
         barrier( latch4 );
         executor.shutdown();
 
@@ -382,7 +372,7 @@ public class MPool<T> {
         query_obj.setRequiringFiltering( pivot_inclusions.getCardinality() );
 
         filter( pivot_inclusions, query, threshold );
-
+        System.out.println( "done" );
         return getValues( pivot_inclusions );
     }
 
