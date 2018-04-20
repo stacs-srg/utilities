@@ -186,7 +186,7 @@ public class ColorsFull {
 
     public void plot(String string_path, String fname) throws Exception {
 
-        Path path = Paths.get(string_path);
+        Path path = Paths.get(string_path + fname);
 
         DataSet dataset = new DataSet(new ArrayList<>(Arrays.asList(new String[]{"query", "threshold", "ros", "pool index", "calculations", "hp exlusions", "pivot inclusions", "pivot exclusions", "requiring filtering", "num_results"})));
         if( exploring ) {
