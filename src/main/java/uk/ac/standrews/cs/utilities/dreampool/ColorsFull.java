@@ -146,7 +146,7 @@ public class ColorsFull {
             if( brute_force ) {
                 results = bruteForce( query.query, query.threshold,query );
             } else if( parallel ) {
-                 results = dream_pool.parallelRangeSearch(query.query, query.threshold, 24, query); // last parameter for debug only.
+                 results = dream_pool.parallelRangeSearch(query.query, query.threshold, 4, query); // last parameter for debug only.
             } else {
                 results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }
@@ -261,12 +261,12 @@ public class ColorsFull {
     public static void main(String[] args) throws Exception {
 
         int num_ref_objs = 100;
-        check_results = false;
+        check_results = true;
         perform_validation = false;
         brute_force = false;
         exploring = false;
         parallel = true;
-        plot = false;
+        plot = true;
         Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);   // choose from NONE, SHORT_SUMMARY, LONG_SUMMARY, VERBOSE
 
         if( plot ) {
