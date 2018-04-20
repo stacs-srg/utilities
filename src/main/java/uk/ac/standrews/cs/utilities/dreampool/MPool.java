@@ -318,10 +318,10 @@ public class MPool<T> {
                 latch1.countDown();
             });
         }
-        System.out.println( "latch 1" );
         barrier( latch1 );
+        // Need to block here until distances_from_query_to_pivots have been calculated.
 
-        final CountDownLatch latch3 = new CountDownLatch(num_pools) ;
+        final CountDownLatch latch2 = new CountDownLatch(num_pools) ;
         // calculate HP exclusions in parallel
         for ( int index : pool_indices ){
             /** Next perform hyperplane exclusion: For a reference point pi ∈ U,
@@ -330,10 +330,9 @@ public class MPool<T> {
              **/
             Pool<T> pool = pools.get(index);
             hp_exclusions_vector[ index ] = pool.findParallelHPExclusion4P(distances_from_query_to_pivots,threshold);
-            latch3.countDown();
+            latch2.countDown();
         }
-        System.out.println( "latch 3" );
-        barrier( latch3 );
+        barrier( latch2 );
 
         RoaringBitmap hp_exclusions = new RoaringBitmap();
         RoaringBitmap pivot_inclusions  = universal_ring.getConciseContents().clone();
@@ -341,11 +340,11 @@ public class MPool<T> {
 
         // At this point we have all the inclusions and exclusion bitmaps and need to reduce them.
 
-        final CountDownLatch latch4 = new CountDownLatch(3) ; // 3 reduces below
+        final CountDownLatch latch3 = new CountDownLatch(3) ; // 3 reduces below
         executor.submit(() -> {
                     combineOR( hp_exclusions, hp_exclusions_vector );
                     query_obj.setHPexclusions( hp_exclusions.getCardinality() );
-                    latch4.countDown();
+                    latch3.countDown();
                 } );
 
         executor.submit(() -> {
@@ -353,15 +352,15 @@ public class MPool<T> {
                     query_obj.setPivotInclusions(pivot_inclusions.getCardinality());
                     //query_obj.validateIncludeList(include_list, query_obj);                       // TODO chenge signatures? <<<<<<<<<<<<<<
                     query_obj.validateOmissions(pivot_inclusions);
-                    latch4.countDown();
+                    latch3.countDown();
                 } );
         executor.submit(() -> {
                     combineOR(pivot_exclusions, exclusions_vector);
                     query_obj.setPivotExclusions(pivot_exclusions.getCardinality());
-                    latch4.countDown();
+                    latch3.countDown();
                 } );
-        System.out.println( "latch 4" );
-        barrier( latch4 );
+        barrier( latch3 );
+
         executor.shutdown();
 
         // Now sequential - reduce the 3 bitmaps to 1 bitmap of results
