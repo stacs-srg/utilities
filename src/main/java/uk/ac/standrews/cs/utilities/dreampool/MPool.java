@@ -275,7 +275,7 @@ public class MPool<T> {
      * finally perform hyperplane exclusion,
      * filter the results to exclude false positives.
      */
-    public Set<T> parallelRangeSearch(final T query, final float threshold, Query<T> query_obj, int PARALLELISM_DEGREE) { // NOTE query_obj only for validation
+    public Set<T> parallelRangeSearch(final T query, final float threshold, int parallelism_degree, Query<T> query_obj) { // NOTE query_obj only for validation
 
         RoaringBitmap[] inclusions_vector = new RoaringBitmap[ num_pools ];
         RoaringBitmap[] exclusions_vector = new RoaringBitmap[ num_pools ];
@@ -289,7 +289,7 @@ public class MPool<T> {
             pool_indices[index] = index;                        // (variable used in lambda expression should be final or effectively final)
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(PARALLELISM_DEGREE);
+        ExecutorService executor = Executors.newFixedThreadPool(parallelism_degree);
 
         final CountDownLatch latch1 = new CountDownLatch(num_pools) ;
         // calculate distance_query_pivot in parallel

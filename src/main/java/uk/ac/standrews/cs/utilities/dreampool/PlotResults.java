@@ -151,7 +151,7 @@ public class PlotResults {
 
             Set<Point> results;
             if( parallel ) {
-                results = dream_pool.parallelRangeSearch(query.query, query.threshold, query, 4); // last parameter for debug only.
+                results = dream_pool.parallelRangeSearch(query.query, query.threshold, 4, query); // last parameter for debug only.
             } else {
                 results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }

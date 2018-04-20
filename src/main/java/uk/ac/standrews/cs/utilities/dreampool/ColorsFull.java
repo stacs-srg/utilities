@@ -146,7 +146,7 @@ public class ColorsFull {
             if( brute_force ) {
                 results = bruteForce( query.query, query.threshold,query );
             } else if( parallel ) {
-                 results = dream_pool.parallelRangeSearch(query.query, query.threshold, query, 4); // last parameter for debug only.
+                 results = dream_pool.parallelRangeSearch(query.query, query.threshold, 24, query); // last parameter for debug only.
             } else {
                 results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }
