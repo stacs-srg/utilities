@@ -294,7 +294,6 @@ public class MPool<T> {
         // calculate distance_query_pivot in parallel
         for ( int index : pool_indices ) {
             executor.submit(() -> {
-                System.out.println( "index " + index);
                 float distance_query_pivot = distance_wrapper.distance(pools.get(index).getPivot(), query);
                 distances_from_query_to_pivots[index] = distance_query_pivot;              // save this for HP exclusion - used below
 
