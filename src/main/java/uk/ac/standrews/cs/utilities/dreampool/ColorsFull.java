@@ -144,7 +144,11 @@ public class ColorsFull {
         int query_calcs = 0;
         int count = 0;
 
-        ExecutorService executor = Executors.newFixedThreadPool(4); // TODO put into MPool?  <<<<<<<<<<<<<<<<<<<<<
+        ExecutorService executor = null;
+
+        if( parallel ) {
+             executor = Executors.newFixedThreadPool(4); // TODO put into MPool?  <<<<<<<<<<<<<<<<<<<<<
+        }
 
         for (Query<CartesianPoint> query : queries) {
 
@@ -174,6 +178,10 @@ public class ColorsFull {
             query_calcs += distance.counter;
 
         }
+        if( parallel ) {
+            executor.shutdown();
+        }
+
         long elapsed_time = System.currentTimeMillis() - start_time;
 
         output( LoggingLevel.SHORT_SUMMARY, "total distance calcs = " + setup_calcs + query_calcs );
@@ -281,8 +289,8 @@ public class ColorsFull {
         perform_validation = false;
         brute_force = false;
         exploring = false;
-        parallel = true;
-        plot = false;
+        parallel = false;
+        plot = true;
         Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);   // choose from NONE, SHORT_SUMMARY, LONG_SUMMARY, VERBOSE
 
         if( plot ) {
@@ -290,7 +298,7 @@ public class ColorsFull {
         }
         long time = System.currentTimeMillis();
         ColorsFull pr = new ColorsFull( "colors", num_ref_objs );
-        long num_results = pr.plot("/Users/al/Desktop/", "colors-RESULTS");
+        long num_results = pr.plot("/Users/al/Desktop/", "colors-RESULTS.csv");
         output( LoggingLevel.SHORT_SUMMARY, "results\t" + num_results);
         output( LoggingLevel.SHORT_SUMMARY, "time/query " + ( System.currentTimeMillis() - time ) / pr.queries.size() );
     }

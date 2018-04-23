@@ -215,25 +215,6 @@ public class Pool<T> {
         }
     }
 
-    /** Uses 3 point hyperplane exclusion: For a reference point pi ∈ U,
-     ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
-     ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
-     **/
-    public RoaringBitmap findHPExclusion3P(RoaringBitmap exclusions, float[] distances_from_query_to_pivots, float threshold) {
-
-        float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
-
-        for( int i = 0; i < num_pools; i++ ) {
-
-            if (i != pool_id && distance_from_query_to_this_pivot - distances_from_query_to_pivots[i] > 2 * threshold) {
-
-                exclusions.or(closer_than[i]); // was addAll
-
-            }
-        }
-        return exclusions;
-    }
-
 
     private float square( float a ) { return a * a; }
 
