@@ -14,27 +14,33 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+package uk.ac.standrews.cs.utilities.dreampool.richard.coreConcepts;
 
-package uk.ac.standrews.cs.utilities.dreampool;
+public class CountedMetric<T> implements Metric<T> {
 
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
+	int count;
+	Metric<T> m;
 
-public class CountingWrapper<T> implements Distance<T> {
+	public CountedMetric(Metric<T> m) {
+		this.count = 0;
+		this.m = m;
+	}
 
-    private final Distance<T> inner;
-    public long counter = 0;
+	@Override
+	public float distance(T x, T y) {
+		this.count++;
+		return this.m.distance(x, y);
+	}
 
-    public CountingWrapper(Distance<T> inner ) {
-        this.inner = inner;
-    }
+	@Override
+	public String getMetricName() {
+		return m.getMetricName();
+	}
 
-    @Override
-    public float distance(T a, T b) {
-        counter++;
-        return inner.distance( a,b );
-    }
+	public int reset() {
+		int res = this.count;
+		this.count = 0;
+		return res;
+	}
 
-    public void reset() {
-        counter = 0;
-    }
 }

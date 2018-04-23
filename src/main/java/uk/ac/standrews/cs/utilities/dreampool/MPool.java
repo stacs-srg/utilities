@@ -23,7 +23,6 @@ import uk.ac.standrews.cs.utilities.m_tree.Distance;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  *
@@ -42,8 +41,6 @@ public class MPool<T> {
     private int element_id = 0;                             // an int used to represent each of the elements used in s, used to index values TreeMap.
     private List<T> values = new ArrayList<>();             // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
 
-    private float[][] inter_pivot_distances;
-
     private Ring<T> universal_ring =
             new Ring<T>(null,
                         this,
@@ -51,6 +48,7 @@ public class MPool<T> {
                         0.0f,
                         1.0F,
                         null );                    // a ring containing all the objects in the universe (this is a catch all to ensure coverage of all points)
+    private float[][] inter_pivot_distances;
 
 
     /**
@@ -81,41 +79,6 @@ public class MPool<T> {
      */
     public MPool(Distance<T>  distance, List<T> ros) throws Exception {
         this( distance, ros, Pool.DEFAULT_RADII );
-    }
-
-    /**
-     * @param arrai
-     * @param mean
-     * @return
-     */
-    private static double stdDev( float[][] arrai, double mean ) {
-        double sum = 0;
-        int count = 0;
-
-        for (int i = 0; i < arrai.length - 1; i++) {
-            for (int j = i; j < arrai[i].length; j++) {
-                double difference = arrai[i][j] - mean;
-                sum = sum + difference * difference;
-                count++;
-            }
-        }
-        double squaredDiffMean = (sum) / count;
-        double standardDev = (Math.sqrt(squaredDiffMean));
-
-        return standardDev;
-    }
-
-    public static double mean(float[][] arrai) {
-        double sum = 0;                             // sum of all the distances between elements
-        int count = 0;
-
-        for (int i = 0; i < arrai.length -1; i++) {
-            for( int j = i; j < arrai[i].length; j++ ) {
-                sum += arrai[i][j];
-                count++;
-            }
-        }
-        return sum / count;
     }
 
 
@@ -168,16 +131,6 @@ public class MPool<T> {
     }
 
     /**
-     *
-     * @param i - the ith pivot
-     * @param j - the jth pivot
-     * @return the distance( pivot i, pivot j )
-     */
-    public float getInterPivotDistance(int i, int j) {
-        return inter_pivot_distances[i][j];
-    }
-
-    /**
      * Find the nodes within range r of query.
      *
      * @param query - some data for which to find the neighbours within the distance specified by threshold
@@ -208,7 +161,7 @@ public class MPool<T> {
 
         for (Pool<T> pool : pools) {
 
-            float distance_query_pivot = distances_from_query_to_pivots[pool.getPoolId()]; // distance_wrapper.distance(pool.getPivot(),query);
+            float distance_query_pivot = distances_from_query_to_pivots[pool.getPoolId()];
 
             // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
             // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
@@ -231,7 +184,7 @@ public class MPool<T> {
              ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
              **/
 
-            exclusions = pool.findHPExclusion4P(exclusions, distances_from_query_to_pivots, threshold);
+            exclusions = findHPExclusion4P(exclusions, distances_from_query_to_pivots, threshold);
             query_obj.validateHPExclusions(exclusions);
         }
 
@@ -275,7 +228,7 @@ public class MPool<T> {
      * finally perform hyperplane exclusion,
      * filter the results to exclude false positives.
      */
-    public Set<T> parallelRangeSearch(final T query, final float threshold, int parallelism_degree, Query<T> query_obj) { // NOTE query_obj only for validation
+    public Set<T> parallelRangeSearch(final T query, final float threshold, ExecutorService executor, Query<T> query_obj) { // NOTE query_obj only for validation
 
         RoaringBitmap[] inclusions_vector = new RoaringBitmap[ num_pools ];
         RoaringBitmap[] exclusions_vector = new RoaringBitmap[ num_pools ];
@@ -283,38 +236,37 @@ public class MPool<T> {
 
         float[] distances_from_query_to_pivots = new float[num_pools];
 
-        int[] pool_indices = new int[num_pools];                // create a set of manifest pool_indices where pool_indices[i] = i
-        for( int index = 0; index < num_pools; index++ ) {      // don't know how to get a lambda for below any other way.
-            pool_indices[index] = index;                        // (variable used in lambda expression should be final or effectively final)
-        }
-
-        ExecutorService executor = Executors.newFixedThreadPool(parallelism_degree);
+        final int batch_size = 4;
 
         final CountDownLatch latch1 = new CountDownLatch(num_pools) ;
         // calculate distance_query_pivot in parallel
-        for ( int index : pool_indices ) {
+        for ( int start = 0; start <= num_pools; start += batch_size) {
+            final int start_f = start;
             executor.submit(() -> {
-                float distance_query_pivot = distance_wrapper.distance(pools.get(index).getPivot(), query);
-                distances_from_query_to_pivots[index] = distance_query_pivot;              // save this for HP exclusion - used below
+                for (int index = start_f; index < start_f + batch_size; index++) {
+                    float distance_query_pivot = distance_wrapper.distance(pools.get(index).getPivot(), query);
+                    distances_from_query_to_pivots[index] = distance_query_pivot;              // save this for HP exclusion - used below
 
-                Pool<T> pool = pools.get(index);
+                    Pool<T> pool = pools.get(index);
 
-                // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
-                // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
+                    // Uses: pivot exclusion (b) For a reference point p ∈ U and any real value μ,
+                    // if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
 
-                Ring<T> r1 = pool.findIncludeRing(distance_query_pivot, threshold);
+                    Ring<T> r1 = pool.findIncludeRing(distance_query_pivot, threshold);
 
-                if (r1 != null) {
-                    // any circles that are added to include_list cover query.
-                    inclusions_vector[index] = r1.getConciseContents();
+                    if (r1 != null) {
+                        // any circles that are added to include_list cover query.
+                        inclusions_vector[index] = r1.getConciseContents();
+                    }
+                    // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
+                    // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
+                    Ring r2 = pool.findExcludeRing(distance_query_pivot, threshold);
+                    if (r2 != null) {
+                        exclusions_vector[index] = r2.getConciseContents();
+                    }
+                    latch1.countDown();
                 }
-                // uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
-                // if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
-                Ring r2 = pool.findExcludeRing(distance_query_pivot, threshold);
-                if (r2 != null) {
-                    exclusions_vector[index] = r2.getConciseContents();
-                }
-                latch1.countDown();
+
             });
         }
         barrier( latch1 );
@@ -322,14 +274,20 @@ public class MPool<T> {
 
         final CountDownLatch latch2 = new CountDownLatch(num_pools) ;
         // calculate HP exclusions in parallel
-        for ( int index : pool_indices ){
+        for ( int start = 0; start <= num_pools; start += batch_size) {
+            final int start_f = start;
             /** Next perform hyperplane exclusion: For a reference point pi ∈ U,
              ** If d(q,p1) - d(q,p2) > 2t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
              ** Here we are performing the first part of this - d(s,p1) ≤ d(s,p2), first second part evaluated at initialisation time.
              **/
-            Pool<T> pool = pools.get(index);
-            hp_exclusions_vector[ index ] = pool.findParallelHPExclusion4P(distances_from_query_to_pivots,threshold);
-            latch2.countDown();
+            executor.submit(() -> {
+                for ( int index = start_f; index < start_f + batch_size; index++) {
+                    Pool<T> pool = pools.get(index);
+                    hp_exclusions_vector[index] = findParallelHPExclusion4P(distances_from_query_to_pivots, threshold);
+                    latch2.countDown();
+                }
+
+            });
         }
         barrier( latch2 );
 
@@ -349,7 +307,7 @@ public class MPool<T> {
         executor.submit(() -> {
                     combineAND(pivot_inclusions, inclusions_vector);
                     query_obj.setPivotInclusions(pivot_inclusions.getCardinality());
-                    //query_obj.validateIncludeList(include_list, query_obj);                       // TODO chenge signatures? <<<<<<<<<<<<<<
+                    //query_obj.validateIncludeList(include_list, query_obj);                       // TODO change signatures?
                     query_obj.validateOmissions(pivot_inclusions);
                     latch3.countDown();
                 } );
@@ -359,8 +317,6 @@ public class MPool<T> {
                     latch3.countDown();
                 } );
         barrier( latch3 );
-
-        executor.shutdown();
 
         // Now sequential - reduce the 3 bitmaps to 1 bitmap of results
 
@@ -372,6 +328,68 @@ public class MPool<T> {
         filter( pivot_inclusions, query, threshold );
 
         return getValues( pivot_inclusions );
+    }
+
+    /** Uses 4 point hyperplane exclusion: For a reference point pi ∈ U,
+     ** If ( d(q,p1)2 - d(q,p2)2 ) / 2d(p1,p2) ) > t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+     ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
+     **/
+    public RoaringBitmap findHPExclusion4P(RoaringBitmap exclusions, float[] distances_from_query_to_pivots, float threshold) {
+
+        for( int i = 0; i < num_pools; i++ ) {
+            float d1 = distances_from_query_to_pivots[i];
+            for (int j = i + 1; j < num_pools; j++) {
+                float d2 = distances_from_query_to_pivots[j];
+
+                if ( square( d2 ) - square( d1 ) / inter_pivot_distances[i][j] > 2 * threshold ) {
+
+                    exclusions.and(pools.get(j).closer_than[i]);
+
+                }
+//                else {
+//                    if ( square( d1 ) - square( d2 ) / inter_pivot_distances[i][j] > 2 * threshold ) {
+//
+//                        exclusions.or(pools.get(i).closer_than[j]);
+//                    }
+//                }
+            }
+
+        }
+        return exclusions;
+    }
+
+    /** Uses 4 point hyperplane exclusion: For a reference point pi ∈ U,
+     ** If ( d(q,p1)2 - d(q,p2)2 ) / 2d(p1,p2) ) > t, then no element of {s ∈ S | d(s,p1) ≤ d(s,p2) } can be a solution to the query
+     ** Here we are initialising the second part of this - d(s,p1) ≤ d(s,p2), first part evaluated at query time.
+     **/
+//    public RoaringBitmap findHPExclusion4P(RoaringBitmap exclusions, float[] distances_from_query_to_pivots, float threshold) {
+//
+//        float distance_from_query_to_this_pivot = distances_from_query_to_pivots[pool_id];
+//
+//        for( int i = 0; i < num_pools; i++ ) {
+//
+//            if (i != pool_id && ( square(distance_from_query_to_this_pivot ) - square( distances_from_query_to_pivots[i] ) / owner.getInterPivotDistance( this.pool_id,i ) ) > 2 * threshold) {
+//
+//                exclusions.and(closer_than[i]);
+//
+//            }
+//        }
+//        return exclusions;
+//    }
+
+
+    /**
+     * Thread safe version of findHPExclusion4P - no sharing
+     * @param distances_from_query_to_pivots
+     * @param threshold
+     * @return
+     */
+    public RoaringBitmap findParallelHPExclusion4P(float[] distances_from_query_to_pivots, float threshold) {
+
+        RoaringBitmap exclusions = new RoaringBitmap();
+
+        return findHPExclusion4P( exclusions,distances_from_query_to_pivots,threshold);
+
     }
 
     private float square( float a ) { return a * a; }
@@ -483,12 +501,11 @@ public class MPool<T> {
     }
 
     private int filter(RoaringBitmap candidates, T query, float threshold) {
-        int false_positives = 0;
         int true_positives = 0;
 
-        Set<Integer> dropset = new HashSet<>();
+        RoaringBitmap deletions = new RoaringBitmap();
 
-        if (candidates != null && !candidates.isEmpty()) {
+        if (candidates != null && !candidates.isEmpty()) {    ///<<<<<<<<<<<<<< AL IS HERE
 
             Iterator<Integer> iter = candidates.iterator();
 
@@ -498,17 +515,13 @@ public class MPool<T> {
                 T candidate = values.get(next);
                 if (candidate != null) {
                     if (distance_wrapper.distance(query, candidate) > threshold) {
-                        dropset.add(next); // TODO this is not necessary!! ****** FIXME
-                        false_positives++;
+                        deletions.add(next);
                     } else {
                         true_positives++;
                     }
                 }
             }
-            for (int member : dropset) {
-                candidates.flip(member);  // TODO this is not necessary!! ****** FIXME
-            }
-
+            candidates.andNot(deletions);
         }
         return true_positives;
     }

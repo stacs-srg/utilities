@@ -25,6 +25,8 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
 
@@ -137,21 +139,23 @@ public class PlotResults {
 
 
     public void doQueries(DataSet dataset, Set<Query<Point>> queries, int num_ros, int pool_index, boolean parallel) throws Exception {
-        int distance_calcs = 0;
-
-        long initial_calcs = CountingWrapper.counter;  // number of calculations after setup.
-        long start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
 
         ProgressIndicator pi = new PercentageProgressIndicator( 100 );
         pi.setTotalSteps(queries.size());
+
+        int distance_calcs = 0;
+        long initial_calcs = distance.counter;
 
         long start_time = System.currentTimeMillis();
 
         for (Query<Point> query : queries) {
 
+            distance.reset();
+
             Set<Point> results;
             if( parallel ) {
-                results = dream_pool.parallelRangeSearch(query.query, query.threshold, 4, query); // last parameter for debug only.
+                ExecutorService executor = Executors.newFixedThreadPool(4);
+                results = dream_pool.parallelRangeSearch(query.query, query.threshold, executor, query); // last parameter for debug only.
             } else {
                 results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }
@@ -160,14 +164,14 @@ public class PlotResults {
 
             pi.progressStep();
 
-            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, (int)(CountingWrapper.counter - start_calcs), results.size());
+            addRow(dataset, query.query.x, query.query.y, query.threshold, num_ros, pool_index, (int)(distance.counter), results.size());
 
-            start_calcs = CountingWrapper.counter;
+            distance_calcs += distance.counter;
 
         }
         long elapsed_time = System.currentTimeMillis() - start_time;
 
-        System.out.println( "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + CountingWrapper.counter + " distance calcs during queries = " + ( CountingWrapper.counter - initial_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
+        System.out.println( "Queries performed: " + queries.size() + " datums = " + datums.size() + " ros = " + num_ros + " total distance calcs = " + ( initial_calcs + distance_calcs ) + " distance calcs during queries = " + ( distance_calcs ) + " in " + elapsed_time + "ms qps = " + ( queries.size() * 1000 ) / elapsed_time + " q/s" );
     }
 
     /************** Private **************/
@@ -193,7 +197,7 @@ public class PlotResults {
         reference_objects = createReferenceObjects(ros);
         dream_pool = new MPool<Point>( distance, reference_objects, radii );
         add_data(dataset_size);
-        setup_distance_calcs = CountingWrapper.counter;
+        setup_distance_calcs = distance.counter;
     }
 
     private void doExperiment(DataSet dataset, boolean parallel, boolean validate) throws Exception {

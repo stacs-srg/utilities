@@ -119,7 +119,7 @@ public class EuclidianResults {
         Random r = new Random(1926373034L); // do same queries each call of doQueries.
 
         long start_time = System.currentTimeMillis();
-        long start_calcs = CountingWrapper.counter;   // number of calculations performed at start of each query
+        long start_calcs = distance.counter;   // number of calculations performed at start of each query
 
         int count = 0;
 
@@ -128,13 +128,15 @@ public class EuclidianResults {
             for (float range = 2.0F; range <= 32.0F; range *= 4.0F) {     // gives different threshold ranges 0..1/2,1/8,1/32 x,y plane
                 float threshold = r.nextFloat() / range;
 
+                distance.reset();
+
                 Point p = newpoint(r);
                 Query query = new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation);
 
                 Set<Point> results = dream_pool.rangeSearch(p, threshold, query); // last parameter for debug only.
                 query.validate( results );
 
-                addRow(dataset, p.x, p.y, query.threshold, num_ros, (int)(CountingWrapper.counter - start_calcs),
+                addRow(dataset, p.x, p.y, query.threshold, num_ros, (int) distance.counter,
                         query.getHPExclusions(),query.getPivotInclusions(),query.getPivotExclusions(),query.getRequiringFiltering(), results.size());
 
                 count++;
@@ -168,7 +170,7 @@ public class EuclidianResults {
         reference_objects = createReferenceObjects(ros);
         dream_pool = new MPool<Point>( distance, reference_objects, radii );
         add_data(dataset_size);
-        setup_distance_calcs = CountingWrapper.counter;
+        setup_distance_calcs = distance.counter;
     }
 
     private void doExperiment( DataSet dataset ) throws Exception {

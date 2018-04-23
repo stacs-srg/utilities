@@ -43,7 +43,7 @@ public class SimpleTest {
         dream_pool = new MPool<Point>( distance, ros );
 //        System.out.println( "Distance calculations (during ro initialisation): " + CountingWrapper.counter );
         add_data();
-        setup_distance_calcs = CountingWrapper.counter;
+        setup_distance_calcs = distance.counter;
 //        System.out.println( "Distance calculations (after adding data): " + CountingWrapper.counter );
     }
 
@@ -72,11 +72,12 @@ public class SimpleTest {
     public void queryOnce() throws Exception {
         Point query = new Point(0.5f, 0.5f);
         float threshold = 0.05f;
+        distance.reset();
         Query q = new Query( query, dream_pool, threshold, points, dream_pool.pools, distance, true );
         System.out.println("Query: " + query + " Threshold: " + threshold);
         Set<Point> results = dream_pool.rangeSearch(query, threshold, q );
-        System.out.println("Total Distance calculations: " + CountingWrapper.counter);
-        System.out.println("Distance calculations (query only): " + (CountingWrapper.counter - setup_distance_calcs));
+        System.out.println("Total Distance calculations: " + distance.counter);
+        System.out.println("Distance calculations (query only): " + (distance.counter - setup_distance_calcs));
     }
 
     private static Point newpoint() {
