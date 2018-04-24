@@ -320,13 +320,7 @@ public class ColumnsAndRadius {
         long t0 = System.currentTimeMillis();
 
         CountedMetric<CartesianPoint> cm = new CountedMetric<>(tc.metric());
-        // for (CartesianPoint q : queries) {
-
-        double[] coords = new double[]{ 0.00115741 ,0.0363137 ,0.0324074 ,0.0367115 ,0.0 ,0.0 ,0.0116826 ,0.0 ,0.0026765 ,0.00249566 ,0.0 ,0.0131655 ,0.00611256 ,9.04225E-4 ,0.0158058 ,0.00517216 ,0.0 ,0.00148293 ,7.59549E-4 ,7.2338E-5 ,0.00354456 ,0.0 ,0.0 ,0.0 ,4.70197E-4 ,0.0 ,0.00249566 ,0.0801505 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,3.6169E-5 ,0.0 ,0.00983796 ,5.78704E-4 ,0.0 ,0.0 ,0.00249566 ,0.0 ,0.00141059 ,0.0317925 ,0.0 ,0.0 ,0.0 ,0.0 ,7.2338E-5 ,3.6169E-4 ,0.0 ,7.2338E-5 ,2.17014E-4 ,0.0 ,3.6169E-5 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0585214 ,0.028899 ,0.00198929 ,0.0 ,0.0 ,0.0 ,0.00499132 ,0.00224248 ,0.0 ,0.0 ,0.0 ,0.00748698 ,0.220124 ,0.0211227 ,0.0 ,0.076208 ,0.0 ,0.0 ,0.129593 ,0.0937138 ,0.0450304 ,0.0 ,0.0 ,0.0 ,0.0 ,1.08507E-4 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.00195312 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.00379774 ,3.6169E-4 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,7.59549E-4 ,0.0 ,0.00242332 ,1.80845E-4 };
-        CartesianPoint q = new CartesianPoint(coords);
-
-
-
+        for (CartesianPoint q : queries) {
 
         List<CartesianPoint> res = new ArrayList<>();
             double[] queryDists = getQueryToRefDists(refs, t, cm, q, res);
@@ -363,7 +357,7 @@ public class ColumnsAndRadius {
             Query<CartesianPoint> Q = new Query<CartesianPoint>( q, null, (float) t, dat, null, new CountingWrapper<CartesianPoint>( new Euclidean<>() ), false );
             // Q.checkSolutions(res);
 
-        // }
+        }
         System.out.println("bitsets");
         System.out.println("dists per query\t" + cm.reset() / queries.size());
         System.out.println("results\t" + noOfResults);
