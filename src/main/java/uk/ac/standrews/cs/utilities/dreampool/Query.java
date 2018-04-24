@@ -67,7 +67,7 @@ public class Query<T> {
      *  Writes an error message if result is outwith threshold.
      * @param result
      */
-    public void validate(Set<T> result) {
+    public void validate(List<T> result) {
         if( validate ) {
             count++;
             int correct_solns = 0;
@@ -157,7 +157,7 @@ public class Query<T> {
         }
     }
 
-    public void checkSolutions(Set<T> result) {
+    public void checkSolutions(List<T> result) {
         int correct_solns = 0;
         boolean errors = false;
         if (result != null && !result.isEmpty()) {

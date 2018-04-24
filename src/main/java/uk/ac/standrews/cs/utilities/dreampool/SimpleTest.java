@@ -24,7 +24,6 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class SimpleTest {
 
@@ -75,7 +74,7 @@ public class SimpleTest {
         distance.reset();
         Query q = new Query( query, dream_pool, threshold, points, dream_pool.pools, distance, true );
         System.out.println("Query: " + query + " Threshold: " + threshold);
-        Set<Point> results = dream_pool.rangeSearch(query, threshold, q );
+        List<Point> results = dream_pool.rangeSearch(query, threshold, q );
         System.out.println("Total Distance calculations: " + distance.counter);
         System.out.println("Distance calculations (query only): " + (distance.counter - setup_distance_calcs));
     }

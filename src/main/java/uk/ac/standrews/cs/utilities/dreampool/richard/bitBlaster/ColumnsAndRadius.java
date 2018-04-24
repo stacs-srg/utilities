@@ -27,7 +27,6 @@ import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.List;
 
 
@@ -247,7 +246,8 @@ public class ColumnsAndRadius {
                                         List<Integer> mustBeIn) {
         BitSet ands = null;
         if (mustBeIn.size() != 0) {
-            ands = datarep[mustBeIn.get(0)].get(0, dataSize);
+            BitSet xx = datarep[mustBeIn.get(0)]; // first include set.  // mustBeIn.get(0) is first index that is non zero
+            ands = xx.get(0, dataSize);  // get the whole set (like clone).
             for (int i = 1; i < Math.min(1000, mustBeIn.size()); i++) {   // TODO <<<<<<< What is 1000 about?
                 ands.and(datarep[mustBeIn.get(i)]);
             }
@@ -323,21 +323,27 @@ public class ColumnsAndRadius {
             List<Integer> mustBeIn = new ArrayList<>();
             List<Integer> cantBeIn = new ArrayList<>();
 
+            System.out.println( "Query " );
             excludeHyperplanePartitions(noOfRefPoints, t, refDists, queryDists,
                     mustBeIn, cantBeIn);
+
+            System.out.println( "\tHP mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
 
             partitionsExcluded += cantBeIn.size() + mustBeIn.size();
 
             excludeRadiusPartitions(noOfRefPoints, nChoose2, t, queryDists,
                     mustBeIn, cantBeIn);
 
+            System.out.println( "\tRadius mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+
             doExclusions(dat, t, datarep, cm, q, res, dataSize, mustBeIn,
                     cantBeIn);
 
+            System.out.println( "\tResults " + res.size() );
+
             noOfResults += res.size();
-            HashSet<CartesianPoint> set = new HashSet<CartesianPoint>(res);
             Query<CartesianPoint> Q = new Query<CartesianPoint>( q, null, (float) t, dat, null, new CountingWrapper<CartesianPoint>( new Euclidean<>() ), false );
-            Q.checkSolutions(set);
+            Q.checkSolutions(res);
 
         }
         System.out.println("bitsets");

@@ -37,7 +37,7 @@ public class Pool<T> {
     private float max_radius;                   // the maximum radius of this pool
     private int pool_id;                        // the index of this pool into (any) array of distances etc. indexed by
     private int num_pools;                      // number of pools in the system - copied down from MPool - what would Martin Fowler say? [good/bad]- discuss not sure - al.
-    public RoaringBitmap[] closer_than;         // Used to store information for hyperplane exclusion - see comments in add below.
+    public RoaringBitmap[] closer_than;                // Used to store information for hyperplane exclusion - see comments in add below.
     private final MPool<T> owner;               // The MPool to which this pool belongs
 
     public Pool(T pivot, int pool_id, int num_pools,  MPool<T> owner, Distance<T> distance) {
@@ -96,7 +96,7 @@ public class Pool<T> {
          **/
 
         for( int i = 0; i < num_pools; i++ ) {
-            if( i != pool_id && distance_from_datum_to_pivot <= distances_from_datum_to_pivots[i] ) { // is this pivot closer than the other?
+            if( distance_from_datum_to_pivot < distances_from_datum_to_pivots[i] ) { // is this pivot closer than the other?
                     closer_than[i].add(element_id);
             }
         }
@@ -181,6 +181,10 @@ public class Pool<T> {
 
     public T getPivot() {
         return pivot;
+    }
+
+    public Ring<T> getRing( int i ) {
+        return rings[i];
     }
 
     public float maxR() {

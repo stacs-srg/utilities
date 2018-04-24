@@ -35,7 +35,7 @@ public class Ring<T> {
     private final float r_min;
     private final float r_max;
     private final Ring inner_ring;
-    private boolean consolodated = false; // have the contents from this ring been consolodated (merged) with inner rings.
+    private boolean consolidated = false; // have the contents from this ring been consolidated (merged) with inner rings.
 
     public Ring( Pool owner, MPool<T> mpool, int ring_number, float r_min, float r_max, Ring inner_ring) {
         // contents = new ArrayList<>();
@@ -98,17 +98,17 @@ public class Ring<T> {
      */
 
     public void consolidateSets() throws Exception {
-        if( consolodated ) {
+        if(consolidated) {
             throw new Exception( "Ring is consolidated" );
         }
         if( inner_ring != null ) {
 
-            if (!inner_ring.consolodated) {
+            if (!inner_ring.consolidated) {
                 throw new Exception("Inner ring has not been consolidated");
             }
 
             contents.or(inner_ring.contents); // was addAll
         }
-        consolodated = true;
+        consolidated = true;
     }
 }

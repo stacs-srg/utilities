@@ -133,7 +133,7 @@ public class EuclidianResults {
                 Point p = newpoint(r);
                 Query query = new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation);
 
-                Set<Point> results = dream_pool.rangeSearch(p, threshold, query); // last parameter for debug only.
+                List<Point> results = dream_pool.rangeSearch(p, threshold, query); // last parameter for debug only.
                 query.validate( results );
 
                 addRow(dataset, p.x, p.y, query.threshold, num_ros, (int) distance.counter,

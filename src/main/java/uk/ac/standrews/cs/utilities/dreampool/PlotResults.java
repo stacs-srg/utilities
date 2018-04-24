@@ -25,8 +25,6 @@ import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
 
@@ -152,13 +150,9 @@ public class PlotResults {
 
             distance.reset();
 
-            Set<Point> results;
-            if( parallel ) {
-                ExecutorService executor = Executors.newFixedThreadPool(4);
-                results = dream_pool.parallelRangeSearch(query.query, query.threshold, executor, query); // last parameter for debug only.
-            } else {
-                results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
-            }
+            List<Point> results;
+
+            results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
 
             query.validate(results);
 

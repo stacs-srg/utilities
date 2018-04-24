@@ -73,7 +73,7 @@ public class ColorsFull {
 
     // private float[] radii = new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F }; // worked best during space exploration
 
-    private float[] radii = new float[]{ 0.318F, 0.418F, 0.518F }; // mean +- 0.1.
+    private float[] radii = new float[]{ 0.318F, 0.418F, 0.518F }; // mean +/- 0.1.
 
     // From Richard 28-3-18:
     //     split the data 10:90 and use the 10% as queries over the other 90%
@@ -154,13 +154,11 @@ public class ColorsFull {
 
             distance.reset();
 
-            Set<CartesianPoint> results;
+            List<CartesianPoint> results;
 
             if( brute_force ) {
                 results = bruteForce( query.query, query.threshold,query );
-            } else if( parallel ) {
-                 results = dream_pool.parallelRangeSearch(query.query, query.threshold, executor, query); // last parameter for debug only.  // TODO  and remove from here?
-            } else {
+            } else  {
                 results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }
             query.validate(results);
@@ -189,9 +187,9 @@ public class ColorsFull {
         return number_of_results;
     }
 
-    private Set<CartesianPoint> bruteForce(CartesianPoint query, float threshold, Query<CartesianPoint> query1) {
+    private List<CartesianPoint> bruteForce(CartesianPoint query, float threshold, Query<CartesianPoint> query1) {
 
-        Set<CartesianPoint> result = new HashSet<>();
+        List<CartesianPoint> result = new ArrayList<>();
 
         for( CartesianPoint datum : data ) {
 
@@ -285,12 +283,12 @@ public class ColorsFull {
     public static void main(String[] args) throws Exception {
 
         int num_ref_objs = 28;
-        check_results = true;
+        check_results = false;
         perform_validation = false;
         brute_force = false;
         exploring = false;
         parallel = false;
-        plot = true;
+        plot = false;
         Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);   // choose from NONE, SHORT_SUMMARY, LONG_SUMMARY, VERBOSE
 
         if( plot ) {
