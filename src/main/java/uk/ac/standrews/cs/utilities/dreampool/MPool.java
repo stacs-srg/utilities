@@ -16,7 +16,6 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import org.roaringbitmap.RoaringBitmap;
 import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 import java.util.*;
@@ -33,23 +32,23 @@ public class MPool<T> {
     private final List<T> pivots;                            // the set of all pivots in the system.
     private int num_pivots;                                  // number of pivots (=number of pools) in the implementation
     private final Distance<T> distance_wrapper;             // the distance function used in the implementation.
-
-    List<Pool<T>> pools = new ArrayList<>();                // the set of pools containing rings and pivots.
     private int element_id = 0;                             // an int used to represent each of the elements used in s, used to index values TreeMap.
+
+    private double[][] inter_pivot_distances;
+    List<Pool<T>> pools = new ArrayList<>();                // the set of pools containing rings and pivots.
     private List<T> values = new ArrayList<>();             // used to store mappings from indices to the elements of s (to facilitate lookup from bitmaps to datums).
     private int num_values;                                 // number of values in values
 
-    private Ring<T> universal_ring =
-            new Ring<T>(null,
-                        this,
-                        0,
-                        0.0f,
-                        1.0F,
-                        null );                    // a ring containing all the objects in the universe (this is a catch all to ensure coverage of all points)
-    private float[][] inter_pivot_distances;
-
     boolean fourPoint = true;  // TODO should be a parameter
 
+
+//    private Ring<T> universal_ring =  // TODO why do we not need this?
+//            new Ring<T>(null,
+//                        this,
+//                        0,
+//                        0.0f,
+//                        1.0F,
+//                        null );                    // a ring containing all the objects in the universe (this is a catch all to ensure coverage of all points)
 
     /**
      * Create MPool using specified radii
@@ -57,12 +56,12 @@ public class MPool<T> {
      * @param pivots - a set of pivots/reference objects to use.
      * @param radii - a set of radii to form pools (balls) around the pivots.
      */
-    public MPool(Distance<T> distance_wrapper, List<T> pivots, float[] radii) throws Exception {
+    public MPool(Distance<T> distance_wrapper, List<T> pivots, double[] radii) throws Exception {
         this.pivots = pivots;
         this.distance_wrapper = distance_wrapper;
         this.num_pivots = pivots.size();
 
-        initialise_pivot_distances( pivots );
+        initialise_inter_pivot_distances( pivots );
 
         System.out.println( "Radii:");
         for( int i = 0;i < radii.length; i++ ) {
@@ -71,20 +70,10 @@ public class MPool<T> {
         initialisePools(radii,distance_wrapper);
     }
 
-    /**
-     * Create MPool using default radii
-     * @param distance
-     * @param ros
-     * @throws Exception
-     */
-    public MPool(Distance<T>  distance, List<T> ros) throws Exception {
-        this( distance, ros, Pool.DEFAULT_RADII );
-    }
-
 
     public void add(T datum) throws Exception {
 
-        float[] distances_from_datum_to_pivots = new float[num_pivots];
+        double[] distances_from_datum_to_pivots = new double[num_pivots];
         int pivot_index = 0;
 
         values.add( datum );                    // add to the master index to facilitate lookup from bitmaps to datums.
@@ -92,19 +81,19 @@ public class MPool<T> {
             distances_from_datum_to_pivots[ pivot_index++ ] = distance_wrapper.distance(pool.getPivot(),datum);
         }
         for( Pool<T> pool : pools ) {
-            pool.add(element_id, datum, distances_from_datum_to_pivots );
+            pool.add(element_id, distances_from_datum_to_pivots );
         }
 
-        universal_ring.add(element_id);
+        // universal_ring.add(element_id);
         element_id++;
     }
 
-    private void initialisePools(float[] radii, Distance<T> distance_wrapper) throws Exception {
+    private void initialisePools(double[] radii, Distance<T> distance_wrapper) throws Exception {
 
         int pool_id = 0;
 
         for( T pivot : pivots ) {
-            pools.add(new Pool(pivot, pool_id, num_pivots, radii, this, distance_wrapper));
+            pools.add(new Pool(pivot, pool_id, num_pivots, radii));
             pool_id++;
         }
 
@@ -115,13 +104,13 @@ public class MPool<T> {
      *
      * initialises an 2D array of inter pivot distances called inter_pivot_distances
      */
-    private void initialise_pivot_distances(List<T> pivots) {
-        inter_pivot_distances = new float[num_pivots][num_pivots];
+    private void initialise_inter_pivot_distances(List<T> pivots) {
+        inter_pivot_distances = new double[num_pivots][num_pivots];
         int i = 0;
         for( T p1 : pivots ) {
             int j = 0;
             for( T p2 : pivots ) {
-                float d = distance_wrapper.distance(p1,p2);
+                double d = distance_wrapper.distance(p1,p2);
                 inter_pivot_distances[ i ][ j ] = d;
                 inter_pivot_distances[ j ][ i ] = d;
                 j++;
@@ -144,76 +133,89 @@ public class MPool<T> {
      * finally perform hyperplane exclusion,
      * filter the results to exclude false positives.
      */
-    public List<T> rangeSearch(final T query, final float threshold, Query<T> query_obj) { // NOTE query_obj only for validation
+    public List<T> rangeSearch(final T query, final double threshold, Query<T> query_obj) { // NOTE query_obj only for validation
 
-        RoaringBitmap pivot_inclusions  = universal_ring.getConciseContents().clone();
-        RoaringBitmap pivot_exclusions = new RoaringBitmap();
-
-        int noOfResults = 0;
         int partitionsExcluded = 0;
+        int noOfResults = 0;
 
-        float[] distances_from_query_to_pivots = new float[num_pivots];
+        double[] distances_from_query_to_pivots = new double[num_pivots];
         int distance_index = 0;
 
         for (Pool<T> pool : pools) {
-            float distance_query_pivot = distance_wrapper.distance(pool.getPivot(), query);
+            double distance_query_pivot = distance_wrapper.distance(pool.getPivot(), query);
             distances_from_query_to_pivots[distance_index++] = distance_query_pivot;              // save this for HP exclusion - used below.
         }
 
-        List<RoaringBitmap> mustBeIn = new ArrayList<>();
-        List<RoaringBitmap> cantBeIn = new ArrayList<>();
+        List<BitSet> mustBeIn = new ArrayList<>();
+        List<BitSet> cantBeIn = new ArrayList<>();
 
         List<T> results = new ArrayList<>();
 
-        //System.out.println( "Query " );
+        //********** TODO Put reference objects into result set here.
+
+        System.out.println( "Query " );
         excludeHyperplanePartitions( threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
 
-        //System.out.println( "\tHP mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+        System.out.println( "\tHP mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+        System.out.println( "\tHP elems mustBeIn " + calcsize(mustBeIn) + " cantBeIn " + calcsize(cantBeIn) );
 
         partitionsExcluded += cantBeIn.size() + mustBeIn.size();
 
         excludeRadiusPartitions(threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
 
-        //System.out.println( "\tRadius mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+        System.out.println( "\tRadius mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+        System.out.println( "\tRadius elems mustBeIn " + calcsize(mustBeIn) + " cantBeIn " + calcsize(cantBeIn) );
 
         doExclusions(threshold, query, results, mustBeIn, cantBeIn);
 
-        //System.out.println( "\tResults " + results.size() );
+        System.out.println( "\tResults " + results.size() );
 
         noOfResults += results.size();
 
-        query_obj.checkSolutions(results);
+        // query_obj.checkSolutions(results);
 
         return results;
 
+// TODO put these back in:
 //        query_obj.setHPexclusions( pivot_exclusions.getCardinality() - pe_before );
 //        query_obj.validateHPExclusions(pivot_exclusions);
 //        query_obj.validateOmissions(pivot_inclusions);
 
     }
 
+    private static long calcsize( List<BitSet> bits ) {
+        long result = 0l;
+        for( BitSet bs : bits ) {
+            result += bs.cardinality();
+        }
+        return result;
+    }
+
     private void doExclusions(double threshold, T query, List<T> results,
-                                     List<RoaringBitmap> mustBeIn, List<RoaringBitmap> cantBeIn) {
+                                     List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
         if (mustBeIn.size() != 0) {
-            RoaringBitmap ands = getAndBitSets(mustBeIn);
+            BitSet ands = getAndBitSets(mustBeIn);
             if (cantBeIn.size() != 0) {
                 /*
                  * hopefully the normal situation or we're in trouble!
                  */
-                RoaringBitmap nots = getOrBitSets(cantBeIn);
-                nots.flip((long)0, (long) values.size());
+                BitSet nots = getOrBitSets(cantBeIn);
+                System.out.println( "1Nots: " + nots.cardinality() );
+                nots.flip(0, num_values);
+                System.out.println( "ands: " + ands.cardinality() );
                 ands.and(nots);
-                filterContendors(threshold, query, results, ands);
+                filterContenders(threshold, query, results, ands);
             } else {
                 // there are no cantBeIn partitions
-                filterContendors(threshold, query, results, ands);
+                filterContenders(threshold, query, results, ands);
             }
         } else {
             // there are no mustBeIn partitions
             if (cantBeIn.size() != 0) {
-                RoaringBitmap nots = getOrBitSets(cantBeIn);
-                nots.flip((long)0, (long) values.size());
-                filterContendors(threshold, query, results, nots);
+                BitSet nots = getOrBitSets(cantBeIn);
+                System.out.println( "2Nots: " + nots.cardinality() );
+                nots.flip(0, num_values);
+                filterContenders(threshold, query, results, nots);
             } else {
                 // there are no exclusions at all...
                 for (T d : values) {
@@ -226,8 +228,8 @@ public class MPool<T> {
     }
 
 
-    private void excludeHyperplanePartitions(float threshold, float[] distances_from_query_to_pivots,
-                                                    List<RoaringBitmap> mustBeIn, List<RoaringBitmap> cantBeIn) {
+    private void excludeHyperplanePartitions(double threshold, double[] distances_from_query_to_pivots,
+                                                    List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
         for (int i = 0; i < num_pivots - 1; i++) {
             double d1 = distances_from_query_to_pivots[i];
             for (int j = i + 1; j < num_pivots; j++) {
@@ -257,61 +259,65 @@ public class MPool<T> {
     }
 
 
-    private void excludeRadiusPartitions( float threshold, float[] distances_from_query_to_pivots,
-                                                 List<RoaringBitmap> mustBeIn, List<RoaringBitmap> cantBeIn) {
+    private void excludeRadiusPartitions( double threshold, double[] distances_from_query_to_pivots,
+                                                 List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
         for (int i = 0; i < num_pivots; i++) {
             double distance_query_pivot = distances_from_query_to_pivots[i];
 
             Pool<T> pool = pools.get(i);
-            if (distance_query_pivot < pool.radii[0] - threshold ) {
-                mustBeIn.add( pool.getRing(0).getConciseContents() );
-            } else if (distance_query_pivot < pool.radii[1] - threshold ) {
-                mustBeIn.add( pool.getRing(1).getConciseContents() );
-            } else if (distance_query_pivot < pool.radii[2] - threshold ) {
-                mustBeIn.add( pool.getRing(2).getConciseContents() );
+            if (distance_query_pivot < pool.getRing(0).radius - threshold ) {
+                mustBeIn.add( pool.getRing(0).contents );
+            } else if (distance_query_pivot < pool.getRing(1).radius - threshold ) {
+                mustBeIn.add( pool.getRing(1).contents );
+            } else if (distance_query_pivot < pool.getRing(2).radius - threshold ) {
+                mustBeIn.add( pool.getRing(2).contents );
             }
 
-            if (distance_query_pivot >= threshold + pool.radii[0]  ) {
-                cantBeIn.add( pool.getRing(0).getConciseContents() );
-            } else if (distance_query_pivot >= threshold + pool.radii[1]) {
-                cantBeIn.add( pool.getRing(1).getConciseContents() );
-            } else if (distance_query_pivot >= threshold + pool.radii[2]) {
-                cantBeIn.add( pool.getRing(2).getConciseContents() );
-            }
-        }
-    }
+            // in reverse order...
 
-    private void filterContendors(double threshold, T query, List<T> results, RoaringBitmap candidates) {
-
-        Iterator<Integer> iter = candidates.iterator();
-
-        while (iter.hasNext()) {
-
-            int next = iter.next();
-
-            if (distance_wrapper.distance(query, values.get(next)) < threshold) {
-                results.add(values.get(next));
+            if (distance_query_pivot >= threshold + pool.getRing(2).radius  ) {
+                cantBeIn.add( pool.getRing(2).contents );
+            } else if (distance_query_pivot >= threshold + pool.getRing(1).radius) {
+                cantBeIn.add( pool.getRing(1).contents );
+            } else if (distance_query_pivot >= threshold + pool.getRing(0).radius) {
+                cantBeIn.add( pool.getRing(0).contents );
             }
         }
     }
 
-    private RoaringBitmap getAndBitSets(List<RoaringBitmap> mustBeIn) {
+    private void filterContenders(double threshold, T query, List<T> results, BitSet candidates) {
+
+        System.out.println( "filt: " + candidates.cardinality() );
+        System.out.println( query );
+        for (int i = 0; i < num_values; i++) {
+            if (candidates.get(i)) {
+                System.out.println( i + " " + distance_wrapper.distance(query, values.get(i)) );
+                if (distance_wrapper.distance(query, values.get(i)) < threshold) {
+                    results.add(values.get(i));
+                    System.out.println( "Adding " + i );
+                } else {
+                    System.out.println( "Not adding " + i );
+                }
+            }
+        }
+    }
+
+    private BitSet getAndBitSets(List<BitSet> mustBeIn) {
+        BitSet ands = null;
         if (mustBeIn.size() != 0) {
-            RoaringBitmap ands = mustBeIn.get(0).clone();
+            ands = mustBeIn.get(0).get(0, num_values); // a new copy
             for (int i = 1; i < mustBeIn.size(); i++) {
                 ands.and(mustBeIn.get(i));
             }
-            return ands;
-        } else {
-            return new RoaringBitmap(); // there are no inclusions.
         }
-
+        return ands;
     }
 
-    private static RoaringBitmap getOrBitSets(List<RoaringBitmap> cantBeIn) {
-        RoaringBitmap nots = new RoaringBitmap();
+    private BitSet getOrBitSets(List<BitSet> cantBeIn) {
+        BitSet nots = null;
         if (cantBeIn.size() != 0) {
-            for (int i = 0; i < cantBeIn.size(); i++) {
+            nots = cantBeIn.get(0).get(0,num_values ); // a new copy
+            for (int i = 1; i < cantBeIn.size(); i++) {
                 nots.or(cantBeIn.get(i));
             }
         }
@@ -332,28 +338,19 @@ public class MPool<T> {
      * @param candidates - a bitmap representing a set of values drawn from S
      * @return the set of values of type T which are represented by the bitmap
      */
-    public Set<T> getValues(RoaringBitmap candidates) {
+    public Set<T> getValues(BitSet candidates) {
         Set<T> result = new HashSet<>();
-        Iterator<Integer> iter = candidates.iterator();
 
-        while( iter.hasNext() ) {
-
-            result.add( getValue( iter.next() ) );
-
+        for (int i = 0; i < num_values; i++) {
+            if (candidates.get(i)) {
+                result.add(getValue(i));
+            }
         }
+
         return result;
     }
 
-    public void show_structure() {
-        for( Pool pool : pools ) {
-            pool.show_structure();
-        }
-    }
-
     public void completeInitialisation() throws Exception {
-        for( Pool<T> pool : pools ) {
-            pool.completeInitialisation();
-        }
         num_values = values.size();
     }
 

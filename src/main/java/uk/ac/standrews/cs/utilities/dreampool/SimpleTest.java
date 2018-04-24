@@ -39,7 +39,9 @@ public class SimpleTest {
 
         distance = new CountingWrapper( new EuclideanDistance() );
         ros = createReferenceObjects();
-        dream_pool = new MPool<Point>( distance, ros );
+        double[] radii = new double[]{ 0.0000330078125, 0.000066015625, 0.00013203125, 0.0002640625, 0.000528125, 0.00105625, .003125, 0.00625, 0.0125, 0.025, 0.05, 0.1, 0.2,0.3, 0.4 };
+
+        dream_pool = new MPool<Point>( distance, ros,radii );
 //        System.out.println( "Distance calculations (during ro initialisation): " + CountingWrapper.counter );
         add_data();
         setup_distance_calcs = distance.counter;
@@ -83,10 +85,5 @@ public class SimpleTest {
 
         return new Point( r.nextFloat(), r.nextFloat() );
     }
-
-    private void show() {
-        dream_pool.show_structure();
-    }
-
 
 }

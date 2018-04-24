@@ -109,7 +109,7 @@ public class Query<T> {
         }
     }
 
-    public void validateOmissions(RoaringBitmap result) {
+    public void validateOmissions(BitSet result) {
         if( validate ) {
 
             Set<T> results = owner.getValues(result);
@@ -141,7 +141,7 @@ public class Query<T> {
             ArrayList<T> clone = new ArrayList<T>();
             clone.addAll( real_solutions );
             for (Ring<T> ring : include_list) {
-                for (T point : ring.getContents()) {
+                for (T point : owner.getValues( ring.contents ) ) {
                     clone.remove(point);
                 }
             }
@@ -150,7 +150,7 @@ public class Query<T> {
                 System.out.println("validateIncludeList: Include list size = " + include_list.size() );
                 int records_in_soln = 0;
                 for( Ring<T> ring : include_list ) {
-                    records_in_soln += ring.getContents().size();
+                    records_in_soln += ring.size();
                 }
                 System.out.println("validateIncludeList: Include list solution size = " + records_in_soln );
             }

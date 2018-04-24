@@ -17,8 +17,7 @@
 
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import org.roaringbitmap.RoaringBitmap;
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
+import java.util.BitSet;
 
 /**
  * A pool is a pivot (centroid) plus a collection of rings
@@ -27,68 +26,47 @@ import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
 public class Pool<T> {
 
-    public static final float[] DEFAULT_RADII = new float[]{0.00625F, 0.0125F, 0.025F, 0.05F, 0.1F, 0.15F, 0.2F, 0.25F, 0.3F, 0.35F, 0.4F, 0.45F };    // TODO make more efficient later - Richards suggestion use median distances.
-
     final T pivot;                              // the pivot (the centre) of the pool.
-    public float[] radii;                       // the array of distances being used to define the size of the rings in this pool
-    private final Distance<T> distance_wrapper; // the distance function being used in this implementation
-    private Ring<T>[] rings;                    // an array of rings, each of which holds the elements drawn from s that are within the ring (rings are inclusive => include the elements in inner rings)
-    private int last_index;                     // last index into the array of rings
-    private float max_radius;                   // the maximum radius of this pool
     private int pool_id;                        // the index of this pool into (any) array of distances etc. indexed by
     private int num_pools;                      // number of pools in the system - copied down from MPool - what would Martin Fowler say? [good/bad]- discuss not sure - al.
-    public RoaringBitmap[] closer_than;                // Used to store information for hyperplane exclusion - see comments in add below.
-    private final MPool<T> owner;               // The MPool to which this pool belongs
+    private Ring<T>[] rings;                    // an array of rings, each of which holds the elements drawn from s that are within the ring (rings are inclusive => include the elements in inner rings)
+    public BitSet[] closer_than;                // Used to store information for hyperplane exclusion - is this closer_then[i] says this pivot is closer than pivot i.
 
-    public Pool(T pivot, int pool_id, int num_pools,  MPool<T> owner, Distance<T> distance) {
-        this(pivot, pool_id, num_pools, DEFAULT_RADII, owner, distance);
-    }
-
-    public Pool(T pivot, int pool_id, int num_pools, float[] radii, MPool<T> owner, Distance<T> distance_wrapper) {
+    public Pool(T pivot, int pool_id, int num_pools, double[] radii) {
 
         this.pivot = pivot;
         this.pool_id = pool_id;
         this.num_pools = num_pools;
-        this.radii = radii;
-        this.owner = owner;
-        this.distance_wrapper = distance_wrapper;
-        initialise_rings();
 
-        closer_than = new RoaringBitmap[num_pools];
+        initialise_rings(radii);
+
+        closer_than = new BitSet[num_pools];
         for( int i = 0; i < closer_than.length; i++ ) {
-            closer_than[i] = new RoaringBitmap();
+            closer_than[i] = new BitSet();
         }
     }
 
 
-    private void initialise_rings() {
+    private void initialise_rings(double[] radii) {
         Ring r = null;
         this.rings= new Ring[radii.length];
-        last_index = rings.length - 1;
 
-        for (int i = 0; i <= last_index; i++ ) {
-            r = new Ring<>(this, owner, i, calc_ring_min( i ), radii[i], r);
+        for (int i = 0; i <= rings.length - 1; i++ ) {
+            r = new Ring<T>( radii[i] );
             rings[i] = r;
         }
-        max_radius = r.getRmax();
     }
 
-    private float calc_ring_min(int index) {
-        if( index == 0 ) {
-            return 0;
-        }
-        return radii[index-1];
-    }
+    public void add(int element_id, double[] distances_from_datum_to_pivots) {
 
-    public void add(int element_id, T datum, float[] distances_from_datum_to_pivots) throws Exception {
+        double distance_from_datum_to_pivot = distances_from_datum_to_pivots[pool_id];
 
-        float distance_from_datum_to_pivot = distances_from_datum_to_pivots[pool_id];
+        // add this element to each ring if it is within the ball of ring.
 
-        // First add this element to the appropriate ring if it datum is within the ball of this pool.
-
-        if( distance_from_datum_to_pivot < maxR() ) {
-            Ring<T> ring = findEnclosingRing(distance_from_datum_to_pivot);
-            ring.add(element_id);
+        for (Ring r : rings) {
+            if (distance_from_datum_to_pivot <= r.radius) {
+                r.add(element_id);
+            }
         }
 
         /** Next add this element to the hyperplane exclusion data structure
@@ -97,86 +75,9 @@ public class Pool<T> {
 
         for( int i = 0; i < num_pools; i++ ) {
             if( distance_from_datum_to_pivot < distances_from_datum_to_pivots[i] ) { // is this pivot closer than the other?
-                    closer_than[i].add(element_id);
+                    closer_than[i].set(element_id);
             }
         }
-    }
-
-    public Ring<T> findEnclosingRing(float distance) throws Exception {
-
-        if (distance > max_radius) {
-            return null;
-        }
-        for (int index = 0; index <= last_index; index++) {
-            if (distance < radii[index]) {
-                return rings[index];
-            }
-        }
-        throw new Exception( "findEnclosingRing - code should never be reached" );
-    }
-
-    /**
-     * Uses pivot exclusion (b) For a reference point p ∈ U and any real value μ,
-     * if d(q,p) ≤ μ−t, then no element of {s ∈ S | d(s,p) > μ} can be a solution to the query
-     *
-     * @param distance_query_pivot - the distance from the query point to this pivot
-     * @param threshold            - the threshold around the query.
-     * @return an enclosing ring that overlaps with query at threshold, or null if there is no overlap
-     */
-    public Ring<T> findIncludeRing(float distance_query_pivot, float threshold) {
-
-        if (distance_query_pivot <= max_radius - threshold) {
-            // if we get past here the outer ring overlaps the query,
-            // that is outer ring covers query
-            // trying to find the smallest one that covers the query
-
-            Ring<T> result = rings[last_index]; // we know this is a good result from above
-
-            // search from outside - find the smallest
-            for (int valid_index = last_index; valid_index >= 0; valid_index--) {
-                if (distance_query_pivot <= rings[valid_index].getRmax() - threshold) {
-                    result = rings[valid_index];
-                }
-            }
-            return result;
-        }
-        return null;
-    }
-
-    /**
-     * Uses pivot exclusion (a) For a reference point p ∈ U and any real value μ,
-     * if d(q,p) > μ+t, then no element of {s ∈ S | d(s,p) ≤ μ} can be a solution to the query
-     *
-     * @param distance_query_pivot - the distance from the query point to this pivot
-     * @param threshold - the threshold around the query.
-     * @return an enclosing ring that does not overlaps with query at threshold, or null if there is overlap by all rings
-     */
-    public Ring findExcludeRing(float distance_query_pivot, float threshold) {
-
-        // overlap condition distance_query_pivot < radii[index] + threshold = TRUE
-
-        int candidate = -1;
-
-        // search from inside - find the biggest non overlapping
-        for (int index = 0; index <= last_index; index++) {
-            if (distance_query_pivot >= radii[index] + threshold) {                // no overlap with query
-                // this radius is a solution - may be bigger rings.
-                candidate = index;
-            } else {
-                // we have overlap so stop
-                break;
-            }
-        }
-        if( candidate == -1 ) {
-            return null;
-        } else {
-            return rings[candidate];
-        }
-
-    }
-
-    public void setRadii(float[] radii) {
-        this.radii = radii;
     }
 
     public T getPivot() {
@@ -186,42 +87,6 @@ public class Pool<T> {
     public Ring<T> getRing( int i ) {
         return rings[i];
     }
-
-    public float maxR() {
-        return max_radius;
-    }
-
-    public MPool<T> getOwner() {
-        return owner;
-    }
-
-    public int getPoolId() { return pool_id; }
-
-    //--------------------
-
-
-    public void show_structure() {
-        int i = 0;
-        System.out.println("Pool with pivot: " + pivot);
-        for (float radius : radii) {
-            Ring<T> ring = rings[i++];
-            System.out.println("\tRing r_min: " + ring.getRmin() + "r_max: " + ring.getRmax());
-//            ArrayList<DataDistance<T>> list = ring.getAllDistances();
-//            for (DataDistance<T> dd : list) {
-//                System.out.println("\tNode: " + dd.value + " distance: " + dd.distance);
-//            }
-        }
-    }
-
-    public void completeInitialisation() throws Exception {
-        for( Ring<T> ring : rings ) {
-            ring.consolidateSets();
-        }
-    }
-
-
-    private float square( float a ) { return a * a; }
-
 
 }
 

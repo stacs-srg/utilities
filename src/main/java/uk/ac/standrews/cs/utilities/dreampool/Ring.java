@@ -16,99 +16,28 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool;
 
-import org.roaringbitmap.RoaringBitmap;
-
-import java.util.Set;
+import java.util.BitSet;
 
 /**
- * Maintains a ring of data (points at some distance bounds from the centroid).
+ * Maintains a ring of data (all inclusive points at some distance bounds from the centroid).
  *
  * Created by al on 26/2/2018.
  */
 public class Ring<T> {
 
-    // private final List<T> contents;
-    private RoaringBitmap contents;
-    private final Pool owner;
-    private final MPool<T> mpool;
-    private final int ring_number;
-    private final float r_min;
-    private final float r_max;
-    private final Ring inner_ring;
-    private boolean consolidated = false; // have the contents from this ring been consolidated (merged) with inner rings.
+    public final BitSet contents;
+    public final double radius;
 
-    public Ring( Pool owner, MPool<T> mpool, int ring_number, float r_min, float r_max, Ring inner_ring) {
-        // contents = new ArrayList<>();
-        contents = new RoaringBitmap();
-        this.ring_number = ring_number;
-        this.owner = owner;
-        this.mpool = mpool;
-        this.r_min = r_min;
-        this.r_max = r_max;
-        this.inner_ring = inner_ring;
+    public Ring( double radius ) {
+        contents = new BitSet();
+        this.radius = radius;
     }
 
-
     public void add( int index ) {
-        contents.add(index);
+        contents.set(index);
     }
 
     public int size() {
-        return contents.getCardinality();
-    }
-
-    public int getRing_number() {
-        return ring_number;
-    }
-
-    public Pool<T> getOwner() {
-        return owner;
-    }
-
-    public MPool<T> getMPool() {
-        return mpool;
-    }
-
-    public float getRmin() {
-        return r_min;
-    }
-
-    public float getRmax() {
-        return r_max;
-    }
-
-    public Ring getInnerRing() {
-        return inner_ring;
-    }
-
-
-    public RoaringBitmap getConciseContents() {
-        return contents;
-    }
-
-    public Set<T> getContents() {
-
-        return getMPool().getValues( getConciseContents() );
-    }
-
-
-    /**
-     * Folds the sets from the inner rings into the set for this ring.
-     * Must always be done from inner to outer.
-     */
-
-    public void consolidateSets() throws Exception {
-        if(consolidated) {
-            throw new Exception( "Ring is consolidated" );
-        }
-        if( inner_ring != null ) {
-
-            if (!inner_ring.consolidated) {
-                throw new Exception("Inner ring has not been consolidated");
-            }
-
-            contents.or(inner_ring.contents); // was addAll
-        }
-        consolidated = true;
+        return contents.cardinality();
     }
 }

@@ -148,7 +148,9 @@ public class ColumnsAndRadius {
                  * hopefully the normal situation or we're in trouble!
                  */
                 BitSet nots = getOrBitSets(datarep, dataSize, cantBeIn);
+                System.out.println( "1Nots: " + nots.cardinality() );
                 nots.flip(0, dataSize);
+                System.out.println( "ands: " + ands.cardinality() );
                 ands.and(nots);
                 filterContendors(dat, t, cm, q, res, dataSize, ands);
             } else {
@@ -159,6 +161,7 @@ public class ColumnsAndRadius {
             // there are no mustBeIn partitions
             if (cantBeIn.size() != 0) {
                 BitSet nots = getOrBitSets(datarep, dataSize, cantBeIn);
+                System.out.println( "2Nots: " + nots.cardinality() );
                 nots.flip(0, dataSize);
                 filterContendors(dat, t, cm, q, res, dataSize, nots);
             } else {
@@ -232,10 +235,16 @@ public class ColumnsAndRadius {
     private static void filterContendors(List<CartesianPoint> dat, double t,
                                          CountedMetric<CartesianPoint> cm, CartesianPoint q,
                                          List<CartesianPoint> res, final int dataSize, BitSet ands) {
+        System.out.println( "filt: " + ands.cardinality() );
+        System.out.println( q );
         for (int i = 0; i < dataSize; i++) {
             if (ands.get(i)) {
+                System.out.println( i + " " + cm.distance(q, dat.get(i)) );
                 if (cm.distance(q, dat.get(i)) < t) {
                     res.add(dat.get(i));
+                    System.out.println( "Adding " + i );
+                } else {
+                    System.out.println( "Not adding " + i );
                 }
             }
         }
@@ -311,8 +320,15 @@ public class ColumnsAndRadius {
         long t0 = System.currentTimeMillis();
 
         CountedMetric<CartesianPoint> cm = new CountedMetric<>(tc.metric());
-        for (CartesianPoint q : queries) {
-            List<CartesianPoint> res = new ArrayList<>();
+        // for (CartesianPoint q : queries) {
+
+        double[] coords = new double[]{ 0.00115741 ,0.0363137 ,0.0324074 ,0.0367115 ,0.0 ,0.0 ,0.0116826 ,0.0 ,0.0026765 ,0.00249566 ,0.0 ,0.0131655 ,0.00611256 ,9.04225E-4 ,0.0158058 ,0.00517216 ,0.0 ,0.00148293 ,7.59549E-4 ,7.2338E-5 ,0.00354456 ,0.0 ,0.0 ,0.0 ,4.70197E-4 ,0.0 ,0.00249566 ,0.0801505 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,3.6169E-5 ,0.0 ,0.00983796 ,5.78704E-4 ,0.0 ,0.0 ,0.00249566 ,0.0 ,0.00141059 ,0.0317925 ,0.0 ,0.0 ,0.0 ,0.0 ,7.2338E-5 ,3.6169E-4 ,0.0 ,7.2338E-5 ,2.17014E-4 ,0.0 ,3.6169E-5 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0585214 ,0.028899 ,0.00198929 ,0.0 ,0.0 ,0.0 ,0.00499132 ,0.00224248 ,0.0 ,0.0 ,0.0 ,0.00748698 ,0.220124 ,0.0211227 ,0.0 ,0.076208 ,0.0 ,0.0 ,0.129593 ,0.0937138 ,0.0450304 ,0.0 ,0.0 ,0.0 ,0.0 ,1.08507E-4 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.00195312 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.00379774 ,3.6169E-4 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,7.59549E-4 ,0.0 ,0.00242332 ,1.80845E-4 };
+        CartesianPoint q = new CartesianPoint(coords);
+
+
+
+
+        List<CartesianPoint> res = new ArrayList<>();
             double[] queryDists = getQueryToRefDists(refs, t, cm, q, res);
             final int dataSize = dat.size();
 
@@ -328,6 +344,7 @@ public class ColumnsAndRadius {
                     mustBeIn, cantBeIn);
 
             System.out.println( "\tHP mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+            System.out.println( "\tHP elems mustBeIn " + calcsize(mustBeIn,datarep) + " cantBeIn " + calcsize(cantBeIn,datarep) );
 
             partitionsExcluded += cantBeIn.size() + mustBeIn.size();
 
@@ -335,6 +352,7 @@ public class ColumnsAndRadius {
                     mustBeIn, cantBeIn);
 
             System.out.println( "\tRadius mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
+            System.out.println( "\tRadius elems mustBeIn " + calcsize(mustBeIn,datarep) + " cantBeIn " + calcsize(cantBeIn,datarep) );
 
             doExclusions(dat, t, datarep, cm, q, res, dataSize, mustBeIn,
                     cantBeIn);
@@ -343,9 +361,9 @@ public class ColumnsAndRadius {
 
             noOfResults += res.size();
             Query<CartesianPoint> Q = new Query<CartesianPoint>( q, null, (float) t, dat, null, new CountingWrapper<CartesianPoint>( new Euclidean<>() ), false );
-            Q.checkSolutions(res);
+            // Q.checkSolutions(res);
 
-        }
+        // }
         System.out.println("bitsets");
         System.out.println("dists per query\t" + cm.reset() / queries.size());
         System.out.println("results\t" + noOfResults);
@@ -354,6 +372,14 @@ public class ColumnsAndRadius {
         System.out.println("partitions excluded\t"
                 + ((double) partitionsExcluded / queries.size()) / nChoose2);
 
+    }
+
+    private static long calcsize(List<Integer> list, BitSet[] datarep) {
+        long result = 0l;
+        for( Integer i : list ) {
+            result += datarep[i].cardinality();
+        }
+        return result;
     }
 
 }

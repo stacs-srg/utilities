@@ -61,19 +61,19 @@ public class ColorsFull {
     private static boolean parallel = false;            // perform the queries in parallel
     private static boolean plot = false;                // report results in a csv file
 
-    private float[][] exploration_radii = new float[][] {
-            new float[]{ 0.07119140625F, 0.106787109375F, 0.1601806640625F, 0.24027099609375F, 0.360406494140625F, 0.540609741210938F }, // 6 rings each * 3/2
-            new float[]{ 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F }, // linear 6 far out
-            new float[]{ 0.6F, 0.7F, 0.8F }, // linear 3 far out
-            new float[]{ 0.1F, 0.2F, 0.3F,},  // linear 3 in close
-            new float[]{ 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F }, // linear 6 close in
-            new float[]{ 0.1F, 0.2F, 0.3F, 0.4F, 0.5F, 0.6F, 0.7F, 0.8F }, // linear 8 rings spread
-            new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F } // geometric 6
+    private double[][] exploration_radii = new double[][] {
+            new double[]{ 0.07119140625, 0.106787109375, 0.1601806640625, 0.24027099609375, 0.360406494140625, 0.540609741210938 }, // 6 rings each * 3/2
+            new double[]{ 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 }, // linear 6 far out
+            new double[]{ 0.6, 0.7, 0.8 }, // linear 3 far out
+            new double[]{ 0.1, 0.2, 0.3,},  // linear 3 in close
+            new double[]{ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 }, // linear 6 close in
+            new double[]{ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 }, // linear 8 rings spread
+            new double[]{ 0.0125, 0.025, 0.05, 0.1, 0.25, 0.5 } // geometric 6
     };
 
-    // private float[] radii = new float[]{ 0.0125F, 0.025F, 0.05F, 0.1F, 0.25F, 0.5F }; // worked best during space exploration
+    // private float[] radii = new float[]{ 0.0125, 0.025, 0.05, 0.1, 0.25, 0.5 }; // worked best during space exploration
 
-    private float[] radii = new float[]{ 0.318F, 0.418F, 0.518F }; // mean +/- 0.1.
+    private double[] radii = new double[]{ 0.318, 0.418, 0.518 }; // mean +/- 0.1.
 
     // From Richard 28-3-18:
     //     split the data 10:90 and use the 10% as queries over the other 90%
@@ -97,10 +97,9 @@ public class ColorsFull {
         TestContext tc = new TestContext(TestContext.Context.colors);
         tc.setSizes(tc.dataSize() / 10, num_pivots);
 
-        data =tc.getData();
+        data = tc.getData();
         pivots = tc.getRefPoints();
         queries = tc.getQueries();
-
         t = tc.getThreshold();
 
         source_size = data.size();
@@ -115,28 +114,31 @@ public class ColorsFull {
         }
     }
 
-    public Set<Query<CartesianPoint>> generateQueries(int num_queries) {
+    public List<Query<CartesianPoint>> generateQueries(int num_queries) {
 
-        HashSet<Query<CartesianPoint>> result = new HashSet<>(); // Could fold these but can't be bothered!
+        List<Query<CartesianPoint>> result = new ArrayList<>(); // Could fold these but can't be bothered!
 
         Random r = new Random(1926373034L); // do same queries each call of doQueries.
 
         float[] thresholds = new float[] { 0.052f, 0.083f, 0.131f }; // 0.01, 0.1 and 1%
 
-        for (CartesianPoint p : queries ) {
+        //for (CartesianPoint p : queries ) {
+
+        double[] coords = new double[]{ 0.00115741 ,0.0363137 ,0.0324074 ,0.0367115 ,0.0 ,0.0 ,0.0116826 ,0.0 ,0.0026765 ,0.00249566 ,0.0 ,0.0131655 ,0.00611256 ,9.04225E-4 ,0.0158058 ,0.00517216 ,0.0 ,0.00148293 ,7.59549E-4 ,7.2338E-5 ,0.00354456 ,0.0 ,0.0 ,0.0 ,4.70197E-4 ,0.0 ,0.00249566 ,0.0801505 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,3.6169E-5 ,0.0 ,0.00983796 ,5.78704E-4 ,0.0 ,0.0 ,0.00249566 ,0.0 ,0.00141059 ,0.0317925 ,0.0 ,0.0 ,0.0 ,0.0 ,7.2338E-5 ,3.6169E-4 ,0.0 ,7.2338E-5 ,2.17014E-4 ,0.0 ,3.6169E-5 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0585214 ,0.028899 ,0.00198929 ,0.0 ,0.0 ,0.0 ,0.00499132 ,0.00224248 ,0.0 ,0.0 ,0.0 ,0.00748698 ,0.220124 ,0.0211227 ,0.0 ,0.076208 ,0.0 ,0.0 ,0.129593 ,0.0937138 ,0.0450304 ,0.0 ,0.0 ,0.0 ,0.0 ,1.08507E-4 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.00195312 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.00379774 ,3.6169E-4 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,0.0 ,7.59549E-4 ,0.0 ,0.00242332 ,1.80845E-4 };
+        CartesianPoint p = new CartesianPoint(coords);
 
                 // for (float threshold : thresholds ) {
                 float threshold = (float) t;
 
                     result.add(new Query(p, dream_pool, threshold, data, dream_pool.pools, validate_distance, perform_validation));
                 //}
-        }
+        //}
 
         return result;
     }
 
 
-    public long doQueries(DataSet dataset, Set<Query<CartesianPoint>> queries, int num_ros, int pool_index ) throws Exception {
+    public long doQueries(DataSet dataset, List<Query<CartesianPoint>> queries, int num_ros, int pool_index ) throws Exception {
         int number_of_results = 0;
 
         long start_time = System.currentTimeMillis();
@@ -223,7 +225,7 @@ public class ColorsFull {
 
     }
 
-    private void initialise(float[] radii) throws Exception {
+    private void initialise(double[] radii) throws Exception {
 
         validate_distance = new Euclidean();
         distance = new CountingWrapper<CartesianPoint>( validate_distance );
@@ -245,7 +247,7 @@ public class ColorsFull {
 
                 initialise(exploration_radii[radii_index]);
                 System.out.println("Generating queries...");
-                Set<Query<CartesianPoint>> generated_queries = generateQueries(num_queries);
+                List<Query<CartesianPoint>> generated_queries = generateQueries(num_queries);
                 System.out.println("Performing queries...");
                 doQueries(dataset, generated_queries, num_ref_objs, radii_index);
             }
@@ -268,7 +270,7 @@ public class ColorsFull {
 
         initialise(radii);
         output( LoggingLevel.SHORT_SUMMARY, "Generating queries...");
-        Set<Query<CartesianPoint>> generated_queries = generateQueries(num_queries);
+        List<Query<CartesianPoint>> generated_queries = generateQueries(num_queries);
         output( LoggingLevel.SHORT_SUMMARY, "Performing queries...");
         return doQueries(dataset, generated_queries, num_ref_objs, 0);
 
@@ -298,7 +300,7 @@ public class ColorsFull {
         ColorsFull pr = new ColorsFull( "colors", num_ref_objs );
         long num_results = pr.plot("/Users/al/Desktop/", "colors-RESULTS.csv");
         output( LoggingLevel.SHORT_SUMMARY, "results\t" + num_results);
-        output( LoggingLevel.SHORT_SUMMARY, "time/query " + ( System.currentTimeMillis() - time ) / pr.queries.size() );
+        output( LoggingLevel.SHORT_SUMMARY, "time/query " + ( System.currentTimeMillis() - time * 1.0 ) / pr.queries.size() );
     }
 
 }
