@@ -21,11 +21,10 @@ import uk.ac.standrews.cs.utilities.m_tree.Distance;
 import java.util.*;
 
 /**
- *
  * A Metric datastructure based on pivot exclusion and hyperplane exclusion.
- * @author al@st-andrews.ac.uk
- * @param <T> The type of the elements stored in this data structure.
  *
+ * @param <T> The type of the elements stored in this data structure.
+ * @author al@st-andrews.ac.uk
  */
 public class MPool<T> {
 
@@ -52,22 +51,18 @@ public class MPool<T> {
 
     /**
      * Create MPool using specified radii
+     *
      * @param distance_wrapper - a distance function that determines distance between two Ts
-     * @param pivots - a set of pivots/reference objects to use.
-     * @param radii - a set of radii to form pools (balls) around the pivots.
+     * @param pivots           - a set of pivots/reference objects to use.
+     * @param radii            - a set of radii to form pools (balls) around the pivots.
      */
     public MPool(Distance<T> distance_wrapper, List<T> pivots, double[] radii) throws Exception {
         this.pivots = pivots;
         this.distance_wrapper = distance_wrapper;
         this.num_pivots = pivots.size();
 
-        initialise_inter_pivot_distances( pivots );
-
-        System.out.println( "Radii:");
-        for( int i = 0;i < radii.length; i++ ) {
-            System.out.println( "\t" + radii[i] );
-        }
-        initialisePools(radii,distance_wrapper);
+        initialise_inter_pivot_distances(pivots);
+        initialisePools(radii, distance_wrapper);
     }
 
 
@@ -76,12 +71,12 @@ public class MPool<T> {
         double[] distances_from_datum_to_pivots = new double[num_pivots];
         int pivot_index = 0;
 
-        values.add( datum );                    // add to the master index to facilitate lookup from bitmaps to datums.
-        for( Pool<T> pool : pools ) {           // calculate the distances to all the pivots.
-            distances_from_datum_to_pivots[ pivot_index++ ] = distance_wrapper.distance(pool.getPivot(),datum);
+        values.add(datum);                    // add to the master index to facilitate lookup from bitmaps to datums.
+        for (Pool<T> pool : pools) {           // calculate the distances to all the pivots.
+            distances_from_datum_to_pivots[pivot_index++] = distance_wrapper.distance(pool.pivot, datum);
         }
-        for( Pool<T> pool : pools ) {
-            pool.add(element_id, distances_from_datum_to_pivots );
+        for (Pool<T> pool : pools) {
+            pool.add(element_id, distances_from_datum_to_pivots);
         }
 
         // universal_ring.add(element_id);
@@ -92,7 +87,7 @@ public class MPool<T> {
 
         int pool_id = 0;
 
-        for( T pivot : pivots ) {
+        for (T pivot : pivots) {
             pools.add(new Pool(pivot, pool_id, num_pivots, radii));
             pool_id++;
         }
@@ -101,18 +96,18 @@ public class MPool<T> {
 
     /**
      * @param pivots - the set of pivots being used in this instance
-     *
-     * initialises an 2D array of inter pivot distances called inter_pivot_distances
+     *               <p>
+     *               initialises an 2D array of inter pivot distances called inter_pivot_distances
      */
     private void initialise_inter_pivot_distances(List<T> pivots) {
         inter_pivot_distances = new double[num_pivots][num_pivots];
         int i = 0;
-        for( T p1 : pivots ) {
+        for (T p1 : pivots) {
             int j = 0;
-            for( T p2 : pivots ) {
-                double d = distance_wrapper.distance(p1,p2);
-                inter_pivot_distances[ i ][ j ] = d;
-                inter_pivot_distances[ j ][ i ] = d;
+            for (T p2 : pivots) {
+                double d = distance_wrapper.distance(p1, p2);
+                inter_pivot_distances[i][j] = d;
+                inter_pivot_distances[j][i] = d;
                 j++;
             }
             i++;
@@ -122,77 +117,94 @@ public class MPool<T> {
     /**
      * Find the nodes within range r of query.
      *
-     * @param query - some data for which to find the neighbours within the distance specified by threshold
+     * @param query     - some data for which to find the neighbours within the distance specified by threshold
      * @param threshold - the threshold distance specifying the size of the query ball
-     * @param query_obj - the query being performed (for diagnostics) - permits extra data to be passed in and out and validation
-     *
+     *                  //     * @param query_obj - the query being performed (for diagnostics) - permits extra data to be passed in and out and validation
      * @return all those nodes from S within @param threshold
-     *
+     * <p>
      * General technique - find the rings that overlap with the query then do inclusion,
      * find the rings that do not overlap using and do exclusion,
      * finally perform hyperplane exclusion,
      * filter the results to exclude false positives.
      */
-    public List<T> rangeSearch(final T query, final double threshold, Query<T> query_obj) { // NOTE query_obj only for validation
-
-        int partitionsExcluded = 0;
-        int noOfResults = 0;
-
-        double[] distances_from_query_to_pivots = new double[num_pivots];
-        int distance_index = 0;
-
-        for (Pool<T> pool : pools) {
-            double distance_query_pivot = distance_wrapper.distance(pool.getPivot(), query);
-            distances_from_query_to_pivots[distance_index++] = distance_query_pivot;              // save this for HP exclusion - used below.
-        }
+    public List<T> rangeSearch(final T query, final double threshold ) {  // NOTE query_obj only for validation
 
         List<BitSet> mustBeIn = new ArrayList<>();
         List<BitSet> cantBeIn = new ArrayList<>();
 
         List<T> results = new ArrayList<>();
 
-        //********** TODO Put reference objects into result set here.
+        double[] distances_from_query_to_pivots = initialiseQueryToPivotDistances(query, threshold, results);
 
-        System.out.println( "Query " );
-        excludeHyperplanePartitions( threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
-
-        System.out.println( "\tHP mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
-        System.out.println( "\tHP elems mustBeIn " + calcsize(mustBeIn) + " cantBeIn " + calcsize(cantBeIn) );
-
-        partitionsExcluded += cantBeIn.size() + mustBeIn.size();
+        excludeHyperplanePartitions(threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
 
         excludeRadiusPartitions(threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
 
-        System.out.println( "\tRadius mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
-        System.out.println( "\tRadius elems mustBeIn " + calcsize(mustBeIn) + " cantBeIn " + calcsize(cantBeIn) );
+        doExclusions(threshold, query, results, mustBeIn, cantBeIn, null );
 
-        doExclusions(threshold, query, results, mustBeIn, cantBeIn);
+        return results;
+    }
 
-        System.out.println( "\tResults " + results.size() );
+    public List<T> diagnosticRangeSearch(final T query, final double threshold, Query<T> query_obj) {
 
-        noOfResults += results.size();
+        int partitionsExcluded = 0;
 
-        // query_obj.checkSolutions(results);
+        List<BitSet> mustBeIn = new ArrayList<>();
+        List<BitSet> cantBeIn = new ArrayList<>();
+
+        List<T> results = new ArrayList<>();
+
+        double[] distances_from_query_to_pivots = initialiseQueryToPivotDistances(query,threshold,results);
+        int distance_index = 0;
+
+
+        //********** TODO Put reference objects into result set here.
+
+        excludeHyperplanePartitions(threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
+
+        long hp_exclusions = calcsize( cantBeIn );
+        long hp_inclusions = calcsize( mustBeIn );
+
+        query_obj.setHPexclusions( hp_exclusions );
+        query_obj.setHPinclusions( hp_inclusions );
+
+        excludeRadiusPartitions(threshold, distances_from_query_to_pivots, mustBeIn, cantBeIn);
+
+        query_obj.setPivotExclusions( calcsize( cantBeIn ) - hp_exclusions );
+        query_obj.setPivotInclusions( calcsize( mustBeIn ) - hp_inclusions );
+
+        doExclusions(threshold, query, results, mustBeIn, cantBeIn,query_obj);
 
         return results;
 
-// TODO put these back in:
-//        query_obj.setHPexclusions( pivot_exclusions.getCardinality() - pe_before );
-//        query_obj.validateHPExclusions(pivot_exclusions);
-//        query_obj.validateOmissions(pivot_inclusions);
-
     }
 
-    private static long calcsize( List<BitSet> bits ) {
+
+    private double[] initialiseQueryToPivotDistances(T query, double threshold, List<T> results) {
+        double[] distances = new double[num_pivots];
+
+        for (int i = 0; i < num_pivots; i++) {
+            Pool<T> pool = pools.get(i);
+            T pivot = pool.pivot;
+            double distance_query_pivot = distance_wrapper.distance(pivot, query);
+            distances[i] = distance_query_pivot;
+            if (distance_query_pivot < threshold) {
+                results.add(pivot);
+            }
+        }
+        return distances;
+    }
+
+    private static long calcsize(List<BitSet> bits) {
         long result = 0l;
-        for( BitSet bs : bits ) {
+        for (BitSet bs : bits) {
             result += bs.cardinality();
         }
         return result;
     }
 
     private void doExclusions(double threshold, T query, List<T> results,
-                                     List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
+                              List<BitSet> mustBeIn, List<BitSet> cantBeIn, Query<T> query_obj) {
         if (mustBeIn.size() != 0) {
             BitSet ands = getAndBitSets(mustBeIn);
             if (cantBeIn.size() != 0) {
@@ -200,21 +212,21 @@ public class MPool<T> {
                  * hopefully the normal situation or we're in trouble!
                  */
                 BitSet nots = getOrBitSets(cantBeIn);
-                System.out.println( "1Nots: " + nots.cardinality() );
                 nots.flip(0, num_values);
-                System.out.println( "ands: " + ands.cardinality() );
                 ands.and(nots);
+                if( query_obj != null ) { query_obj.setRequiringFiltering( ands.cardinality() ); }
                 filterContenders(threshold, query, results, ands);
             } else {
                 // there are no cantBeIn partitions
+                if( query_obj != null ) { query_obj.setRequiringFiltering( ands.cardinality() ); }
                 filterContenders(threshold, query, results, ands);
             }
         } else {
             // there are no mustBeIn partitions
             if (cantBeIn.size() != 0) {
                 BitSet nots = getOrBitSets(cantBeIn);
-                System.out.println( "2Nots: " + nots.cardinality() );
                 nots.flip(0, num_values);
+                if( query_obj != null ) { query_obj.setRequiringFiltering( nots.cardinality() ); }
                 filterContenders(threshold, query, results, nots);
             } else {
                 // there are no exclusions at all...
@@ -229,7 +241,7 @@ public class MPool<T> {
 
 
     private void excludeHyperplanePartitions(double threshold, double[] distances_from_query_to_pivots,
-                                                    List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
+                                             List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
         for (int i = 0; i < num_pivots - 1; i++) {
             double d1 = distances_from_query_to_pivots[i];
             for (int j = i + 1; j < num_pivots; j++) {
@@ -259,45 +271,39 @@ public class MPool<T> {
     }
 
 
-    private void excludeRadiusPartitions( double threshold, double[] distances_from_query_to_pivots,
-                                                 List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
-        for (int i = 0; i < num_pivots; i++) {
-            double distance_query_pivot = distances_from_query_to_pivots[i];
+    private void excludeRadiusPartitions(double threshold, double[] distances_from_query_to_pivots,  // TODO generalise these properly.
+                                         List<BitSet> mustBeIn, List<BitSet> cantBeIn) {
+        for (int pivot_index = 0; pivot_index < num_pivots; pivot_index++) {
+            double distance_query_pivot = distances_from_query_to_pivots[pivot_index];
 
-            Pool<T> pool = pools.get(i);
-            if (distance_query_pivot < pool.getRing(0).radius - threshold ) {
-                mustBeIn.add( pool.getRing(0).contents );
-            } else if (distance_query_pivot < pool.getRing(1).radius - threshold ) {
-                mustBeIn.add( pool.getRing(1).contents );
-            } else if (distance_query_pivot < pool.getRing(2).radius - threshold ) {
-                mustBeIn.add( pool.getRing(2).contents );
+            Pool<T> pool = pools.get(pivot_index);
+            Ring<T>[] rings = pool.rings;
+
+            // Inclusion first
+
+            for (int i = 0; i < rings.length; i++) {
+                if (distance_query_pivot < pool.rings[i].radius - threshold) {
+                    mustBeIn.add(pool.rings[i].contents);
+                    break; // stop once we have found once that covers
+                }
             }
 
-            // in reverse order...
+            // Next exclusion - do in reverse order
 
-            if (distance_query_pivot >= threshold + pool.getRing(2).radius  ) {
-                cantBeIn.add( pool.getRing(2).contents );
-            } else if (distance_query_pivot >= threshold + pool.getRing(1).radius) {
-                cantBeIn.add( pool.getRing(1).contents );
-            } else if (distance_query_pivot >= threshold + pool.getRing(0).radius) {
-                cantBeIn.add( pool.getRing(0).contents );
+            for (int i = rings.length - 1; i >= 0; i--) {
+                if (distance_query_pivot < pool.rings[i].radius - threshold) {
+                    mustBeIn.add(pool.rings[i].contents);
+                    break; // stop once we have the smallest that doesn't cover
+                }
             }
         }
     }
 
     private void filterContenders(double threshold, T query, List<T> results, BitSet candidates) {
 
-        System.out.println( "filt: " + candidates.cardinality() );
-        System.out.println( query );
-        for (int i = 0; i < num_values; i++) {
-            if (candidates.get(i)) {
-                System.out.println( i + " " + distance_wrapper.distance(query, values.get(i)) );
-                if (distance_wrapper.distance(query, values.get(i)) < threshold) {
-                    results.add(values.get(i));
-                    System.out.println( "Adding " + i );
-                } else {
-                    System.out.println( "Not adding " + i );
-                }
+        for (int i = candidates.nextSetBit(0); i >= 0; i = candidates.nextSetBit(i + 1)) {
+            if (distance_wrapper.distance(query, values.get(i)) < threshold) {
+                results.add(values.get(i));
             }
         }
     }
@@ -316,7 +322,7 @@ public class MPool<T> {
     private BitSet getOrBitSets(List<BitSet> cantBeIn) {
         BitSet nots = null;
         if (cantBeIn.size() != 0) {
-            nots = cantBeIn.get(0).get(0,num_values ); // a new copy
+            nots = cantBeIn.get(0).get(0, num_values); // a new copy
             for (int i = 1; i < cantBeIn.size(); i++) {
                 nots.or(cantBeIn.get(i));
             }
@@ -325,16 +331,14 @@ public class MPool<T> {
     }
 
     /**
-     *
      * @param i - an index into the set of datums
      * @return the ith datum in the set
      */
-    public T getValue( int i ) {
-        return values.get( i );
+    public T getValue(int i) {
+        return values.get(i);
     }
 
     /**
-     *
      * @param candidates - a bitmap representing a set of values drawn from S
      * @return the set of values of type T which are represented by the bitmap
      */

@@ -133,7 +133,7 @@ public class EuclidianResults {
                 Point p = newpoint(r);
                 Query query = new Query(p, dream_pool, threshold, datums, dream_pool.pools, validate_distance, perform_validation);
 
-                List<Point> results = dream_pool.rangeSearch(p, threshold, query); // last parameter for debug only.
+                List<Point> results = dream_pool.diagnosticRangeSearch(p, threshold, query);
                 query.validate( results );
 
                 addRow(dataset, p.x, p.y, query.threshold, num_ros, (int) distance.counter,
@@ -197,9 +197,9 @@ public class EuclidianResults {
         return new Point( x, y );
     }
 
-    private void addRow(DataSet data, float queryx, float queryy, float threshold, int count_ros, int count_calcs, int hp_exlude, int pivot_include, int pivot_exclude, int requiring_filtering, int num_results) {
+    private void addRow(DataSet data, float queryx, float queryy, float threshold, int count_ros, int count_calcs, long hp_exlude, long pivot_include, long pivot_exclude, long requiring_filtering, int num_results) {
 
-        data.addRow(Float.toString(queryx), Float.toString(queryy), Float.toString(threshold),Integer.toString(count_ros), Integer.toString(count_calcs), Integer.toString(hp_exlude), Integer.toString(pivot_include), Integer.toString(pivot_exclude),Integer.toString(requiring_filtering),Integer.toString(num_results));
+        data.addRow(Float.toString(queryx), Float.toString(queryy), Float.toString(threshold),Integer.toString(count_ros), Integer.toString(count_calcs), Long.toString(hp_exlude), Long.toString(pivot_include), Long.toString(pivot_exclude),Long.toString(requiring_filtering),Integer.toString(num_results));
     }
 
     public static void main(String[] args) throws Exception {

@@ -16,11 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.dreampool.richard.bitBlaster;
 
-import uk.ac.standrews.cs.utilities.dreampool.CountingWrapper;
-import uk.ac.standrews.cs.utilities.dreampool.Query;
 import uk.ac.standrews.cs.utilities.dreampool.richard.coreConcepts.CountedMetric;
 import uk.ac.standrews.cs.utilities.dreampool.richard.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.dreampool.richard.dataPoints.cartesian.Euclidean;
 import uk.ac.standrews.cs.utilities.dreampool.richard.searchStructures.VPTree;
 import uk.ac.standrews.cs.utilities.dreampool.richard.testloads.TestContext;
 import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
@@ -148,9 +145,7 @@ public class ColumnsAndRadius {
                  * hopefully the normal situation or we're in trouble!
                  */
                 BitSet nots = getOrBitSets(datarep, dataSize, cantBeIn);
-                System.out.println( "1Nots: " + nots.cardinality() );
                 nots.flip(0, dataSize);
-                System.out.println( "ands: " + ands.cardinality() );
                 ands.and(nots);
                 filterContendors(dat, t, cm, q, res, dataSize, ands);
             } else {
@@ -161,7 +156,6 @@ public class ColumnsAndRadius {
             // there are no mustBeIn partitions
             if (cantBeIn.size() != 0) {
                 BitSet nots = getOrBitSets(datarep, dataSize, cantBeIn);
-                System.out.println( "2Nots: " + nots.cardinality() );
                 nots.flip(0, dataSize);
                 filterContendors(dat, t, cm, q, res, dataSize, nots);
             } else {
@@ -198,10 +192,10 @@ public class ColumnsAndRadius {
                     if (fourPoint) {
                         cond2 = (d1 * d1 - d2 * d2) / refDists[i][j] > 2 * t;
                     } else {
-                        cond2 = (d1 - d2) > 2 * t; // Richard had cond1 <<< TODO WRONG?
+                        cond2 = (d1 - d2) > 2 * t;
                     }
                     if (cond2) {
-                        cantBeIn.add(partitionPointer);  // TODO is this wrong????
+                        cantBeIn.add(partitionPointer);
                     }
                 }
                 partitionPointer++;
@@ -235,16 +229,10 @@ public class ColumnsAndRadius {
     private static void filterContendors(List<CartesianPoint> dat, double t,
                                          CountedMetric<CartesianPoint> cm, CartesianPoint q,
                                          List<CartesianPoint> res, final int dataSize, BitSet ands) {
-        System.out.println( "filt: " + ands.cardinality() );
-        System.out.println( q );
         for (int i = 0; i < dataSize; i++) {
             if (ands.get(i)) {
-                System.out.println( i + " " + cm.distance(q, dat.get(i)) );
                 if (cm.distance(q, dat.get(i)) < t) {
                     res.add(dat.get(i));
-                    System.out.println( "Adding " + i );
-                } else {
-                    System.out.println( "Not adding " + i );
                 }
             }
         }
@@ -333,28 +321,19 @@ public class ColumnsAndRadius {
             List<Integer> mustBeIn = new ArrayList<>();
             List<Integer> cantBeIn = new ArrayList<>();
 
-            System.out.println( "Query " );
             excludeHyperplanePartitions(noOfRefPoints, t, refDists, queryDists,
                     mustBeIn, cantBeIn);
-
-            System.out.println( "\tHP mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
-            System.out.println( "\tHP elems mustBeIn " + calcsize(mustBeIn,datarep) + " cantBeIn " + calcsize(cantBeIn,datarep) );
 
             partitionsExcluded += cantBeIn.size() + mustBeIn.size();
 
             excludeRadiusPartitions(noOfRefPoints, nChoose2, t, queryDists,
                     mustBeIn, cantBeIn);
 
-            System.out.println( "\tRadius mustBeIn " + mustBeIn.size() + " cantBeIn " + cantBeIn.size() );
-            System.out.println( "\tRadius elems mustBeIn " + calcsize(mustBeIn,datarep) + " cantBeIn " + calcsize(cantBeIn,datarep) );
-
             doExclusions(dat, t, datarep, cm, q, res, dataSize, mustBeIn,
                     cantBeIn);
 
-            System.out.println( "\tResults " + res.size() );
-
             noOfResults += res.size();
-            Query<CartesianPoint> Q = new Query<CartesianPoint>( q, null, (float) t, dat, null, new CountingWrapper<CartesianPoint>( new Euclidean<>() ), false );
+            //Query<CartesianPoint> Q = new Query<CartesianPoint>( q, null, (float) t, dat, null, new CountingWrapper<CartesianPoint>( new Euclidean<>() ), false );
             // Q.checkSolutions(res);
 
         }

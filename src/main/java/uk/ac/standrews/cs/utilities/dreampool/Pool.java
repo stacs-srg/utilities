@@ -26,19 +26,22 @@ import java.util.BitSet;
 
 public class Pool<T> {
 
-    final T pivot;                              // the pivot (the centre) of the pool.
-    private int pool_id;                        // the index of this pool into (any) array of distances etc. indexed by
-    private int num_pools;                      // number of pools in the system - copied down from MPool - what would Martin Fowler say? [good/bad]- discuss not sure - al.
-    private Ring<T>[] rings;                    // an array of rings, each of which holds the elements drawn from s that are within the ring (rings are inclusive => include the elements in inner rings)
-    public BitSet[] closer_than;                // Used to store information for hyperplane exclusion - is this closer_then[i] says this pivot is closer than pivot i.
+    public final T pivot;                       // the pivot (the centre) of the pool.
+    public final int pool_id;                   // the index of this pool into (any) array of distances etc. indexed by
+    public final int num_pools;                 // number of pools in the system - copied down from MPool - what would Martin Fowler say? [good/bad]- discuss not sure - al.
+    public final Ring<T>[] rings;               // an array of rings, each of which holds the elements drawn from s that are within the ring (rings are inclusive => include the elements in inner rings)
+    public final BitSet[] closer_than;          // Used to store information for hyperplane exclusion - is this closer_then[i] says this pivot is closer than pivot i. // TODO This probably should not be here.
 
     public Pool(T pivot, int pool_id, int num_pools, double[] radii) {
 
         this.pivot = pivot;
         this.pool_id = pool_id;
         this.num_pools = num_pools;
+        this.rings= new Ring[radii.length];
 
-        initialise_rings(radii);
+        for (int i = 0; i <= rings.length - 1; i++ ) {
+            rings[i] = new Ring<T>(radii[i]);
+        }
 
         closer_than = new BitSet[num_pools];
         for( int i = 0; i < closer_than.length; i++ ) {
@@ -46,16 +49,6 @@ public class Pool<T> {
         }
     }
 
-
-    private void initialise_rings(double[] radii) {
-        Ring r = null;
-        this.rings= new Ring[radii.length];
-
-        for (int i = 0; i <= rings.length - 1; i++ ) {
-            r = new Ring<T>( radii[i] );
-            rings[i] = r;
-        }
-    }
 
     public void add(int element_id, double[] distances_from_datum_to_pivots) {
 
@@ -78,14 +71,6 @@ public class Pool<T> {
                     closer_than[i].set(element_id);
             }
         }
-    }
-
-    public T getPivot() {
-        return pivot;
-    }
-
-    public Ring<T> getRing( int i ) {
-        return rings[i];
     }
 
 }

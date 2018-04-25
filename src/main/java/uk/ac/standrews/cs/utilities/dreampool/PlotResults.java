@@ -152,7 +152,7 @@ public class PlotResults {
 
             List<Point> results;
 
-            results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
+            results = dream_pool.diagnosticRangeSearch(query.query, query.threshold, query); // last parameter for debug only.
 
             query.validate(results);
 

@@ -32,10 +32,11 @@ public class Query<T> {
     private final boolean validate;
     private final MPool<T> owner;
 
-    private int count_hp_exclusions = 0;
-    private int count_pivot_inclusions = 0;
-    private int count_pivot_exclusions = 0;
-    private int requiring_filtering = 0;
+    private long count_hp_exclusions = 0;
+    private long count_hp_inclusions = 0;
+    private long count_pivot_inclusions = 0;
+    private long count_pivot_exclusions = 0;
+    private long requiring_filtering = 0;
 
     /**
      * @param query
@@ -203,15 +204,19 @@ public class Query<T> {
 
     }
 
-    public void setHPexclusions(int HPexclusions) {
+    public void setHPexclusions(long HPexclusions) {
         this.count_hp_exclusions = HPexclusions;
     }
 
-    public void setPivotInclusions(int pivotInclusions) {
+    public void setHPinclusions(long HPinclusions ) {
+        this.count_hp_inclusions = HPinclusions;
+    }
+
+    public void setPivotInclusions(long pivotInclusions) {
         this.count_pivot_inclusions = pivotInclusions;
     }
 
-    public void setPivotExclusions(int pivotExclusions) {
+    public void setPivotExclusions(long pivotExclusions) {
         this.count_pivot_exclusions = pivotExclusions;
     }
 
@@ -219,19 +224,24 @@ public class Query<T> {
         this.requiring_filtering = requiringFiltering;
     }
 
-    public int getHPExclusions() {
+    public long getHPExclusions() {
         return count_hp_exclusions;
     }
 
-    public int getPivotInclusions() {
+    public long getHPInclusions() {
+        return count_hp_inclusions;
+    }
+
+
+    public long getPivotInclusions() {
         return count_pivot_inclusions;
     }
 
-    public int getPivotExclusions() {
+    public long getPivotExclusions() {
         return count_pivot_exclusions;
     }
 
-    public int getRequiringFiltering() {
+    public long getRequiringFiltering() {
         return requiring_filtering;
     }
 

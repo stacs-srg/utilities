@@ -76,7 +76,7 @@ public class SimpleTest {
         distance.reset();
         Query q = new Query( query, dream_pool, threshold, points, dream_pool.pools, distance, true );
         System.out.println("Query: " + query + " Threshold: " + threshold);
-        List<Point> results = dream_pool.rangeSearch(query, threshold, q );
+        List<Point> results = dream_pool.diagnosticRangeSearch(query, threshold, q );
         System.out.println("Total Distance calculations: " + distance.counter);
         System.out.println("Distance calculations (query only): " + (distance.counter - setup_distance_calcs));
     }

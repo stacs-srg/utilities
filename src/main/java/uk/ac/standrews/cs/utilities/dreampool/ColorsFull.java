@@ -25,9 +25,11 @@ import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static uk.ac.standrews.cs.utilities.FileManipulation.createFileIfDoesNotExist;
 import static uk.ac.standrews.cs.utilities.Logging.output;
@@ -37,14 +39,11 @@ import static uk.ac.standrews.cs.utilities.Logging.output;
  */
 public class ColorsFull {
 
-
-    private final double t; // temp threshold
-
-
     private MPool<CartesianPoint> dream_pool;
 
     private CountingWrapper<CartesianPoint> distance;   // counts number of distance calculations made
-    private Euclidean validate_distance;                      // used to check results.
+    private Euclidean validate_distance;                // used to check results.
+    private static double tc_threshold;                 // threshold supplied by test context
 
     private List<CartesianPoint> data;
     private List<CartesianPoint> queries;
@@ -58,7 +57,7 @@ public class ColorsFull {
     private static boolean brute_force = false;         // do brute force rather than MPool.
     private static boolean check_results = false;       // whether to check results of queries for correctness (less exhaustive than full evaluation).
     private static boolean exploring = false;           // set to perform space exploration (radii and ros).
-    private static boolean parallel = false;            // perform the queries in parallel
+//    private static boolean parallel = false;            // perform the queries in parallel
     private static boolean plot = false;                // report results in a csv file
 
     private double[][] exploration_radii = new double[][] {
@@ -77,7 +76,7 @@ public class ColorsFull {
 
     // From Richard 28-3-18:
     //     split the data 10:90 and use the 10% as queries over the other 90%
-    //     use thresholds of 0.052, 0.083, and 0.131 (supposed to fetch mean 0.01, 0.1 and 1% of data respectively but they don’t in my experience(!)
+    //     use thresholds of 0.052, 0.083, and 0.131 (supposed to fetch mean 0.01, 0.1 and 1% of data respectively but they don’threshold in my experience(!)
     //     measure mean number of distance calcs per query; good outcomes are 5k, 10k, 20k
     //
 
@@ -90,7 +89,7 @@ public class ColorsFull {
         output( LoggingLevel.SHORT_SUMMARY, "brute force = " + brute_force );
         output( LoggingLevel.SHORT_SUMMARY, "check results = " + check_results );
         output( LoggingLevel.SHORT_SUMMARY, "exploring = " + exploring );
-        output( LoggingLevel.SHORT_SUMMARY, "parallel = " + parallel );
+//        output( LoggingLevel.SHORT_SUMMARY, "parallel = " + parallel );
         output( LoggingLevel.SHORT_SUMMARY, "plot = " + plot );
         output( LoggingLevel.SHORT_SUMMARY, "Injesting file " + filename );
 
@@ -100,7 +99,7 @@ public class ColorsFull {
         data = tc.getData();
         pivots = tc.getRefPoints();
         queries = tc.getQueries();
-        t = tc.getThreshold();
+        tc_threshold = tc.getThreshold();
 
         source_size = data.size();
     }
@@ -116,7 +115,7 @@ public class ColorsFull {
 
     public List<Query<CartesianPoint>> generateQueries(int num_queries) {
 
-        List<Query<CartesianPoint>> result = new ArrayList<>(); // Could fold these but can't be bothered!
+        List<Query<CartesianPoint>> result = new ArrayList<>(); // Could fold these but can'threshold be bothered!
 
         Random r = new Random(1926373034L); // do same queries each call of doQueries.
 
@@ -124,14 +123,39 @@ public class ColorsFull {
 
         for (CartesianPoint p : queries ) {
 
-                // for (float threshold : thresholds ) {
-                float threshold = (float) t;
+                for (float threshold : thresholds ) {
 
                     result.add(new Query(p, dream_pool, threshold, data, dream_pool.pools, validate_distance, perform_validation));
-                //}
+                }
         }
 
         return result;
+    }
+
+    public long justQueries(double threshold) throws Exception {
+
+        initialise(radii);
+
+        int number_of_results = 0;
+
+        long start_time = System.currentTimeMillis();
+        long setup_calcs = distance.counter;
+        int query_calcs = 0;
+
+        distance.reset();
+
+        for (CartesianPoint query : queries ) {
+
+            List<CartesianPoint> results = dream_pool.rangeSearch(query, threshold); // // last parameter for debug only.
+            number_of_results += results.size();
+
+        }
+
+        query_calcs += distance.counter;
+
+        output( LoggingLevel.SHORT_SUMMARY, "total distance calcs = " + setup_calcs + query_calcs );
+        output( LoggingLevel.SHORT_SUMMARY, "dists per query = " + query_calcs / queries.size() );
+        return number_of_results;
     }
 
 
@@ -145,9 +169,9 @@ public class ColorsFull {
 
         ExecutorService executor = null;
 
-        if( parallel ) {
-             executor = Executors.newFixedThreadPool(4); // TODO put into MPool?  <<<<<<<<<<<<<<<<<<<<<
-        }
+//        if( parallel ) {
+//             executor = Executors.newFixedThreadPool(4);
+//        }
 
         for (Query<CartesianPoint> query : queries) {
 
@@ -158,9 +182,9 @@ public class ColorsFull {
             if( brute_force ) {
                 results = bruteForce( query.query, query.threshold,query );
             } else  {
-                results = dream_pool.rangeSearch(query.query, query.threshold, query); // last parameter for debug only.
+                results = dream_pool.diagnosticRangeSearch(query.query, query.threshold, query); // last parameter for debug only.
             }
-            query.validate(results);
+
             if( check_results ) {
                 query.checkSolutions(results);
             }
@@ -175,9 +199,9 @@ public class ColorsFull {
             query_calcs += distance.counter;
 
         }
-        if( parallel ) {
-            executor.shutdown();
-        }
+//        if( parallel ) {
+//            executor.shutdown();
+//        }
 
         long elapsed_time = System.currentTimeMillis() - start_time;
 
@@ -265,6 +289,11 @@ public class ColorsFull {
         output( LoggingLevel.SHORT_SUMMARY, "datums = " + num_datums );
         output( LoggingLevel.SHORT_SUMMARY, "queries = " + num_queries );
 
+        output( LoggingLevel.SHORT_SUMMARY,  "Radii:");
+        for( int i = 0;i < radii.length; i++ ) {
+            output( LoggingLevel.SHORT_SUMMARY,  "\t" + radii[i] );
+        }
+
         initialise(radii);
         output( LoggingLevel.SHORT_SUMMARY, "Generating queries...");
         List<Query<CartesianPoint>> generated_queries = generateQueries(num_queries);
@@ -274,9 +303,9 @@ public class ColorsFull {
     }
 
 
-    private void addRow(DataSet data, String query, float threshold,  long count_ros, long pool_index, long count_calcs, int hp_exlude, int pivot_include, int pivot_exclude, int requiring_filtering, long num_results) {
+    private void addRow(DataSet data, String query, float threshold, long count_ros, long pool_index, long count_calcs, long hp_exlude, long pivot_include, long pivot_exclude, long requiring_filtering, long num_results) {
 
-        data.addRow(query, Float.toString(threshold),Long.toString(count_ros), Long.toString(pool_index), Long.toString(count_calcs), Integer.toString(hp_exlude), Integer.toString(pivot_include), Integer.toString(pivot_exclude),Integer.toString(requiring_filtering), Long.toString(num_results));
+        data.addRow(query, Float.toString(threshold),Long.toString(count_ros), Long.toString(pool_index), Long.toString(count_calcs), Long.toString(hp_exlude), Long.toString(pivot_include), Long.toString(pivot_exclude),Long.toString(requiring_filtering), Long.toString(num_results));
     }
 
     public static void main(String[] args) throws Exception {
@@ -286,8 +315,9 @@ public class ColorsFull {
         perform_validation = false;
         brute_force = false;
         exploring = false;
-        parallel = false;
+//        parallel = false;
         plot = false;
+
         Logging.setLoggingLevel(LoggingLevel.SHORT_SUMMARY);   // choose from NONE, SHORT_SUMMARY, LONG_SUMMARY, VERBOSE
 
         if( plot ) {
@@ -295,7 +325,8 @@ public class ColorsFull {
         }
         long time = System.currentTimeMillis();
         ColorsFull pr = new ColorsFull( "colors", num_ref_objs );
-        long num_results = pr.plot("/Users/al/Desktop/", "colors-RESULTS.csv");
+        long num_results = pr.justQueries( tc_threshold );    // or 0.083 or the other
+        //long num_results = pr.plot("/Users/al/Desktop/", "colors-RESULTS.csv");
         output( LoggingLevel.SHORT_SUMMARY, "results\t" + num_results);
         output( LoggingLevel.SHORT_SUMMARY, "time/query " + ( System.currentTimeMillis() - time * 1.0 ) / pr.queries.size() );
     }
