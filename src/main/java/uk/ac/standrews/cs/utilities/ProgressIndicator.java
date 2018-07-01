@@ -30,6 +30,7 @@ public abstract class ProgressIndicator {
     private final AtomicInteger total_steps = new AtomicInteger();
     private final AtomicInteger number_of_steps_completed = new AtomicInteger();
     private final AtomicInteger number_of_steps_per_update = new AtomicInteger();
+    private final long startTime;
 
     private double proportion_complete;
 
@@ -43,6 +44,12 @@ public abstract class ProgressIndicator {
 
         this.number_of_updates.set(number_of_updates);
         number_of_steps_since_last_update.set(0);
+        this.startTime = System.nanoTime();
+    }
+
+    protected double elapsedSeconds() {
+        long elapsedNano = System.nanoTime() - this.startTime;
+        return (double) elapsedNano / 1e9;
     }
 
     /**

@@ -42,6 +42,6 @@ public class PercentageProgressIndicatorStderr extends ProgressIndicator {
      */
     public void indicateProgress(final double proportion_complete) {
 
-        System.err.println(Math.round(proportion_complete * HUNDRED_PERCENT) + "%");
+        System.err.println(Math.round(proportion_complete * HUNDRED_PERCENT) + "% -- elapsed " + String.format("%8.2f seconds", elapsedSeconds()));
     }
 }
