@@ -25,10 +25,10 @@ public class BruteForceSimilaritySearch<T> {
     final Distance<T> distance_metric;
 
     private List<T> values;
-    private float[][] distances;
+    private double[][] distances;
 
     private boolean arrays_initialised = false;
-    final Comparator<? super DataDistance<T>> distance_comparator = (Comparator<DataDistance<T>>) (o1, o2) -> Float.compare(o1.distance, o2.distance);
+    final Comparator<? super DataDistance<T>> distance_comparator = (Comparator<DataDistance<T>>) (o1, o2) -> Double.compare(o1.distance, o2.distance);
 
     public BruteForceSimilaritySearch(final Distance<T> distance_metric) {
 
@@ -71,14 +71,14 @@ public class BruteForceSimilaritySearch<T> {
         }
 
         for (int i = 0; i < values.size(); i++) {
-            final float distance = query_index < values.size() ? distances[query_index][i] : distance_metric.distance(values.get(i), query);
+            final double distance = query_index < values.size() ? distances[query_index][i] : distance_metric.distance(values.get(i), query);
             result.add(new DataDistance<>(values.get(i), distance));
         }
 
         return result;
     }
 
-    public List<DataDistance<T>> rangeSearch(final T query, final float r) {
+    public List<DataDistance<T>> rangeSearch(final T query, final double r) {
 
         initialiseArraysIfNecessary();
 
@@ -96,7 +96,7 @@ public class BruteForceSimilaritySearch<T> {
         if (!arrays_initialised) {
 
             final int number_of_values = values.size();
-            distances = new float[number_of_values][number_of_values];
+            distances = new double[number_of_values][number_of_values];
 
             for (int i = 0; i < number_of_values; i++) {
                 for (int j = 0; j < number_of_values; j++) {

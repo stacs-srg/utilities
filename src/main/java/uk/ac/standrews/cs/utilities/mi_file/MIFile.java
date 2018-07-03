@@ -95,11 +95,11 @@ public class MIFile<T> {
      */
     public void add(T data) throws Exception{
 
-        TreeMap<Float,T> knp = kNearestReferenceObjects(data, ki);
+        TreeMap<Double,T> knp = kNearestReferenceObjects(data, ki);
 
         int score = 0; // the position of each of the pivots (reference objects).
 
-        for( Map.Entry<Float, T> e : knp.entrySet() ) {
+        for( Map.Entry<Double, T> e : knp.entrySet() ) {
 
             invFile.insert(e.getValue(), data, score++);
         }
@@ -115,7 +115,7 @@ public class MIFile<T> {
      */
     public List<DataDistance<T>> nearestN(T query, int n){
 
-        TreeMap<Float,T>  query_k_nearest_reference_objects = kNearestReferenceObjects(query,ks);
+        TreeMap<Double,T>  query_k_nearest_reference_objects = kNearestReferenceObjects(query,ks);
 
         return incrementalkNNSearch( query, query_k_nearest_reference_objects, n );
     }
@@ -166,12 +166,12 @@ public class MIFile<T> {
      *
      * Signature of method from Amato - code adapted slightly from Giuseppe's version.
      */
-    private TreeMap<Float,T> kNearestReferenceObjects(T object, int k) {   // was called kNearestReferenceObjectsSequential in  Giuseppe's version.
-        TreeMap<Float,T> result = new TreeMap<>(); // maps from distance to an object
+    private TreeMap<Double,T> kNearestReferenceObjects(T object, int k) {   // was called kNearestReferenceObjectsSequential in  Giuseppe's version.
+        TreeMap<Double,T> result = new TreeMap<>(); // maps from distance to an object
 
         for( T reference : reference_objects ) {
 
-            float dist = distance_wrapper.distance(object, reference);
+            double dist = distance_wrapper.distance(object, reference);
 
             T o = reference;
 
@@ -194,16 +194,16 @@ public class MIFile<T> {
         return result;
     }
 
-    private List<DataDistance<T>> incrementalkNNSearch(T query, TreeMap<Float, T> query_k_nearest_reference_objects, int k) {
+    private List<DataDistance<T>> incrementalkNNSearch(T query, TreeMap<Double, T> query_k_nearest_reference_objects, int k) {
 
         CandidateSet candidateSet = new CandidateSet(query, distance_wrapper, ki + 1, k);
 
         boolean stop = false;
 
-        Iterator<Map.Entry<Float, T>> q_iter = query_k_nearest_reference_objects.entrySet().iterator();
+        Iterator<Map.Entry<Double, T>> q_iter = query_k_nearest_reference_objects.entrySet().iterator();
 
         for (int position = 0; q_iter.hasNext(); position++) { // for each RO in order
-            Map.Entry<Float, T> nextRO = q_iter.next();
+            Map.Entry<Double, T> nextRO = q_iter.next();
             T pivot = nextRO.getValue();                        // the data of the reference object
 
             int low_inv_file_pos = position - max_pos_diff; // was Math.min( 0, position - max_pos_diff ) in als version!

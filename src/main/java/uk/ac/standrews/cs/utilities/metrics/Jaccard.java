@@ -18,10 +18,7 @@ package uk.ac.standrews.cs.utilities.metrics;
 
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by al on 06/09/2017.
@@ -37,6 +34,15 @@ public class Jaccard implements Metric<String> {
         Collection bgrams = Shingle.ngrams(B,2);
         return ( (double) ( intersection( agrams,bgrams ).size() ) ) / union( agrams, bgrams ).size();
     }
+
+    public double distance(BitSet A, BitSet B ) {
+        BitSet union = A.get(0,A.length());   // and and or are destructive in BitSet
+        union.or(B);
+        BitSet intersection = A.get(0,A.length());
+        intersection.and(B);
+        return ( (double) intersection.cardinality() ) / union.cardinality();
+    }
+
 
     @Override
     public String getMetricName() {

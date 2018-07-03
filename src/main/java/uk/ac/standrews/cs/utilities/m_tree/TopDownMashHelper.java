@@ -157,12 +157,12 @@ public class TopDownMashHelper<T> {
     private MTree<T>.Node examineAllCandidates( Set<MTree<T>.Node> closest_set, T query ) {
 
         MTree<T>.Node closest = null;
-        float closest_distance = Float.MAX_VALUE;
+        double closest_distance = Double.MAX_VALUE;
         boolean enclosing = false;
 
         for (MTree<T>.Node node : closest_set) {
 
-            final float distanceNodeToQ = distance_wrapper.distance(node.data, query);
+            final double distanceNodeToQ = distance_wrapper.distance(node.data, query);
 
             if (distanceNodeToQ < closest_distance && ( Math.abs(distanceNodeToQ - distanceNodeToQ) <= MTree.EPSILON) ) { // node is closer and the query is in this circle.
                 closest = node;

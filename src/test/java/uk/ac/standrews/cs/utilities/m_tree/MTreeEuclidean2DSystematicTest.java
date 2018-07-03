@@ -40,12 +40,12 @@ public abstract class MTreeEuclidean2DSystematicTest {
     private final int repetition_number;
     private final boolean duplicate_values;
 
-    private static final float range = 100.0f;
+    private static final double range = 100.0f;
     private static final long SEED = 3459873497234L;
 
-    private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Float.compare(o1.distance, o2.distance);
+    private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Double.compare(o1.distance, o2.distance);
 
-    private static final float[] radii = new float[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
+    private static final double[] radii = new double[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
 
     public MTreeEuclidean2DSystematicTest(final int number_of_points, final int repetition_number, final boolean duplicate_values) {
 
@@ -159,7 +159,7 @@ public abstract class MTreeEuclidean2DSystematicTest {
 
     private void checkNeighboursWithinRangesForPoint(final Point p) {
 
-        for (final float radius : radii) {
+        for (final double radius : radii) {
 
             final List<DataDistance<Point>> tree_distances = tree.rangeSearch(p, radius);
             final List<DataDistance<Point>> brute_force_distances = brute_force.rangeSearch(p, radius);

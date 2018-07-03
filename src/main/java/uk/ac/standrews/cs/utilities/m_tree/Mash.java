@@ -148,7 +148,7 @@ public class Mash<T> extends MTree<T> {
 //            return super.nearestNeighbour(query);
 //        }
 //
-//        float distance_to_target = distance_wrapper.distance(candidate.data, query);
+//        double distance_to_target = distance_wrapper.distance(candidate.data, query);
 //
 //        // Case 2 we are outside the covering radius, so move up the tree till we are inside.
 //        if( distance_to_target > candidate.radius ) {

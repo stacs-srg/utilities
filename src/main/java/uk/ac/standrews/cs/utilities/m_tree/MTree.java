@@ -30,7 +30,7 @@ import java.util.List;
 public class MTree<T> {
 
     private static final int DEFAULT_MAX_LEVEL_SIZE = 20;
-    static final float EPSILON = 0.0000000001f; // A small float to avoid checking with zero.
+    static final double EPSILON = 0.0000000001f; // A small double to avoid checking with zero.
     private static final boolean DEBUG = false;
 
     private static int count_leaf_comparisons = 0;
@@ -87,7 +87,7 @@ public class MTree<T> {
      * @param r     the distance from query over which to search
      * @return all those nodes within r of @param T.
      */
-    public List<DataDistance<T>> rangeSearch(final T query, final float r) {
+    public List<DataDistance<T>> rangeSearch(final T query, final double r) {
 
         count_leaf_comparisons = 0;
         count_intermediate_comparisons = 0;
@@ -157,13 +157,13 @@ public class MTree<T> {
      * @param RQ the search radius
      */
 
-    private void rangeSearch(final Node N, final T query, final float RQ, final List<DataDistance<T>> results) {
+    private void rangeSearch(final Node N, final T query, final double RQ, final List<DataDistance<T>> results) {
 
         if (N.isLeaf()) {
 
             count_leaf_comparisons++;
 
-            final float distanceNodeToQ = distance_wrapper.distance(N.data, query);
+            final double distanceNodeToQ = distance_wrapper.distance(N.data, query);
             if (distanceNodeToQ - RQ <= EPSILON) {
                 results.add(new DataDistance<>(N.data, distanceNodeToQ));
             }
@@ -172,15 +172,15 @@ public class MTree<T> {
 
             count_intermediate_comparisons++;
 
-            final float distanceNodeToQ = distance_wrapper.distance(N.data, query);
+            final double distanceNodeToQ = distance_wrapper.distance(N.data, query);
 
             for (final Node child : N.children) {
 
-                final float distanceChildToParent = child.distance_to_parent;
+                final double distanceChildToParent = child.distance_to_parent;
 
                 if (Math.abs(distanceNodeToQ - distanceChildToParent) - RQ - child.radius < EPSILON) {  // only look at the children if the query is inside the ball.
 
-                    final float distanceChildToQ = distance_wrapper.distance(child.data, query);
+                    final double distanceChildToQ = distance_wrapper.distance(child.data, query);
 
                     if (distanceChildToQ - RQ - child.radius < EPSILON) {
                         count_depth++;
@@ -244,7 +244,7 @@ public class MTree<T> {
 
         if (node.isLeaf()) {
 
-            final float distance_from_this_leaf_query = distance_wrapper.distance(node.data, query);
+            final double distance_from_this_leaf_query = distance_wrapper.distance(node.data, query);
             if (distance_from_this_leaf_query < closest_thus_far.distance) { // this node is closer
                 return new DataDistance<>(node.data, distance_from_this_leaf_query);
             } else {
@@ -291,7 +291,7 @@ public class MTree<T> {
 
         if (node.isLeaf()) { // we are at a leaf - see if ths is closer than other nodes in results
 
-            final float node_distance = distance_wrapper.distance(node.data, query);
+            final double node_distance = distance_wrapper.distance(node.data, query);
             if (results.size() < n) { // fill up the list without checking until at capacity
                 results.addInDistanceOrder(node.data, node_distance);
 
@@ -307,7 +307,7 @@ public class MTree<T> {
 
                 // see if we need to check out the child
 
-                final float distance_from_query_to_child = distance_wrapper.distance(child.data, query);
+                final double distance_from_query_to_child = distance_wrapper.distance(child.data, query);
                 if (results.size() < n || distance_from_query_to_child - node.radius - results.furthestDistance() < EPSILON) {
 
                     nearestN(child, n, query, results); // have a look at the children
@@ -324,7 +324,7 @@ public class MTree<T> {
      * @param distance_to_parent - the distance to the parent from subtree (pre calculated in caller)
      * @return the node inserted into the tree.
      */
-    private Node insertIntoNode(final Node subTree, final T data, final float distance_to_parent) {
+    private Node insertIntoNode(final Node subTree, final T data, final double distance_to_parent) {
 
         if ((subTree.isFull())) {
 
@@ -353,15 +353,15 @@ public class MTree<T> {
 
         Node selected_pivot = node; // the best pivot into which to insert - 3 choices: this node, enclosing child, or nearest child.
 
-        final float distance_from_data_to_node = distance_wrapper.distance(selected_pivot.data, data); // the distance between data and the selected pivot.
+        final double distance_from_data_to_node = distance_wrapper.distance(selected_pivot.data, data); // the distance between data and the selected pivot.
 
-        float selected_pivot_distance = distance_from_data_to_node; // the distance between data and the selected pivot.
+        double selected_pivot_distance = distance_from_data_to_node; // the distance between data and the selected pivot.
 
         // Try and see if there is an enclosing child for the data
         // This can create unavoidable overlaps in the balls.
         for (final Node child : node.children) {
             if (child != node.children.get(0)) { // do not do this on the first child which is the same as the parent
-                final float distance_from_data_to_child = distance_wrapper.distance(child.data, data);
+                final double distance_from_data_to_child = distance_wrapper.distance(child.data, data);
 
                 if (distance_from_data_to_child < child.radius && distance_from_data_to_child < selected_pivot_distance) { // we are inside the radius of the child and closer
 
@@ -380,7 +380,7 @@ public class MTree<T> {
             // See if any of the children are closer than the node to data
             for (final Node child : node.children) {
                 if (child != node.children.get(0)) { // do not do this on the first child which is the same as the parent
-                    final float distance_from_data_to_child = distance_wrapper.distance(child.data, data);
+                    final double distance_from_data_to_child = distance_wrapper.distance(child.data, data);
 
                     if (distance_from_data_to_child < selected_pivot_distance) { // this pivot is closer than the node and any other we have found
                         selected_pivot_distance = distance_from_data_to_child;
@@ -398,7 +398,7 @@ public class MTree<T> {
 
                 for (final Node child : node.children) {  // check all the children for overlap
                     if (child != selected_pivot) {
-                        final float d_from_selected_pivot_to_child = distance_wrapper.distance(child.data, selected_pivot.data);
+                        final double d_from_selected_pivot_to_child = distance_wrapper.distance(child.data, selected_pivot.data);
 
                         if (d_from_selected_pivot_to_child - child.radius - selected_pivot.radius < EPSILON) {
                             // using this selected_pivot would create overlap.
@@ -533,8 +533,8 @@ public class MTree<T> {
                 // and other nodes may have zero distance - I think this is the best way!
 
                 if (child != new_pivot) { // the pivot becomes a new root - don't copy - used == since identical
-                    final float r1 = distance_wrapper.distance(sub_root.data, child.data);
-                    final float r2 = distance_wrapper.distance(new_pivot.data, child.data);
+                    final double r1 = distance_wrapper.distance(sub_root.data, child.data);
+                    final double r2 = distance_wrapper.distance(new_pivot.data, child.data);
 
                     if (r1 < r2) {
                         partition1.add(child);
@@ -604,12 +604,12 @@ public class MTree<T> {
     public class Node {
 
         public T data;
-        float radius;
-        float distance_to_parent;
+        double radius;
+        double distance_to_parent;
         Node parent;
         List<Node> children;
 
-        Node(final T oN, final Node parent, final float distance_to_parent) {
+        Node(final T oN, final Node parent, final double distance_to_parent) {
             data = oN;
             radius = 0.0f;
             this.distance_to_parent = distance_to_parent;
@@ -624,7 +624,7 @@ public class MTree<T> {
          * @param newNode            the node to average_value to the Node
          * @param distance_to_parent - the distance from newNode to the parent
          */
-        void addChild(final Node newNode, final float distance_to_parent) {
+        void addChild(final Node newNode, final double distance_to_parent) {
 
             if (children.size() == 0) {
                 // We are turning a leaf into an intermediate node
@@ -635,7 +635,7 @@ public class MTree<T> {
             children.add(newNode);
             newNode.distance_to_parent = distance_to_parent;
             newNode.parent = this;
-            final float new_radius = distance_to_parent + newNode.radius;
+            final double new_radius = distance_to_parent + newNode.radius;
             if (new_radius > radius) {
                 radius = new_radius;
             }
@@ -680,7 +680,7 @@ public class MTree<T> {
             return closest.size();
         }
 
-        private void addInDistanceOrder(final T data, final float distance) {
+        private void addInDistanceOrder(final T data, final double distance) {
 
             int index;
             if (closest.size() == 0) {
@@ -700,7 +700,7 @@ public class MTree<T> {
             // if we get here then the new element is further than rest so should not be added.
         }
 
-        float furthestDistance() {
+        double furthestDistance() {
 
             final DataDistance furthest_element = closest.get(closest.size() - 1);
             return furthest_element.distance;
@@ -757,9 +757,9 @@ public class MTree<T> {
      * @return the set of distances from the list
      */
     @SuppressWarnings("unused")
-    public List<Float> mapDistances(final List<DataDistance<T>> data_distances) {
+    public List<Double> mapDistances(final List<DataDistance<T>> data_distances) {
 
-        final List<Float> result = new ArrayList<>();
+        final List<Double> result = new ArrayList<>();
         for (final DataDistance<T> dd : data_distances) {
             result.add(dd.distance);
         }
@@ -907,7 +907,7 @@ public class MTree<T> {
             }
             System.out.println("child: " + child.data + "radius: " + child.radius + " distance to parent: " + child.distance_to_parent + " is leaf: " + child.isLeaf() + " count children: " + child.children.size() + " parent: " + node.data);
             assert child.distance_to_parent <= node.radius;
-            final float d = distance_wrapper.distance(child.data, node.data);
+            final double d = distance_wrapper.distance(child.data, node.data);
             assert d == child.distance_to_parent;
             assert child.parent == node;
             assert child.radius <= node.radius;

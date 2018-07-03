@@ -17,7 +17,7 @@
 
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.dreampool.richard.util.OrderedList;
+import uk.ac.standrews.cs.utilities.richard.util.OrderedList;
 
 import java.util.List;
 
@@ -52,20 +52,6 @@ public class CartesianPoint {
 	 */
 	public CartesianPoint(double[] point) {
 		this.point = point;
-	}
-
-	/**
-	 * Create a new CartesianPoint based on an array of floats
-	 * 
-	 * @param point
-	 *            the array of floats
-	 */
-	public CartesianPoint(float[] point) {
-		double[] ds = new double[point.length];
-		for (int i = 0; i < point.length; i++) {
-			ds[i] = point[i];
-		}
-		this.point = ds;
 	}
 
 	/**
@@ -241,15 +227,15 @@ public class CartesianPoint {
 	}
 
 	/**
-	 * returns a CartesianPoint representing a given vector of floats
+	 * returns a CartesianPoint representing a given vector of doubles
 	 * 
 	 * @param fs
-	 *            vector of floats to be converted
+	 *            vector of doubles to be converted
 	 * @return the point
 	 * 
 	 * 
 	 */
-	public static CartesianPoint toCartesianPoint(float[] fs) {
+	public static CartesianPoint toCartesianPoint(double[] fs) {
 		double[] ds = new double[fs.length];
 		for (int i = 0; i < fs.length; i++) {
 			ds[i] = fs[i];

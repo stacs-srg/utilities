@@ -34,15 +34,15 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
     private final int repetition_number;
     private final boolean duplicate_values;
 
-    private static final float range = 100.0f;
+    private static final double range = 100.0f;
     private static final long SEED = 3459873497234L;
 
     private Point positve_nucleus = new Point( range * 1.5f, range * 1.5f ); // a double positive node around which to nucleate positive points.
     private Point negative_nucleus = new Point( - range * 1.5f, - range * 1.5f ); // a double positive node around which to nucleate positive points.
 
-    private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Float.compare(o1.distance, o2.distance);
+    private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Double.compare(o1.distance, o2.distance);
 
-    private static final float[] radii = new float[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
+    private static final double[] radii = new double[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
 
     public PositivesAndNegativesEuclideanClusteringExploration(final int number_of_points, final int repetition_number, final boolean duplicate_values) throws Exception {
 

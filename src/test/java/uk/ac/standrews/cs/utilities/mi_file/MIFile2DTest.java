@@ -45,7 +45,7 @@ public class MIFile2DTest {
 
     private Set<Point> createReferenceObjects() {
         Set<Point> pts = new HashSet<>();
-        for (float step = 10.0F; step < 80.0F; step+=10.0F) {
+        for (double step = 10.0F; step < 80.0F; step+=10.0F) {
 
             pts.add(new Point(+step + 1.0f, +step + 2.0f ));
             pts.add(new Point(-step - 3.0f , -step - 4.0f ));
@@ -185,7 +185,7 @@ public class MIFile2DTest {
 
         int count = 0;
 
-        for (float step = 1.0F; step < 50.0F; step++) {
+        for (double step = 1.0F; step < 50.0F; step++) {
 
             file.add(new Point(+step, +step));
             count++;
@@ -210,7 +210,7 @@ public class MIFile2DTest {
         int count = addSquares();
         assertEquals(count, file.size());
 
-        for (float step = 1.0F; step < 50.0F; step++) {
+        for (double step = 1.0F; step < 50.0F; step++) {
 
             assertTrue(file.contains(new Point(+step, +step)));
             assertTrue(file.contains(new Point(-step, +step)));

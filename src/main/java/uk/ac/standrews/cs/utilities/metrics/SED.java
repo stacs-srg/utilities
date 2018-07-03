@@ -54,7 +54,7 @@ public class SED implements Metric<String> {
          * once finalised, these are populated in order with probabilities that
          * average_value to ones
          */
-        private float[] finalProbs;
+        private double[] finalProbs;
         private int[] finalEvents;
 
         public SparseProbabilityArray() {
@@ -75,27 +75,27 @@ public class SED implements Metric<String> {
         public void finalise() {
             final int size = this.cardMap.size();
             this.finalEvents = new int[size];
-            this.finalProbs = new float[size];
+            this.finalProbs = new double[size];
 
             int ptr = 0;
             for (int event : this.cardMap.keySet()) {
                 this.finalEvents[ptr] = event;
-                this.finalProbs[ptr++] = (float) this.cardMap.get(event)
+                this.finalProbs[ptr++] = (double) this.cardMap.get(event)
                         / this.acc;
             }
             this.cardMap = null;
         }
 
-        public static float SEDistance(SparseProbabilityArray ar1,
+        public static double SEDistance(SparseProbabilityArray ar1,
                                      SparseProbabilityArray ar2) {
             double k = doCalc( ar1,ar2 );
-            return (float) Math.pow(Math.pow(2, Math.max(0,k)) - 1, 0.486);
+            return (double) Math.pow(Math.pow(2, Math.max(0,k)) - 1, 0.486);
         }
 
-        public static float JSDistance(SparseProbabilityArray ar1,
+        public static double JSDistance(SparseProbabilityArray ar1,
                                        SparseProbabilityArray ar2) {
             double k = doCalc( ar1,ar2 );
-            return (float) Math.sqrt(Math.max(0,k));
+            return (double) Math.sqrt(Math.max(0,k));
         }
 
         private static double doCalc(SparseProbabilityArray ar1,

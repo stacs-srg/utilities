@@ -30,7 +30,7 @@ import java.util.Map;
 public class TreeStructure {
 
     public HashMap<Integer,Integer> child_distribution = new HashMap<>(); // Used by showStructure to record children size distributions
-    public HashMap<Integer,List<Float>> overlap_distribution = new HashMap<>(); // Used by showStructure to record overlaps in children
+    public HashMap<Integer,List<Double>> overlap_distribution = new HashMap<>(); // Used by showStructure to record overlaps in children
 
     public int max_depth = 0;
     public int number_leaves = 0;
@@ -49,8 +49,8 @@ public class TreeStructure {
     }
 
 
-    public void record_overlap(int count, float v) {
-        List<Float> list =  overlap_distribution.get(count);
+    public void record_overlap(int count, double v) {
+        List<Double> list =  overlap_distribution.get(count);
         if( list == null ) {
             list = new ArrayList<>();
             list.add(v);
@@ -87,7 +87,7 @@ public class TreeStructure {
             counts += count;
             System.err.println( "\tsize: " +  size + " count: " + count );
         }
-        System.err.println( "Average number of children (non leaf nodes) : " + (float) products / counts );
+        System.err.println( "Average number of children (non leaf nodes) : " + (double) products / counts );
 
     }
 
@@ -95,26 +95,26 @@ public class TreeStructure {
         System.err.println( "Overlaps in Children:" );
 
         int count = 0;
-        float total = 0.0f;
+        double total = 0.0f;
 
-        for( Map.Entry<Integer,List<Float>> entry : overlap_distribution.entrySet() ) {
+        for( Map.Entry<Integer,List<Double>> entry : overlap_distribution.entrySet() ) {
             int size = entry.getKey();
-            List<Float> entries = entry.getValue();
+            List<Double> entries = entry.getValue();
             int entries_count = entries.size();
-            float min = Float.MAX_VALUE;
-            float max = Float.MIN_VALUE;
-            float sub_count = 0;
+            double min = Double.MAX_VALUE;
+            double max = Double.MIN_VALUE;
+            double sub_count = 0;
 
-            for( Float f : entries ) {
+            for( Double f : entries ) {
                 count++;
                 sub_count += f;
                 total += f;
                 if( f > max ) { max = f; };
                 if( f < min ) { min = f; };
             }
-            System.err.println( "\tsize: " +  size + " min overlaps: " + min + " max overlaps: " + max + " average overlaps: " + (float) sub_count / entries_count );
+            System.err.println( "\tsize: " +  size + " min overlaps: " + min + " max overlaps: " + max + " average overlaps: " + (double) sub_count / entries_count );
         }
-        System.err.println( "Average overlaps for whole tree: " + (float) total / count );
+        System.err.println( "Average overlaps for whole tree: " + (double) total / count );
 
     }
 }

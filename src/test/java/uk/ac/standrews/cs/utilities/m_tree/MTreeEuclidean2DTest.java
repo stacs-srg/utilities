@@ -137,7 +137,7 @@ public class MTreeEuclidean2DTest {
 
         int count = 0;
 
-        for (float coord = 1.0F; coord < 50.0F; coord++) {
+        for (double coord = 1.0F; coord < 50.0F; coord++) {
 
             tree.add(new Point(+coord, +coord));
             count++;
@@ -162,7 +162,7 @@ public class MTreeEuclidean2DTest {
         int count = addSquares();
         assertEquals(count, tree.size());
 
-        for (float coord = 1.0F; coord < 50.0F; coord++) {
+        for (double coord = 1.0F; coord < 50.0F; coord++) {
 
             assertTrue(tree.contains(new Point(+coord, +coord)));
             assertTrue(tree.contains(new Point(-coord, +coord)));
@@ -252,8 +252,8 @@ public class MTreeEuclidean2DTest {
         Point p = new Point(0.0F, 0.0F);
 
         // test search in ever increasing circles.
-        for (float i = 1.0F; i < 50.0F; i++) {
-            float search_circle = (float) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid double errors
+        for (double i = 1.0F; i < 50.0F; i++) {
+            double search_circle = (double) Math.sqrt(i * i); // requested_result_set_size of square plus a little to avoid double errors
             List<DataDistance<Point>> result = tree.rangeSearch(p, search_circle);
             List<Point> values = tree.mapValues(result);
 
