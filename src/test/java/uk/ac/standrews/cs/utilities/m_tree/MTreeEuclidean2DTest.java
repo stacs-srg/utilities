@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
 
 import java.util.List;
 

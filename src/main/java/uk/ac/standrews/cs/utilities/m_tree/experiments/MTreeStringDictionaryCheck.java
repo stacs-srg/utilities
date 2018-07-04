@@ -18,9 +18,9 @@ package uk.ac.standrews.cs.utilities.m_tree.experiments;
 
 import org.simmetrics.metrics.Levenshtein;
 import uk.ac.standrews.cs.utilities.FileManipulation;
-import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
 import uk.ac.standrews.cs.utilities.m_tree.MTree;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -119,7 +119,7 @@ public class MTreeStringDictionaryCheck {
         assertTrue(values.contains("tomcat")); // distance 2
     }
 
-    public static class EditDistance implements Distance<String> {
+    public static class EditDistance implements NamedMetric<String> {
 
         Levenshtein levenshtein = new Levenshtein();
 
@@ -127,6 +127,11 @@ public class MTreeStringDictionaryCheck {
         public double distance(String s1, String s2) {
 
             return levenshtein.distance(s1, s2);
+        }
+
+        @Override
+        public String getMetricName() {
+            return "Levenshtein";
         }
     }
 }

@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.mi_file;
 
-import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.*;
 
@@ -29,14 +29,14 @@ public class CandidateSet<T> {
     private final TreeMap<Double, T> orderedRes;         //here we maintain the k current best using the distance as entry
     private final HashMap<T,Double> objectsOfOrderedRes; //here we maintain the k current best using the data as entry
     private final T query;                              // the object for which we are finding NN.
-    private final Distance<T> distance_wrapper;
+    private final NamedMetric<T> distance_wrapper;
     private int k;                                      // number of objects to be retrieved
 
     private double kDist = Double.MAX_VALUE;
 
     private HashMap<T,Double> tempResults = new HashMap<>(); // Temporary results?
 
-    public CandidateSet(T query, Distance<T> distance_wrapper, int maxEntries, int k) {
+    public CandidateSet(T query, NamedMetric<T> distance_wrapper, int maxEntries, int k) {
         this.query = query;
         this.distance_wrapper = distance_wrapper;
         this.maxEntries=maxEntries;
@@ -92,7 +92,7 @@ public class CandidateSet<T> {
 
             Double d = eliminateDuplicateObjects(object);  // if it is already in objectsOfOrderedRes we remove it
             if ( d != null ) {                            // it was in the above collection - so remove it from the other data structure
-                eliminateDuplicateDistances(d);
+                eliminateDuplicateMetrics(d);
             } // next do the insertion in the lists
             while( object != null ) { // loop is necessary because could be two objects at same distance. We are using the TreeMap in a sorted way - hack.
                 dist += rdist;
@@ -108,7 +108,7 @@ public class CandidateSet<T> {
 
             Double d = eliminateDuplicateObjects(object);  // if it is already in objectsOfOrderedRes we remove it
             if ( d != null ) {                            // it was in the above collection - so remove it from the other data structure
-                eliminateDuplicateDistances(d);
+                eliminateDuplicateMetrics(d);
             }
             if( orderedRes.size() >= k  ) {
                 T to = orderedRes.remove(orderedRes.lastKey());
@@ -132,7 +132,7 @@ public class CandidateSet<T> {
     }
 
     //if object o is already one of the k current best, we eliminate it
-    private T eliminateDuplicateDistances(double d){
+    private T eliminateDuplicateMetrics(double d){
         return orderedRes.remove(d);
     }
 

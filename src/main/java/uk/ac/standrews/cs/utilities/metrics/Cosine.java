@@ -17,11 +17,11 @@
 
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.Iterator;
 
-public class Cosine implements Metric<String> {
+public class Cosine implements NamedMetric<String> {
 
     public double distance(String x, String y) {
         SparseDistro sdx = new SparseDistro(topAndTail(x));

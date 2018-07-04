@@ -16,18 +16,18 @@
  */
 package uk.ac.standrews.cs.utilities.richard.searchStructures;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.*;
 
 
 public abstract class SearchIndex<T> {
 
-	public Metric<T> metric;
+	public NamedMetric<T> metric;
 	public List<T> data;
 	protected Random rand;
 
-	protected SearchIndex(List<T> data, Metric<T> metric) {
+	protected SearchIndex(List<T> data, NamedMetric<T> metric) {
 		this.metric = metric;
 		this.data = data;
 		this.rand = new Random(0);

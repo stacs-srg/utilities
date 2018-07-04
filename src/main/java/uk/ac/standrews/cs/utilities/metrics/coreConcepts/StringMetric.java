@@ -14,20 +14,8 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.m_tree;
+package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-/**
- * Used by MTree to return data and distance from the data.
- * Created by al on 20/02/2017.
- */
-@SuppressWarnings("WeakerAccess")
-public class DataDistance<T> {
-
-    public T value;
-    public double distance;
-
-    public DataDistance(T data, double distance) {
-        this.value = data;
-        this.distance = distance;
-    }
+public interface StringMetric extends NamedMetric<String> {
+    double distance(String var1, String var2);
 }

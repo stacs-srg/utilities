@@ -17,6 +17,8 @@
 package uk.ac.standrews.cs.utilities.m_tree;
 
 import uk.ac.standrews.cs.utilities.archive.Diagnostic;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.List;
 /**
  * Created by al@st-andrews.ac.uk on 13/01/2017.
  * Code to implement an M-Tree.
- * Code based on ACM SAC Tutorial, March 2007 by Zezula, Amato, Dohnal - Similarity Search: The Metric Space Approach pp 129-
+ * Code based on ACM SAC Tutorial, March 2007 by Zezula, Amato, Dohnal - Similarity Search: The NamedMetric Space Approach pp 129-
  * URL for tutorial: http://www.nmis.isti.cnr.it/amato/similarity-search-book/SAC-07-tutorial.pdf
  */
 public class MTree<T> {
@@ -45,15 +47,15 @@ public class MTree<T> {
     public Node root = null;
     int number_of_entries = 0;
     private final int max_level_size; // size of a level
-    final Distance<T> distance_wrapper;
+    final NamedMetric<T> distance_wrapper;
 
-    public MTree(final Distance<T> d, final int max_level_size) {
+    public MTree(final NamedMetric<T> d, final int max_level_size) {
 
         distance_wrapper = d;
         this.max_level_size = max_level_size;
     }
 
-    public MTree(final Distance<T> d) {
+    public MTree(final NamedMetric<T> d) {
 
         this(d, DEFAULT_MAX_LEVEL_SIZE);
     }

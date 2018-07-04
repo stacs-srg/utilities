@@ -14,16 +14,9 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
-/**
- * @author Richard Connor richard.connor@strath.ac.uk
- *
- */
 package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
 public interface Metric<T> {
 
     public double distance(T x, T y);
-
-    public String getMetricName();
 }

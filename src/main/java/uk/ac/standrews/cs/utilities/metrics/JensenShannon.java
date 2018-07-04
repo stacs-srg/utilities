@@ -17,7 +17,7 @@
 package uk.ac.standrews.cs.utilities.metrics;
 
 import uk.ac.standrews.cs.utilities.archive.ErrorHandling;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ import static uk.ac.standrews.cs.utilities.metrics.KullbackLeibler.kullbackLeibl
 /**
  * Created by al on 06/09/2017.
  */
-public class JensenShannon implements Metric<String> {
+public class JensenShannon implements NamedMetric<String> {
 
     /**
      *

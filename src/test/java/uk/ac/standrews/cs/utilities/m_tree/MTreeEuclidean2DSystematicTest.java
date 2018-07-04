@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,7 +59,7 @@ public abstract class MTreeEuclidean2DSystematicTest {
     @Before
     public void setUp() throws Exception {
 
-        final Distance distance_metric = new EuclideanDistance();
+        final NamedMetric distance_metric = new EuclideanDistance();
 
         tree = new MTree<>(distance_metric);
         brute_force = new BruteForceSimilaritySearch<>(distance_metric);

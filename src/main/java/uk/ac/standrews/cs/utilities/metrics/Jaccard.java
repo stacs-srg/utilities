@@ -16,14 +16,14 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.*;
 
 /**
  * Created by al on 06/09/2017.
  */
-public class Jaccard implements Metric<String> {
+public class Jaccard implements NamedMetric<String> {
 
     public double distance(Collection A, Collection B ) {
         return ( (double) ( intersection( A,B ).size() ) ) / union( A, B ).size();

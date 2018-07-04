@@ -22,9 +22,9 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
-public class JensenShannon2 extends SED implements Metric<String> {
+public class JensenShannon2 extends SED implements NamedMetric<String> {
 
     /**
      * @param maxCharVal

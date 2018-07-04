@@ -22,13 +22,13 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class SED implements Metric<String> {
+public class SED implements NamedMetric<String> {
 
     private int charValUpb;
     private Map<String, SparseProbabilityArray> memoTable;

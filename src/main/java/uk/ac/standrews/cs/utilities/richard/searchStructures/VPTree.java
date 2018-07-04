@@ -17,7 +17,7 @@
 package uk.ac.standrews.cs.utilities.richard.searchStructures;
 
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 import uk.ac.standrews.cs.utilities.richard.util.OrderedListAlt;
 import uk.ac.standrews.cs.utilities.richard.util.Range;
 import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
@@ -219,7 +219,7 @@ public class VPTree<T> extends SearchIndex<T> {
 
 	private double[] dists;
 
-	public VPTree(List<T> data, Metric<T> metric) {
+	public VPTree(List<T> data, NamedMetric<T> metric) {
 		super(data, metric);
 
 		this.data = data;

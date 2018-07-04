@@ -16,12 +16,12 @@
  */
 package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-public class CountedMetric<T> implements Metric<T> {
+public class CountedMetric<T> implements ICountedMetric<T> {
 
 	int count;
-	Metric<T> m;
+	NamedMetric<T> m;
 
-	public CountedMetric(Metric<T> m) {
+	public CountedMetric(NamedMetric<T> m) {
 		this.count = 0;
 		this.m = m;
 	}
@@ -41,6 +41,10 @@ public class CountedMetric<T> implements Metric<T> {
 		int res = this.count;
 		this.count = 0;
 		return res;
+	}
+
+	public int getComparisonCount() {
+		return count;
 	}
 
 }

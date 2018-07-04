@@ -17,9 +17,8 @@
 
 package uk.ac.standrews.cs.utilities.richard.dataPoints.cartesian;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
 import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 /**
  * @author Richard Connor
@@ -27,7 +26,7 @@ import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
  *
  * @param <T>
  */
-public class Euclidean<T extends CartesianPoint>  implements Distance<T>, Metric<T> {
+public class Euclidean<T extends CartesianPoint>  implements NamedMetric<T> {
 
 	public double distance(T x, T y) {
 		double[] ys = y.getPoint();

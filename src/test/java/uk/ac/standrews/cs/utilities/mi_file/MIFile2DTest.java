@@ -18,7 +18,7 @@ package uk.ac.standrews.cs.utilities.mi_file;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 

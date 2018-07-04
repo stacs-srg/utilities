@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.m_tree;
+package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-public interface Distance<T> {
+public interface ICountedMetric<T> extends NamedMetric<T>  {
 
-    double distance(T a, T b);
+    public int reset();
+    public int getComparisonCount();
 }

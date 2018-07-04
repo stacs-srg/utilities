@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.mi_file;
 
-import uk.ac.standrews.cs.utilities.m_tree.DataDistance;
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.*;
 
@@ -31,7 +31,7 @@ import java.util.*;
  * Distance between two data objects is measured by computing the spearmann footrule distance between
  * the two sequence of reference objects that represent them. The closer the two data objects
  * the most similar the two sequence of reference objects. The index is based on the use of inverted files.
- * More details on the technique can be found in the paper "Approximate Similarity Search in Metric Spaces Using
+ * More details on the technique can be found in the paper "Approximate Similarity Search in NamedMetric Spaces Using
  * Inverted Files", by Giuseppe Amato and Pasquale Savino, presented at Infoscale 2008.
  *
  * Giuseppe Amato
@@ -42,7 +42,7 @@ import java.util.*;
  */
 public class MIFile<T> {
 
-    final Distance<T> distance_wrapper;
+    final NamedMetric<T> distance_wrapper;
     private final Set<T> reference_objects;
     private final InvertedFile<T> invFile;
 
@@ -62,7 +62,7 @@ public class MIFile<T> {
      * @param ki Specifies the number of reference objects used for indexing. It must be smaller than n_ro
      * @param ks Specifies the number of reference objects used for searching.
      */
-    public MIFile(Distance<T> d, Set<T> reference_objects, int ki, int ks  ) throws Exception {
+    public MIFile(NamedMetric<T> d, Set<T> reference_objects, int ki, int ks  ) throws Exception {
 
         distance_wrapper = d;
         this.reference_objects = reference_objects;

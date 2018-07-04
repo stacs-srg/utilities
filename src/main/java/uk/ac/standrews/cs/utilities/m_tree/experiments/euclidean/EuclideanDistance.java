@@ -16,9 +16,10 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
 
-import uk.ac.standrews.cs.utilities.m_tree.Distance;
 
-public class EuclideanDistance implements Distance<Point> {
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+
+public class EuclideanDistance implements NamedMetric<Point> {
 
     public double distance(Point p1, Point p2) {
 
@@ -26,6 +27,11 @@ public class EuclideanDistance implements Distance<Point> {
         double ydistance = p1.y - p2.y;
 
         return (double) Math.sqrt((xdistance * xdistance) + (ydistance * ydistance));
+    }
+
+    @Override
+    public String getMetricName() {
+        return "EuclideanDistance (2D)";
     }
 }
 
