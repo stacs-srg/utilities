@@ -26,7 +26,7 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class MTreeEuclidean2DSystematicLargeTest extends MTreeEuclidean2DSystematicTest {
 
-    private static final int[] tree_sizes = new int[]{100, 200};
+    private static final int[] tree_sizes = new int[]{100};
     private static final int number_of_repetitions = 1;
 
     @Parameters(name = "tree size={0}, repetition={1}, duplicates={2}")

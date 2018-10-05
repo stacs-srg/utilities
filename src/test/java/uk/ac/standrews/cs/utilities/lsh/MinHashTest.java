@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -50,19 +51,11 @@ public class MinHashTest {
         return result;
     }
 
-    @Before
-    public void setup() {
-
-    }
-
     @Test
     public void jacquard_minhash_same_as_2grams() {
 
         String input1 = "The attribute to awe and majesty.";
         String input2 = "The attribute to awe and majesty.";
-
-        Set<String> input1_2grams = Shingle.ngrams(input1,2);
-        Set<String> input2_2grams = Shingle.ngrams(input2,2);
 
         double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
 
@@ -70,10 +63,7 @@ public class MinHashTest {
                 toCollection(MinHash.createMinHashSignature( input1, DEFAULTSIGNATURESIZE_TEST, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2, DEFAULTSIGNATURESIZE_TEST, 2)));
 
-        System.out.println( "Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
-
-        assertTrue(Math.abs(jacquard_ngrams-jacquard_minhash) == 0.0 );
-
+        assertEquals(0.0, Math.abs(jacquard_ngrams-jacquard_minhash) );
     }
 
     @Test
@@ -82,19 +72,13 @@ public class MinHashTest {
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "Jul. O Romeo, 12345! wherefore art thou Romeo?";
 
-        Set<String> input1_2grams = Shingle.ngrams(input1,2);
-        Set<String> input2_2grams = Shingle.ngrams(input2,2);
-
         double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
 
         double jacquard_minhash = jaccard.distance(
                 toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 
-        System.out.println( jacquard_ngrams + " " + jacquard_minhash+ " Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
-
         assertTrue(Math.abs(jacquard_ngrams-jacquard_minhash) < 0.2 );
-
     }
 
     @Test
@@ -103,19 +87,12 @@ public class MinHashTest {
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "This is a totally different string than above!";
 
-        Set<String> input1_2grams = Shingle.ngrams(input1,2);
-        Set<String> input2_2grams = Shingle.ngrams(input2,2);
-
         double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
 
         double jacquard_minhash = jaccard.distance(
                 toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
                 toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
 
-        System.out.println( jacquard_ngrams + " " + jacquard_minhash+ " Diff = " + Math.abs(jacquard_ngrams-jacquard_minhash) );
-
         assertTrue(Math.abs(jacquard_ngrams-jacquard_minhash) < 0.2 );
-
     }
-
 }
