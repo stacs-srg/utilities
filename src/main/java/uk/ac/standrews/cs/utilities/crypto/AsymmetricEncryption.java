@@ -359,7 +359,6 @@ public class AsymmetricEncryption {
         } catch (CryptoException e) {
             return false;
         }
-
     }
 
     /**
@@ -519,12 +518,15 @@ public class AsymmetricEncryption {
 
                 if (line.contains(PUBLIC_KEY_HEADER)) {
 
-                    if (builder != null) { // Finished to read the key
+                    if (builder != null) {
+
                         builder.append(line);
-                        PublicKey publicKey = getPublicKeyFromPEMString(builder.toString());
-                        key_list.add(publicKey);
+                        PublicKey public_key = getPublicKeyFromPEMString(builder.toString());
+                        key_list.add(public_key);
                         builder = null;
-                    } else { // Starting to read a new key
+
+                    } else {
+
                         builder = new StringBuilder();
                         builder.append(line);
                         builder.append("\n");
@@ -536,7 +538,6 @@ public class AsymmetricEncryption {
                         builder.append(line);
                         builder.append("\n");
                     }
-
                 }
             }
         }
@@ -617,6 +618,7 @@ public class AsymmetricEncryption {
                         return SymmetricEncryption.getKey(decrypt(private_key, builder.toString()));
 
                     } catch (final CryptoException e) {
+
                         // Couldn't decrypt, try the next one.
                         builder = new StringBuilder();
                     }
@@ -638,7 +640,7 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static String encryptAESKey(final PublicKey public_key, final SecretKey AES_key) throws CryptoException {
 
-        return AsymmetricEncryption.encrypt(public_key, SymmetricEncryption.keyToString(AES_key)) + "\n";
+        return encrypt(public_key, SymmetricEncryption.keyToString(AES_key)) + "\n";
     }
 
     @SuppressWarnings("unused")

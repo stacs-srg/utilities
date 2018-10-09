@@ -21,7 +21,7 @@ package uk.ac.standrews.cs.utilities.crypto;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-public class CryptoException extends Throwable {
+public class CryptoException extends Exception {
 
     CryptoException(final String message) {
 
@@ -31,11 +31,5 @@ public class CryptoException extends Throwable {
     CryptoException(final Throwable cause) {
 
         super(cause);
-    }
-
-    @SuppressWarnings("unused")
-    public CryptoException(final String message, final Throwable cause) {
-
-        super(message, cause);
     }
 }
