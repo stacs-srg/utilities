@@ -57,12 +57,12 @@
             <version>[0.7,)</version>
         </dependency>
 
-        <dependency>
-            <groupId>uk.ac.standrews.cs</groupId>
-            <artifactId>common-test</artifactId>
-            <version>2.0-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>uk.ac.standrews.cs</groupId>-->
+            <!--<artifactId>common-test</artifactId>-->
+            <!--<version>2.0-SNAPSHOT</version>-->
+            <!--<type>jar</type>-->
+        <!--</dependency>-->
 
         <dependency>
             <!-- Manipulation of MS Access files -->
@@ -95,11 +95,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.5</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>uk.ac.standrews.cs</groupId>
-            <artifactId>ciesvium</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
