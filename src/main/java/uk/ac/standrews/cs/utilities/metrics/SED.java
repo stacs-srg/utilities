@@ -184,6 +184,20 @@ public class SED implements NamedMetric<String> {
 
     @Override
     public double distance(String x, String y) {
+        if( x == null || x.equals( "" ) ) {
+            if( y == null || y.equals( "" ) ) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+        if( y == null || y.equals( "" ) ) {
+            return 1;
+        }
+        if( x.equals( y ) ) {
+            return 0;
+        }
+       //
         SparseProbabilityArray s1 = stringToSparseArray(x);
         SparseProbabilityArray s2 = stringToSparseArray(y);
         return SparseProbabilityArray.SEDistance(s1, s2);
@@ -199,6 +213,13 @@ public class SED implements NamedMetric<String> {
 
         System.out.println("SED:" );
 
+
+        System.out.println("null/cat: " + sed.distance(null, "cat"));
+        System.out.println("cat/null: " + sed.distance("cat", null));
+        System.out.println("null/null: " + sed.distance(null, null));
+        System.out.println("empty string/empty string: " + sed.distance("", ""));
+        System.out.println("empty string/cat: " + sed.distance("", "cat"));
+        System.out.println("cat/empty string: " + sed.distance("cat", ""));
         System.out.println("cat/cat: " + sed.distance("cat", "cat"));
         System.out.println( "pillar/caterpillar: " +  sed.distance( "pillar", "caterpillar" ) );  //  6/11 correct
         System.out.println( "bat/cat: " + sed.distance( "bat", "cat" ) );
