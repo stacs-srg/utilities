@@ -34,6 +34,19 @@ public class JensenShannon2 extends SED implements NamedMetric<String> {
     }
 
     public double distance(String x, String y) {
+        if( x == null || x.equals( "" ) ) {
+            if( y == null || y.equals( "" ) ) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+        if( y == null || y.equals( "" ) ) {
+            return 1;
+        }
+        if( x.equals( y ) ) {
+            return 0;
+        }
         SparseProbabilityArray s1 = stringToSparseArray(x);
         SparseProbabilityArray s2 = stringToSparseArray(y);
         return SparseProbabilityArray.JSDistance(s1, s2);
