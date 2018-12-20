@@ -41,6 +41,8 @@ public class PercentageProgressIndicator extends ProgressIndicator {
      */
     public void indicateProgress(final double proportion_complete) {
 
-        System.out.println(Math.round(proportion_complete * HUNDRED_PERCENT) + "%");
+//        System.out.println(Math.round(proportion_complete * HUNDRED_PERCENT) + "%");
+        System.out.print("\b\b\b" + Math.round(proportion_complete * HUNDRED_PERCENT) + "%");
+        System.out.println();
     }
 }
