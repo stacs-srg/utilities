@@ -30,7 +30,7 @@ public class SparseDistro {
 
     private ArrayList<QgramDistribution> list = new ArrayList<>();
 
-    private boolean counting;  // distribution is counting occurancies not probabilities.
+    private boolean counting;  // distribution is counting occurrences not probabilities.
 
     public SparseDistro(String x) {
 

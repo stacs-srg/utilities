@@ -213,7 +213,6 @@ public class SED implements NamedMetric<String> {
 
         System.out.println("SED:" );
 
-
         System.out.println("null/cat: " + sed.distance(null, "cat"));
         System.out.println("cat/null: " + sed.distance("cat", null));
         System.out.println("null/null: " + sed.distance(null, null));

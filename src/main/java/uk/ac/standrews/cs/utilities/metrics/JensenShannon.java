@@ -32,7 +32,6 @@ import static uk.ac.standrews.cs.utilities.metrics.KullbackLeibler.kullbackLeibl
 public class JensenShannon implements NamedMetric<String> {
 
     /**
-     *
      * @param x
      * @param y
      * @return the JensenShannonDistance
@@ -49,7 +48,6 @@ public class JensenShannon implements NamedMetric<String> {
     }
 
     /**
-     *
      * @param x
      * @param y
      * @return the JensenShannonDistance (from elsewhere):
@@ -63,7 +61,6 @@ public class JensenShannon implements NamedMetric<String> {
     }
 
     /**
-     *
      * @param p1
      * @param p2
      * @return  the Jensen-Shannon divergence.
@@ -110,7 +107,6 @@ public class JensenShannon implements NamedMetric<String> {
         return "^" + x + "$";
     }
 
-
     private static SparseDistro average(SparseDistro xx, SparseDistro yy) throws Exception {
         if( ! ( xx.is_counting() && yy.is_counting() ) ) {
             throw new Exception( "Can only average counting distributions" );
@@ -149,28 +145,10 @@ public class JensenShannon implements NamedMetric<String> {
     public static void main(String[] args) {
 
         JensenShannon js = new JensenShannon();
-        KullbackLeibler kl = new KullbackLeibler();
-
-        double[] array1 = new double[]{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        double[] array2 = new double[]{ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
-
-//        System.out.println( kl.kullbackLeiblerDivergence( array1, array1 ) );
-//        System.out.println( kl.kullbackLeiblerDivergence( array1, array2 ) );
-//        System.out.println( kl.kullbackLeiblerDivergence( array2, array1 ) );
-
-        double[] array3 = new double[]{ 0.05, 0.4, 0.25, 0.3 };
-        double[] array4 = new double[]{ 0.4, 0.25, 0.3, 0.05 };
-
-//        System.out.println( kl.kullbackLeiblerDivergence( array1, array4 ) );
-
-//         System.out.println( kl.kullbackLeiblerDivergence( "ABC", "ABC" ) );
-//         System.out.println( kl.kullbackLeiblerDivergence( "CDE", "BCDEFCDCDCDCD" ) );
-//         System.out.println( kl.kullbackLeiblerDivergence(  "BCDEFCDCDCDCD", "CDE" ) );
-//         System.out.println( kl.kullbackLeiblerDivergence( "ABC", "CDE" ) );
-//         System.out.println( kl.kullbackLeiblerDivergence( "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ) );
-
 
         System.out.println("JS:" );
+
+        System.out.println("cat/cat: " + js.distance("cat", "cat"));
         System.out.println( "cat/zoo: " + js.distance( "cat", "zoo" ) );
         System.out.println( "mclauchlan/mclauchlan: " + js.distance( "mclauchlan", "mclauchlan" ) );
         System.out.println( "pillar/caterpillar: " + js.distance( "pillar", "caterpillar" ) );  //  6/11 correct
