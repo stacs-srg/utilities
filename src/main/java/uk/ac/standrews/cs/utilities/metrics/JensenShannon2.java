@@ -26,27 +26,15 @@ import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 public class JensenShannon2 extends SED implements NamedMetric<String> {
 
-    /**
-     * @param maxCharVal
-     */
     public JensenShannon2(int maxCharVal) {
         super(maxCharVal);
     }
 
     public double distance(String x, String y) {
-        if( x == null || x.equals( "" ) ) {
-            if( y == null || y.equals( "" ) ) {
-                return 0;
-            } else {
-                return 1;
-            }
-        }
-        if( y == null || y.equals( "" ) ) {
-            return 1;
-        }
-        if( x.equals( y ) ) {
-            return 0;
-        }
+
+        final double extreme = check(x, y);
+        if (extreme != -1.0) return extreme;
+
         SparseProbabilityArray s1 = stringToSparseArray(x);
         SparseProbabilityArray s2 = stringToSparseArray(y);
         return SparseProbabilityArray.JSDistance(s1, s2);

@@ -96,7 +96,7 @@ public class SparseDistro {
         return sb.toString();
     }
 
-    public void average_value(String key, double value) throws Exception {
+    public void average_value(String key, double value) {
 
         if( counting ) {
             QgramDistribution sc = new QgramDistribution(key, value);
@@ -110,7 +110,7 @@ public class SparseDistro {
                 already.count = ( already.count + value ) / 2;
             }
         } else {
-            throw new Exception( "Cannot average_value to a probability distribution");
+            throw new RuntimeException( "Cannot average_value to a probability distribution");
         }
     }
 
@@ -123,7 +123,6 @@ public class SparseDistro {
         }
         list.add(i,sc);
     }
-
 
     public static void main(String[] args) {
         SparseDistro sd1 = new SparseDistro( "AABBABACVXSAB");

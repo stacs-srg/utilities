@@ -32,8 +32,6 @@ import static uk.ac.standrews.cs.utilities.metrics.KullbackLeibler.kullbackLeibl
 public class JensenShannon implements NamedMetric<String> {
 
     /**
-     * @param x
-     * @param y
      * @return the JensenShannonDistance
      * The square root of the Jensen-Shannon divergence is a metric
      */
@@ -48,12 +46,11 @@ public class JensenShannon implements NamedMetric<String> {
     }
 
     /**
-     * @param x
-     * @param y
      * @return the JensenShannonDistance (from elsewhere):
      * The square root of the Jensen-Shannon divergence is a metric
      */
     public double JensenShannonDistance(double[] x, double[] y) {
+
         if (x.length != y.length)
             throw new IllegalArgumentException(String.format("Arrays have different length: x[%d], y[%d]", x.length, y.length));
 
@@ -61,30 +58,23 @@ public class JensenShannon implements NamedMetric<String> {
     }
 
     /**
-     * @param p1
-     * @param p2
-     * @return  the Jensen-Shannon divergence.
+     * @return the Jensen-Shannon divergence.
      * The Jensen-Shannon divergence is a symmetric and smoothed version of the Kullback-Leibler divergence
      */
     public double jensenShannonDivergence(double[] p1, double[] p2) {
-        assert(p1.length == p2.length);
+
         double[] average = new double[p1.length];
         for (int i = 0; i < p1.length; i++) {
-            average[i] += (p1[i] + p2[i])/2;      // average of the two arrays.
+            average[i] += (p1[i] + p2[i]) / 2;
         }
-        return (kullbackLeiblerDivergence(p1, average) + kullbackLeiblerDivergence(p2, average))/2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
+        return (kullbackLeiblerDivergence(p1, average) + kullbackLeiblerDivergence(p2, average)) / 2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
     }
 
     public double jensenShannonDivergence(String p1, String p2) {
-        SparseDistro p1_distro = new SparseDistro( topAndTail(p1) );
-        SparseDistro p2_distro = new SparseDistro( topAndTail(p2) );
-        SparseDistro average = null;
-        try {
-            average = average( p1_distro,p2_distro );
-        } catch (Exception e) {
-            // this cannot occur since the two distros above were newly created and hence using counts.
-            ErrorHandling.hardError( "Unexpected probability based distribition" );
-        }
+
+        SparseDistro p1_distro = new SparseDistro(topAndTail(p1));
+        SparseDistro p2_distro = new SparseDistro(topAndTail(p2));
+        SparseDistro average = average(p1_distro, p2_distro);
 
         p1_distro = p1_distro.toProbability();
         p2_distro = p2_distro.toProbability();
@@ -93,13 +83,14 @@ public class JensenShannon implements NamedMetric<String> {
         double kl1 = kullbackLeiblerDivergence(p1_distro, average);
         double kl2 = kullbackLeiblerDivergence(p2_distro, average);
 
-        return (kl1 + kl2)/2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
+        return (kl1 + kl2) / 2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
     }
 
     //---------------------------- utility code ----------------------------//
 
     /**
      * Adds a character to the front and end of the string - ensures that even empty strings contain 1 2-gram.
+     *
      * @param x - a string to be encapsulated
      * @return an a string encapsulated with ^ and $
      */
@@ -107,16 +98,19 @@ public class JensenShannon implements NamedMetric<String> {
         return "^" + x + "$";
     }
 
-    private static SparseDistro average(SparseDistro xx, SparseDistro yy) throws Exception {
-        if( ! ( xx.is_counting() && yy.is_counting() ) ) {
-            throw new Exception( "Can only average counting distributions" );
+    private static SparseDistro average(SparseDistro xx, SparseDistro yy) {
+
+        if (!(xx.is_counting() && yy.is_counting())) {
+            throw new RuntimeException("Can only average counting distributions");
         }
-        SparseDistro ave = new SparseDistro( xx ); // a copy of the first distribution.
+
+        SparseDistro ave = new SparseDistro(xx); // a copy of the first distribution.
+
         // now average_value in the records from the second
         Iterator<QgramDistribution> yy_iter = yy.getIterator();
-        while( yy_iter.hasNext() ) {
+        while (yy_iter.hasNext()) {
             QgramDistribution nxt = yy_iter.next();
-            ave.average_value( nxt.key, nxt.count );
+            ave.average_value(nxt.key, nxt.count);
         }
         return ave;
     }
@@ -129,12 +123,11 @@ public class JensenShannon implements NamedMetric<String> {
     }
 
     public static Set intersection(Collection a, Collection b) {
-        Set result = new HashSet();
-        Iterator a_iter = a.iterator();
-        while( a_iter.hasNext() ) {
-            Object next = a_iter.next();
-            if( b.contains( next ) ) {
-                result.add( next );
+
+        Set<Object> result = new HashSet<>();
+        for (final Object next : a) {
+            if (b.contains(next)) {
+                result.add(next);
             }
         }
         return result;
@@ -146,17 +139,17 @@ public class JensenShannon implements NamedMetric<String> {
 
         JensenShannon js = new JensenShannon();
 
-        System.out.println("JS:" );
+        System.out.println("JS:");
 
         System.out.println("cat/cat: " + js.distance("cat", "cat"));
-        System.out.println( "cat/zoo: " + js.distance( "cat", "zoo" ) );
-        System.out.println( "mclauchlan/mclauchlan: " + js.distance( "mclauchlan", "mclauchlan" ) );
-        System.out.println( "pillar/caterpillar: " + js.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "cat/bat: " + js.distance( "cat", "bat" ) );
-        System.out.println( "bat/cat: " + js.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + js.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " + js.distance( "cat", "caterpillar" ) );
-        System.out.println( "n/zoological: " + js.distance( "n", "zoological" ) );
-        System.out.println( "a/hi: " + js.distance( "a", "hej" ));
+        System.out.println("cat/zoo: " + js.distance("cat", "zoo"));
+        System.out.println("mclauchlan/mclauchlan: " + js.distance("mclauchlan", "mclauchlan"));
+        System.out.println("pillar/caterpillar: " + js.distance("pillar", "caterpillar"));  //  6/11 correct
+        System.out.println("cat/bat: " + js.distance("cat", "bat"));
+        System.out.println("bat/cat: " + js.distance("bat", "cat"));
+        System.out.println("cat/cart: " + js.distance("cat", "cart"));
+        System.out.println("cat/caterpillar: " + js.distance("cat", "caterpillar"));
+        System.out.println("n/zoological: " + js.distance("n", "zoological"));
+        System.out.println("a/hi: " + js.distance("a", "hej"));
     }
 }

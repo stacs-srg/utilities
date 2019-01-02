@@ -97,4 +97,21 @@ public final class Levenshtein implements StringMetric {
     public String toString() {
         return "Levenshtein [insertDelete=" + this.insertDelete + ", substitute=" + this.substitute + "]";
     }
+
+    public static void main(String[] a) {
+        Levenshtein metric = new Levenshtein();
+
+        System.out.println("Levenshtein:" );
+
+        System.out.println("cat/cat: " + metric.distance("cat", "cat"));
+        System.out.println( "cat/zoo: " + metric.distance( "cat", "zoo" ) );
+        System.out.println( "mclauchlan/mclauchlan: " + metric.distance( "mclauchlan", "mclauchlan" ) );
+        System.out.println( "pillar/caterpillar: " + metric.distance( "pillar", "caterpillar" ) );  //  6/11 correct
+        System.out.println( "cat/bat: " + metric.distance( "cat", "bat" ) );
+        System.out.println( "bat/cat: " + metric.distance( "bat", "cat" ) );
+        System.out.println( "cat/cart: " + metric.distance( "cat", "cart" ) );
+        System.out.println( "cat/caterpillar: " + metric.distance( "cat", "caterpillar" ) );
+        System.out.println( "n/zoological: " + metric.distance( "n", "zoological" ) );
+        System.out.println( "a/hi: " + metric.distance( "a", "hej" ));
+    }
 }

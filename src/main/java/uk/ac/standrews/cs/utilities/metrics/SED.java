@@ -18,7 +18,6 @@
 /**
  * @author Richard Connor richard.connor@strath.ac.uk
  * Implements Structural Entropic Distance
- *
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
@@ -32,7 +31,7 @@ public class SED implements NamedMetric<String> {
 
     private int charValUpb;
     private Map<String, SparseProbabilityArray> memoTable;
-    private static double log2 = Math.log(2);
+    private static final double log2 = Math.log(2);
 
     private static double h(double d) {
         return -d * Math.log(d);
@@ -58,48 +57,49 @@ public class SED implements NamedMetric<String> {
         private int[] finalEvents;
 
         public SparseProbabilityArray() {
-            this.cardMap = new TreeMap<>();
-            this.acc = 0;
+
+            cardMap = new TreeMap<>();
+            acc = 0;
         }
 
-        @SuppressWarnings("boxing")
-        public void addEvent(int event, int card) {
-            if (!this.cardMap.keySet().contains(event)) {
-                this.cardMap.put(event, 0);
+        private synchronized void addEvent(int event, int card) {
+
+            if (!cardMap.keySet().contains(event)) {
+                cardMap.put(event, 0);
             }
-            this.cardMap.put(event, this.cardMap.get(event) + card);
-            this.acc += card;
+
+            cardMap.put(event, cardMap.get(event) + card);
+            acc += card;
         }
 
-        @SuppressWarnings("boxing")
-        public void finalise() {
-            final int size = this.cardMap.size();
-            this.finalEvents = new int[size];
-            this.finalProbs = new double[size];
+        private synchronized void finalise() {
+
+            final int size = cardMap.size();
+            finalEvents = new int[size];
+            finalProbs = new double[size];
 
             int ptr = 0;
-            for (int event : this.cardMap.keySet()) {
-                this.finalEvents[ptr] = event;
-                this.finalProbs[ptr++] = (double) this.cardMap.get(event)
-                        / this.acc;
+            for (int event : cardMap.keySet()) {
+                finalEvents[ptr] = event;
+                finalProbs[ptr++] = (double) cardMap.get(event) / acc;
             }
-            this.cardMap = null;
+            cardMap = null;
         }
 
-        public static double SEDistance(SparseProbabilityArray ar1,
-                                     SparseProbabilityArray ar2) {
-            double k = doCalc( ar1,ar2 );
-            return (double) Math.pow(Math.pow(2, Math.max(0,k)) - 1, 0.486);
+        public static double SEDistance(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {
+
+            double k = doCalc(ar1, ar2);
+            return Math.pow(Math.pow(2, Math.max(0, k)) - 1, 0.486);
         }
 
-        public static double JSDistance(SparseProbabilityArray ar1,
-                                       SparseProbabilityArray ar2) {
-            double k = doCalc( ar1,ar2 );
-            return (double) Math.sqrt(Math.max(0,k));
+        public static double JSDistance(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {
+
+            double k = doCalc(ar1, ar2);
+            return Math.sqrt(Math.max(0, k));
         }
 
-        private static double doCalc(SparseProbabilityArray ar1,
-                                     SparseProbabilityArray ar2) {
+        private static double doCalc(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {
+
             int ar1Ptr = 0;
             int ar2Ptr = 0;
             int ar1Event = ar1.finalEvents[ar1Ptr];
@@ -108,10 +108,9 @@ public class SED implements NamedMetric<String> {
             boolean finished = false;
             double simAcc = 0;
             while (!finished) {
-                // System.out.println(ar1Event + ";" + ar2Event);
+
                 if (ar1Event == ar2Event) {
-                    simAcc += hCalc(ar1.finalProbs[ar1Ptr],
-                            ar2.finalProbs[ar2Ptr]);
+                    simAcc += hCalc(ar1.finalProbs[ar1Ptr], ar2.finalProbs[ar2Ptr]);
                     ar1Ptr++;
                     ar2Ptr++;
                 } else if (ar1Event < ar2Event) {
@@ -119,49 +118,50 @@ public class SED implements NamedMetric<String> {
                 } else {
                     ar2Ptr++;
                 }
+
                 if (ar1Ptr == ar1.finalEvents.length) {
                     ar1Event = Integer.MAX_VALUE;
                 } else {
 
                     ar1Event = ar1.finalEvents[ar1Ptr];
                 }
+
                 if (ar2Ptr == ar2.finalEvents.length) {
                     ar2Event = Integer.MAX_VALUE;
                 } else {
                     ar2Event = ar2.finalEvents[ar2Ptr];
                 }
-                finished = ar1Ptr == ar1.finalEvents.length
-                        && ar2Ptr == ar2.finalEvents.length;
+                finished = ar1Ptr == ar1.finalEvents.length && ar2Ptr == ar2.finalEvents.length;
             }
-            double k = (1 - (simAcc / log2) / 2);
-            return k;
+
+            return (1 - (simAcc / log2) / 2);
         }
     }
 
-    /**
-     * @param maxCharVal
-     */
     public SED(int maxCharVal) {
+
         if (maxCharVal > Math.sqrt(Integer.MAX_VALUE)) {
             throw new RuntimeException("char val too large for SED");
         }
-        this.charValUpb = maxCharVal + 1;
-        this.memoTable = new HashMap<>();
+        charValUpb = maxCharVal + 1;
+        memoTable = new HashMap<>();
     }
 
     protected SparseProbabilityArray stringToSparseArray(String s) {
-        if (this.memoTable.containsKey(s)) {
-            return this.memoTable.get(s);
-        } else {
+
+        if (memoTable.containsKey(s)) {
+            return memoTable.get(s);
+        }
+        else {
             SparseProbabilityArray spa = new SparseProbabilityArray();
 
             for (int i = -1; i < s.length(); i++) {
                 char ch1 = 0;
-                char ch2 = 0;
+                char ch2;
                 try {
                     ch1 = s.charAt(i);
                     spa.addEvent(ch1, 2);
-                    if (ch1 > this.charValUpb || ch1 == 0) {
+                    if (ch1 > charValUpb || ch1 == 0) {
                         throw new RuntimeException("incorrect char val in SED");
                     }
                     ch2 = s.charAt(i + 1);
@@ -170,37 +170,44 @@ public class SED implements NamedMetric<String> {
                         ch1 = 1;
                         ch2 = s.charAt(0);
                     } else {
-                        // ch1 = s.charAt(i); //redundant
                         ch2 = 1;
                     }
                 }
-                spa.addEvent(ch1 * this.charValUpb + ch2, 1);
+                spa.addEvent(ch1 * charValUpb + ch2, 1);
             }
             spa.finalise();
-            this.memoTable.put(s, spa);
+            memoTable.put(s, spa);
             return spa;
         }
     }
 
     @Override
     public double distance(String x, String y) {
-        if( x == null || x.equals( "" ) ) {
-            if( y == null || y.equals( "" ) ) {
+
+        final double extreme = check(x, y);
+        if (extreme != -1.0) return extreme;
+
+        SparseProbabilityArray s1 = stringToSparseArray(x);
+        SparseProbabilityArray s2 = stringToSparseArray(y);
+        return SparseProbabilityArray.SEDistance(s1, s2);
+    }
+
+    protected double check(final String x, final String y) {
+
+        if (x == null || x.equals("")) {
+            if (y == null || y.equals("")) {
                 return 0;
             } else {
                 return 1;
             }
         }
-        if( y == null || y.equals( "" ) ) {
+        if (y == null || y.equals("")) {
             return 1;
         }
-        if( x.equals( y ) ) {
+        if (x.equals(y)) {
             return 0;
         }
-       //
-        SparseProbabilityArray s1 = stringToSparseArray(x);
-        SparseProbabilityArray s2 = stringToSparseArray(y);
-        return SparseProbabilityArray.SEDistance(s1, s2);
+        return -1;
     }
 
     @Override
@@ -211,7 +218,7 @@ public class SED implements NamedMetric<String> {
     public static void main(String[] a) {
         SED sed = new SED(255);
 
-        System.out.println("SED:" );
+        System.out.println("SED:");
 
         System.out.println("null/cat: " + sed.distance(null, "cat"));
         System.out.println("cat/null: " + sed.distance("cat", null));
@@ -220,12 +227,11 @@ public class SED implements NamedMetric<String> {
         System.out.println("empty string/cat: " + sed.distance("", "cat"));
         System.out.println("cat/empty string: " + sed.distance("cat", ""));
         System.out.println("cat/cat: " + sed.distance("cat", "cat"));
-        System.out.println( "pillar/caterpillar: " +  sed.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "bat/cat: " + sed.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + sed.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " +sed.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + sed.distance( "cat", "zoo" ) );
-        System.out.println( "n/zoological: " + sed.distance( "n", "zoological" ) );
+        System.out.println("pillar/caterpillar: " + sed.distance("pillar", "caterpillar"));  //  6/11 correct
+        System.out.println("bat/cat: " + sed.distance("bat", "cat"));
+        System.out.println("cat/cart: " + sed.distance("cat", "cart"));
+        System.out.println("cat/caterpillar: " + sed.distance("cat", "caterpillar"));
+        System.out.println("cat/zoo: " + sed.distance("cat", "zoo"));
+        System.out.println("n/zoological: " + sed.distance("n", "zoological"));
     }
-
 }
