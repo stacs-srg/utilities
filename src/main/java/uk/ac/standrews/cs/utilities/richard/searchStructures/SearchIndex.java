@@ -185,11 +185,6 @@ public abstract class SearchIndex<T> {
 	 * for three line lengths of the triangle aqb, this gives the distance from
 	 * "dropping the perpendicular" from q to ab; nb it can be negative if qb is
 	 * greater than ab
-	 * 
-	 * @param ab
-	 * @param aq
-	 * @param bq
-	 * @return
 	 */
 	public static double projectionDistance(double ab, double aq, double bq) {
 		if (ab == 0) {
@@ -208,10 +203,6 @@ public abstract class SearchIndex<T> {
 	/**
 	 * for three points p1, p2 and s; gives the perpendicular distance from p1p2
 	 * to s, given the lenght of p1s and the projection of s onto p1p2
-	 * 
-	 * @param proj
-	 * @param aq
-	 * @return
 	 */
 	public static double altitude(double proj, double aq) {
 		return Math.sqrt(aq * aq - proj * proj);

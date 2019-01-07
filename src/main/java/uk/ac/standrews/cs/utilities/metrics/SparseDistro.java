@@ -135,7 +135,6 @@ public class SparseDistro {
 
     /**
      * Converts a distribution from counting to probabilities
-     * @return
      */
     public SparseDistro toProbability() {
         if( counting ) {

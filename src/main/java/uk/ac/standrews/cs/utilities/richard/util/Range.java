@@ -23,7 +23,7 @@ public class Range implements Iterable<Integer> {
 	Iterator<Integer> i;
 
 	/**
-	 * @param start
+	 * @param lwb
 	 *            of range (inclusive)
 	 * @param upb
 	 *            end of range (exclusive)

@@ -147,7 +147,7 @@ public class SED implements NamedMetric<String> {
         memoTable = new HashMap<>();
     }
 
-    protected SparseProbabilityArray stringToSparseArray(String s) {
+    protected synchronized SparseProbabilityArray stringToSparseArray(String s) {
 
         if (memoTable.containsKey(s)) {
             return memoTable.get(s);
@@ -192,7 +192,7 @@ public class SED implements NamedMetric<String> {
         return SparseProbabilityArray.SEDistance(s1, s2);
     }
 
-    protected double check(final String x, final String y) {
+    protected static double check(final String x, final String y) {
 
         if (x == null || x.equals("")) {
             if (y == null || y.equals("")) {
