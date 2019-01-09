@@ -30,29 +30,30 @@ public final class Levenshtein implements StringMetric {
     private final double substitute;
 
     public Levenshtein(double insertDelete, double substitute) {
-        Preconditions.checkArgument(insertDelete > 0.0F);
-        Preconditions.checkArgument(substitute >= 0.0F);
+        Preconditions.checkArgument(insertDelete > 0.0);
+        Preconditions.checkArgument(substitute >= 0.0);
         this.maxCost = Math.max(insertDelete, substitute);
         this.insertDelete = insertDelete;
         this.substitute = substitute;
     }
 
     public Levenshtein() {
-        this(1.0F, 1.0F);
+        this(1.0, 1.0);
     }
 
     public double compare(String a, String b) {
-        return a.isEmpty() && b.isEmpty() ? 1.0F : 1.0F - this.distance(a, b) / (this.maxCost * (float) Math.max(a.length(), b.length()));
+        return a.isEmpty() && b.isEmpty() ? 1.0 : 1.0 - this.distance(a, b) / (this.maxCost * (double) Math.max(a.length(), b.length()));
     }
 
     public double distance(String s, String t) {
         if (s.isEmpty()) {
-            return (float)t.length();
+            return (double)t.length();
         } else if (t.isEmpty()) {
-            return (float)s.length();
+            return (double)s.length();
         } else if (s.equals(t)) {
-            return 0.0F;
+            return 0.0;
         } else {
+
             int tLength = t.length();
             int sLength = s.length();
             double[] v0 = new double[tLength + 1];
@@ -69,7 +70,7 @@ public final class Levenshtein implements StringMetric {
                 for(int j = 0; j < tLength; ++j) {
                     v1[j + 1] = min(v1[j] + this.insertDelete,
                                          v0[j + 1] + this.insertDelete,
-                                          v0[j] + (s.charAt(i) == t.charAt(j) ? 0.0F : this.substitute));
+                                          v0[j] + (s.charAt(i) == t.charAt(j) ? 0.0 : this.substitute));
                 }
 
                 double[] swap = v0;
@@ -99,19 +100,19 @@ public final class Levenshtein implements StringMetric {
     }
 
     public static void main(String[] a) {
-        Levenshtein metric = new Levenshtein();
+        Levenshtein lev = new Levenshtein();
 
         System.out.println("Levenshtein:" );
 
-        System.out.println("cat/cat: " + metric.distance("cat", "cat"));
-        System.out.println( "cat/zoo: " + metric.distance( "cat", "zoo" ) );
-        System.out.println( "mclauchlan/mclauchlan: " + metric.distance( "mclauchlan", "mclauchlan" ) );
-        System.out.println( "pillar/caterpillar: " + metric.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "cat/bat: " + metric.distance( "cat", "bat" ) );
-        System.out.println( "bat/cat: " + metric.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + metric.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " + metric.distance( "cat", "caterpillar" ) );
-        System.out.println( "n/zoological: " + metric.distance( "n", "zoological" ) );
-        System.out.println( "a/hi: " + metric.distance( "a", "hej" ));
+        System.out.println("empty string/empty string: " + lev.distance("", ""));
+        System.out.println("empty string/cat: " + lev.distance("", "cat"));
+        System.out.println("cat/empty string: " + lev.distance("cat", ""));
+        System.out.println("cat/cat: " + lev.distance("cat", "cat"));
+        System.out.println( "pillar/caterpillar: " +  lev.distance( "pillar", "caterpillar" ) );  //  6/11 correct
+        System.out.println( "bat/cat: " + lev.distance( "bat", "cat" ) );
+        System.out.println( "cat/cart: " + lev.distance( "cat", "cart" ) );
+        System.out.println( "cat/caterpillar: " +lev.distance( "cat", "caterpillar" ) );
+        System.out.println( "cat/zoo: " + lev.distance( "cat", "zoo" ) );
+        System.out.println( "n/zoological: " + lev.distance( "n", "zoological" ) );
     }
 }

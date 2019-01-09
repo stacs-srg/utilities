@@ -53,9 +53,9 @@ public class Cosine implements StringMetric, NamedMetric<String> {
             }
         }
 
-       return 1 - dot_product / ( p.magnitude() * q.magnitude());
+       // return 1 - dot_product / ( p.magnitude() * q.magnitude());
 
-        //return Math.acos( dot_product / ( Math.sqrt(p.magnitude()) * Math.sqrt(q.magnitude()) ) ) / (2 * Math.PI );
+        return Math.acos( dot_product / ( p.magnitude()) * q.magnitude() ) * ( 2 / Math.PI );
     }
 
     @Override
@@ -79,6 +79,7 @@ public class Cosine implements StringMetric, NamedMetric<String> {
         Cosine cos = new Cosine();
 
         System.out.println("Cosine:");
+        System.out.println("empty/a: " + cos.distance("", "a"));
         System.out.println("a/a: " + cos.distance("a", "a"));
         System.out.println("mclauchlan/mclauchlan: " + cos.distance("mclauchlan", "mclauchlan"));
         System.out.println("pillar/caterpillar: " + cos.distance("pillar", "caterpillar"));  //  6/11 correct
@@ -90,6 +91,13 @@ public class Cosine implements StringMetric, NamedMetric<String> {
         System.out.println("n/zoological: " + cos.distance("n", "zoological"));
         System.out.println("abcdefghijklmnopqrstuvwxyz/zyxwvutsrqponmlkjihgfedcba: " + cos.distance("abcdefghijklmnopqrstuvwxyz", "zyxwvutsrqponmlkjihgfedcba"));
 
+        String s1 = "NILSSJÖBERGINGRIDERSDOTTER------------";
+        String s2 = "JONJONSSON LENBERGINGRID GRETANILSDR20051835----";
+        String s3 = "JONJONSSON LENBERGINGRID GRETANILSDOTTER20051835----";
+
+        System.out.println("s1/s2: " + cos.distance(s1, s2));
+        System.out.println("s2/s3: " + cos.distance(s2, s3));
+        System.out.println("s1/s3: " + cos.distance(s1, s3));
 
     }
 

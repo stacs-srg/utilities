@@ -50,6 +50,8 @@ public class JensenShannon2 extends SED implements NamedMetric<String> {
 
         System.out.println("JS2:" );
 
+        System.out.println("empty/empty: " + js2.distance("", ""));
+        System.out.println("empty/cat: " + js2.distance("", "cat"));
         System.out.println("cat/cat: " + js2.distance("cat", "cat"));
         System.out.println( "cat/zoo: " + js2.distance( "cat", "zoo" ) );
         System.out.println( "mclauchlan/mclauchlan: " + js2.distance( "mclauchlan", "mclauchlan" ) );
