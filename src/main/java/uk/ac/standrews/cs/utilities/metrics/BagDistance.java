@@ -30,10 +30,12 @@ package uk.ac.standrews.cs.utilities.metrics;
  */
 
 
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class BagDistance {
+public class BagDistance implements NamedMetric<String> {
 
     public BagDistance() {
 
@@ -100,4 +102,8 @@ public class BagDistance {
         System.out.println( "n/zoological: " + bd.distance( "n", "zoological" ) );
     }
 
+    @Override
+    public String getMetricName() {
+        return "BagDistance";
+    }
 }
