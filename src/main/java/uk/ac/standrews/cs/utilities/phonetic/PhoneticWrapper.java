@@ -22,17 +22,17 @@ import org.apache.commons.codec.StringEncoder;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-public class PhoneticWrapper implements NamedMetric<String>  {
+public class PhoneticWrapper implements NamedMetric<String> {
 
     private final StringEncoder encoder;
     private final StringMetric metric;
     private final String metric_name;
 
-    public PhoneticWrapper( StringEncoder encoder, StringMetric metric ) {
+    public PhoneticWrapper(StringEncoder encoder, StringMetric metric) {
 
         this.encoder = encoder;
         this.metric = metric;
-        this.metric_name = "PhoneticWrapper(" + encoder.getClass().getSimpleName() + "/" + metric.getMetricName() + ")";
+        this.metric_name = encoder.getClass().getSimpleName() + "/" + metric.getMetricName();
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PhoneticWrapper implements NamedMetric<String>  {
             String str1 = encoder.encode(x);
             String str2 = encoder.encode(y);
 
-            return metric.distance( str1, str2 );
+            return metric.distance(str1, str2);
 
         } catch (EncoderException e) {
             return 1.0;
