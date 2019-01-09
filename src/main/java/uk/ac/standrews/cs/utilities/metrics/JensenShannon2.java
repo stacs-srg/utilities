@@ -32,8 +32,8 @@ public class JensenShannon2 extends SED implements NamedMetric<String> {
 
     public double distance(String x, String y) {
 
-        final double extreme = check(x, y);
-        if (extreme != -1.0) return extreme;
+        double check = CheckValues.checkNullAndEmpty(x, y);
+        if (check != -1) return 1 - check;
 
         SparseProbabilityArray s1 = stringToSparseArray(x);
         SparseProbabilityArray s2 = stringToSparseArray(y);
