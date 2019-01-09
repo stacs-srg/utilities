@@ -29,7 +29,7 @@ import static uk.ac.standrews.cs.utilities.metrics.KullbackLeibler.kullbackLeibl
 /**
  * Created by al on 06/09/2017.
  */
-public class JensenShannonOld implements NamedMetric<String> {
+public class JensenShannonKullbackLeibler implements NamedMetric<String> {
 
     /**
      *
@@ -151,7 +151,7 @@ public class JensenShannonOld implements NamedMetric<String> {
 
     public static void main(String[] args) {
 
-        JensenShannonOld js = new JensenShannonOld();
+        JensenShannonKullbackLeibler js = new JensenShannonKullbackLeibler();
         KullbackLeibler kl = new KullbackLeibler();
 
         double[] array1 = new double[]{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
