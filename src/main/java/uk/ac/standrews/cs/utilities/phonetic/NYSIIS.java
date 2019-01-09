@@ -186,7 +186,7 @@ public class NYSIIS implements StringEncoder {
     private final boolean strict;
 
     /**
-     * Creates an instance of the {@link Nysiis} encoder with strict mode (original form),
+     * Creates an instance of the encoder with strict mode (original form),
      * i.e. encoded strings have a maximum length of 6.
      */
     public NYSIIS() {
@@ -194,7 +194,7 @@ public class NYSIIS implements StringEncoder {
     }
 
     /**
-     * Create an instance of the {@link Nysiis} encoder with the specified strict mode:
+     * Create an instance of the encoder with the specified strict mode:
      *
      * <ul>
      *  <li>{@code true}: encoded strings have a maximum length of 6</li>
@@ -244,7 +244,7 @@ public class NYSIIS implements StringEncoder {
     }
 
     /**
-     * Indicates the strict mode for this {@link Nysiis} encoder.
+     * Indicates the strict mode for this encoder.
      *
      * @return {@code true} if the encoder is configured for strict mode, {@code false} otherwise
      */
@@ -330,5 +330,4 @@ public class NYSIIS implements StringEncoder {
         final String string = key.toString();
         return this.isStrict() ? string.substring(0, Math.min(TRUE_LENGTH, string.length())) : string;
     }
-
 }

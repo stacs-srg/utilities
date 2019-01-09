@@ -89,9 +89,6 @@ public class TestLoad {
 	/**
 	 * 
 	 * generated cartesian data
-	 * 
-	 * @param dimension
-	 * @param size
 	 */
 	public TestLoad(int dimension, int size, boolean gaussian) {
 		this.testData = new ArrayList<>();
@@ -105,11 +102,6 @@ public class TestLoad {
 	/**
 	 * 
 	 * generated cartesian data
-	 * 
-	 * @param dimension
-	 * @param size
-	 * @param repeatable
-	 * @param gaussian
 	 */
 	public TestLoad(int dimension, int size, boolean repeatable,
 			boolean gaussian) {
@@ -150,22 +142,22 @@ public class TestLoad {
 		return this.testData.size();
 	}
 
-	/**
-	 * 
-	 * For a given metric and query, returns a threshold value just slightly
-	 * bigger than that required to get a given percentage of the data
-	 * 
-	 * @param m
-	 * @param queries
-	 * @param returns
-	 * @param guess
-	 *            A guess at the correct value; works anyway, but will be faster
-	 *            with a good guess
-	 * @return 0.1 percent more than the threshold at which the last datum lies
-	 *         so guaranteed to return at least the correct number, may return
-	 *         more in a very dense and large space
-	 */
-	@SuppressWarnings("boxing")
+//	/**
+//	 *
+//	 * For a given metric and query, returns a threshold value just slightly
+//	 * bigger than that required to get a given percentage of the data
+//	 *
+//	 * @param m
+//	 * @param queries
+//	 * @param returns
+//	 * @param guess
+//	 *            A guess at the correct value; works anyway, but will be faster
+//	 *            with a good guess
+//	 * @return 0.1 percent more than the threshold at which the last datum lies
+//	 *         so guaranteed to return at least the correct number, may return
+//	 *         more in a very dense and large space
+//	 */
+//	@SuppressWarnings("boxing")
 //	public List<Double> findThresholdByPercent(NamedMetric<CartesianPoint> m,
 //			List<CartesianPoint> queries, int[] returns, double guess) {
 //

@@ -38,16 +38,16 @@ import org.apache.commons.codec.StringEncoder;
 import org.apache.commons.codec.binary.StringUtils;
 
 /**
- * Encodes a string into a double metaphone value. This Implementation is based on the algorithm by &lt;CITE>Lawrence
- * Philips&lt;/CITE>.
- * &lt;p>
+ * Encodes a string into a double metaphone value. This Implementation is based on the algorithm by <CITE>Lawrence
+ * Philips</CITE>.
+ *
  * This class is conditionally thread-safe. The instance field {@link #maxCodeLen} is mutable
  * {@link #setMaxCodeLen(int)} but is not volatile, and accesses are not synchronized. If an instance of the class is
  * shared between threads, the caller needs to ensure that suitable synchronization is used to ensure safe publication
  * of the value between threads, and must not invoke {@link #setMaxCodeLen(int)} after initial setup.
  *
- * @see &lt;a href="http://drdobbs.com/184401251?pgno=2">Original Article&lt;/a>
- * @see &lt;a href="http://en.wikipedia.org/wiki/Metaphone">http://en.wikipedia.org/wiki/Metaphone&lt;/a>
+ * @see <a href="http://drdobbs.com/184401251?pgno=2">Original Article</a>
+ * @see <a href="http://en.wikipedia.org/wiki/Metaphone">http://en.wikipedia.org/wiki/Metaphone</a>
  *
  * @version $Id: DoubleMetaphone.java 1634417 2014-10-27 00:42:28Z ggregory $
  */

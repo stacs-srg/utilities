@@ -32,9 +32,8 @@ public class PhoneticWrapper implements NamedMetric<String>  {
 
         this.encoder = encoder;
         this.metric = metric;
-        this.metric_name = "PhoneticWrapper" + "(" + encoder.getClass().getName() + "," + metric.getMetricName() + ")";
+        this.metric_name = "PhoneticWrapper" + "(" + encoder.getClass().getSimpleName() + "," + metric.getMetricName() + ")";
     }
-
 
     @Override
     public String getMetricName() {

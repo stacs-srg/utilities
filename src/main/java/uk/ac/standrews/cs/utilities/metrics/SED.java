@@ -108,7 +108,7 @@ public class SED implements NamedMetric<String> {
             boolean finished = false;
             double simAcc = 0;
             while (!finished) {
-                // System.out.println(ar1Event + ";" + ar2Event);
+
                 if (ar1Event == ar2Event) {
                     simAcc += hCalc(ar1.finalProbs[ar1Ptr],
                             ar2.finalProbs[ar2Ptr]);
@@ -133,8 +133,7 @@ public class SED implements NamedMetric<String> {
                 finished = ar1Ptr == ar1.finalEvents.length
                         && ar2Ptr == ar2.finalEvents.length;
             }
-            double k = (1 - (simAcc / log2) / 2);
-            return k;
+            return (1 - (simAcc / log2) / 2);
         }
     }
 
@@ -170,7 +169,6 @@ public class SED implements NamedMetric<String> {
                         ch1 = 1;
                         ch2 = s.charAt(0);
                     } else {
-                        // ch1 = s.charAt(i); //redundant
                         ch2 = 1;
                     }
                 }
@@ -197,7 +195,7 @@ public class SED implements NamedMetric<String> {
         if( x.equals( y ) ) {
             return 0;
         }
-       //
+
         SparseProbabilityArray s1 = stringToSparseArray(x);
         SparseProbabilityArray s2 = stringToSparseArray(y);
         return SparseProbabilityArray.SEDistance(s1, s2);
@@ -205,14 +203,13 @@ public class SED implements NamedMetric<String> {
 
     @Override
     public String getMetricName() {
-        return "sed";
+        return "SED";
     }
 
     public static void main(String[] a) {
         SED sed = new SED(255);
 
         System.out.println("SED:" );
-
 
         System.out.println("empty string/empty string: " + sed.distance("", ""));
         System.out.println("empty string/cat: " + sed.distance("", "cat"));
@@ -225,5 +222,4 @@ public class SED implements NamedMetric<String> {
         System.out.println( "cat/zoo: " + sed.distance( "cat", "zoo" ) );
         System.out.println( "n/zoological: " + sed.distance( "n", "zoological" ) );
     }
-
 }
