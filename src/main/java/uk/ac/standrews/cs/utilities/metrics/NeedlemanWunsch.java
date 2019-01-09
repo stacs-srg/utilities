@@ -64,17 +64,17 @@ import java.util.Objects;
  * Code included for speed tests - modified to comply with our interfaces.
  */
 
-public class NeedlemanWunch implements NamedMetric<String> {
+public class NeedlemanWunsch implements NamedMetric<String> {
 
     private static final Substitution MATCH_0_MISMATCH_1 = new MatchMismatch(0.0F, -1.0F);
     private final Substitution substitution;
     private final double gapValue;
 
-    public NeedlemanWunch() {
+    public NeedlemanWunsch() {
         this(-2.0F, MATCH_0_MISMATCH_1);
     }
 
-    public NeedlemanWunch(double gapValue, Substitution substitution) {
+    public NeedlemanWunsch(double gapValue, Substitution substitution) {
         Preconditions.checkArgument(gapValue <= 0.0F);
         Preconditions.checkNotNull(substitution);
         this.gapValue = gapValue;
@@ -134,18 +134,18 @@ public class NeedlemanWunch implements NamedMetric<String> {
     }
 
     public String toString() {
-        return "NeedlemanWunch [costFunction=" + this.substitution + ", gapCost=" + this.gapValue + "]";
+        return "NeedlemanWunsch [costFunction=" + this.substitution + ", gapCost=" + this.gapValue + "]";
     }
 
     @Override
     public String getMetricName() {
-        return "NeedlemanWunch";
+        return "NeedlemanWunsch";
     }
 
     public static void main(String[] a) {
-        NeedlemanWunch nw = new NeedlemanWunch();
+        NeedlemanWunsch nw = new NeedlemanWunsch();
 
-        System.out.println("NeedlemanWunch:" );
+        System.out.println("NeedlemanWunsch:" );
 
         System.out.println("empty string/empty string: " + nw.distance("", ""));
         System.out.println("empty string/cat: " + nw.distance("", "cat"));
