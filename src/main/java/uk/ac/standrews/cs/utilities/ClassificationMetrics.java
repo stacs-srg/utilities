@@ -25,25 +25,28 @@ public class ClassificationMetrics {
     // Precision is TP / (TP + FP).
     public static double precision(int true_positives, int false_positives) {
 
-        return (double) true_positives / (true_positives + false_positives);
+        final int denominator = true_positives + false_positives;
+        return denominator == 0 ? 0.0 : (double) true_positives / denominator;
     }
 
     // Recall is TP / (TP + FN)
     public static double recall(int true_positives, int false_negatives) {
 
-        return (double) true_positives / (true_positives + false_negatives);
+        final int denominator = true_positives + false_negatives;
+        return denominator == 0 ? 0.0 : (double) true_positives / denominator;
     }
 
     // Accuracy is (TP + TN) / (TP + TN + FP + FN)
     public static double accuracy(int true_positives, int true_negatives, int false_positives, int false_negatives) {
 
-        int total_cases = true_positives + true_negatives + false_positives + false_negatives;
-        return (double) (true_positives + true_negatives) / total_cases;
+        final int denominator = true_positives + true_negatives + false_positives + false_negatives;
+        return denominator == 0 ? 0.0 : (double) (true_positives + true_negatives) / denominator;
     }
 
     // F1 is (2 * TP) / (2 * TP + FP + FN)
     public static double F1(int true_positives, int false_positives, int false_negatives) {
 
-        return (double) (true_positives * 2) / (true_positives * 2 + false_positives + false_negatives);
+        final int denominator = true_positives * 2 + false_positives + false_negatives;
+        return denominator == 0 ? 0.0 : (double) (true_positives * 2) / denominator;
     }
 }

@@ -89,7 +89,7 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
             average = average( p1_distro,p2_distro );
         } catch (Exception e) {
             // this cannot occur since the two distros above were newly created and hence using counts.
-            ErrorHandling.hardError( "Unexpected probability based distribition" );
+            ErrorHandling.hardError( "Unexpected probability based distribution" );
         }
 
         p1_distro = p1_distro.toProbability();
