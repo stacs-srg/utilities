@@ -42,7 +42,7 @@ public class JensenShannon extends SED implements NamedMetric<String> {
 
     @Override
     public String getMetricName() {
-        return "JensenShannon2";
+        return "JensenShannon";
     }
 
     public static void main(String[] a) {
