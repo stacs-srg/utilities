@@ -25,6 +25,10 @@ import java.util.Iterator;
 public class Cosine implements StringMetric, NamedMetric<String> {
 
     public double distance(String x, String y) {
+
+        double check = CheckValues.checkNullAndEmpty(x, y);
+        if (check != -1) return check;
+
         SparseDistro sdx = new SparseDistro(topAndTail(x));
         SparseDistro sdy = new SparseDistro(topAndTail(y));
         return distance(sdx, sdy);
