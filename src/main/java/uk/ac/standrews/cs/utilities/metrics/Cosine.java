@@ -26,8 +26,12 @@ public class Cosine implements StringMetric, NamedMetric<String> {
 
     public double distance(String x, String y) {
 
-        double check = CheckValues.checkNullAndEmpty(x, y);
-        if (check != -1) return check;
+        if (x.equals(y)) {
+            return 0.0;
+        }
+        if (x.isEmpty() || y.isEmpty()) {
+            return 1.0;
+        }
 
         SparseDistro sdx = new SparseDistro(topAndTail(x));
         SparseDistro sdy = new SparseDistro(topAndTail(y));
