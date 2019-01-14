@@ -45,17 +45,18 @@ public class Cosine implements StringMetric, NamedMetric<String> {
 
         while (p_iter.hasNext()) {
 
-            QgramDistribution pi = p_iter.next();
+            QgramDistribution next_qgram = p_iter.next();
 
-            QgramDistribution qi = q.getEntry( pi.key );
+            QgramDistribution qi = q.getEntry( next_qgram.key );
             if( qi != null  ) {
-                dot_product += pi.count * qi.count;
+                dot_product += next_qgram.count * qi.count;
             }
         }
 
-       // return 1 - dot_product / ( p.magnitude() * q.magnitude());
+        double cosine_similarity = dot_product / (p.magnitude() * q.magnitude());
+        double angular_distance = 2.0 * Math.acos( cosine_similarity ) / Math.PI;
 
-        return Math.acos( dot_product / ( p.magnitude()) * q.magnitude() ) * ( 2 / Math.PI );
+        return angular_distance;
     }
 
     @Override
@@ -82,6 +83,7 @@ public class Cosine implements StringMetric, NamedMetric<String> {
         System.out.println("empty/a: " + cos.distance("", "a"));
         System.out.println("a/a: " + cos.distance("a", "a"));
         System.out.println("mclauchlan/mclauchlan: " + cos.distance("mclauchlan", "mclauchlan"));
+        System.out.println("mclauchlan/mclauchln: " + cos.distance("mclauchlan", "mclauchln"));
         System.out.println("pillar/caterpillar: " + cos.distance("pillar", "caterpillar"));  //  6/11 correct
         System.out.println("bat/cat: " + cos.distance("bat", "cat"));
         System.out.println("cat/bat: " + cos.distance("cat", "bat"));        System.out.println("cat/cart: " + cos.distance("cat", "cart"));
@@ -95,9 +97,11 @@ public class Cosine implements StringMetric, NamedMetric<String> {
         String s2 = "JONJONSSON LENBERGINGRID GRETANILSDR20051835----";
         String s3 = "JONJONSSON LENBERGINGRID GRETANILSDOTTER20051835----";
 
-        System.out.println("s1/s2: " + cos.distance(s1, s2));
-        System.out.println("s2/s3: " + cos.distance(s2, s3));
-        System.out.println("s1/s3: " + cos.distance(s1, s3));
+        System.out.println("s1/s2: " + s1 + "/" + s2 + ": " + cos.distance(s1, s2));
+        System.out.println("s2/s3: " + s2 + "/" + s3 + ": " + cos.distance(s2, s3));
+        System.out.println("s1/s3: " + s1 + "/" + s3 + ": " + cos.distance(s1, s3));
+
+        System.out.println( "D(s1,s2)>D(s2,s3)+D(s1,s3): " + ( cos.distance(s1, s2) > cos.distance(s2, s3) + cos.distance(s1, s3) ) );
 
     }
 
