@@ -32,7 +32,7 @@ public class PhoneticWrapper implements NamedMetric<String> {
 
         this.encoder = encoder;
         this.metric = metric;
-        this.metric_name = encoder.getClass().getSimpleName() + "/" + metric.getMetricName();
+        this.metric_name = encoder.getClass().getSimpleName() + "-" + metric.getMetricName();
     }
 
     @Override
