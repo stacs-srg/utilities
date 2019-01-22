@@ -82,8 +82,15 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
     }
 
     public double jensenShannonDivergence(String p1, String p2) {
+        double check = CheckValues.checkNullAndEmpty(p1, p2);
+        if (check != -1) return 1 - check;
+
         SparseDistro p1_distro = new SparseDistro( topAndTail(p1) );
         SparseDistro p2_distro = new SparseDistro( topAndTail(p2) );
+
+        if( p1.equals(p2 )) {   // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+            return 1;
+        }
         SparseDistro average = null;
         try {
             average = average( p1_distro,p2_distro );

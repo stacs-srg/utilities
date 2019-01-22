@@ -20,6 +20,7 @@ package uk.ac.standrews.cs.utilities.metrics;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import static uk.ac.standrews.cs.utilities.metrics.Shingle.ngramIterator;
 
@@ -180,5 +181,19 @@ public class SparseDistro {
             sumsq+= distro.count * distro.count;
         }
         return Math.sqrt( sumsq );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SparseDistro)) return false;
+        SparseDistro that = (SparseDistro) o;
+        return counting == that.counting &&
+                Objects.equals(list, that.list);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(list, counting);
     }
 }

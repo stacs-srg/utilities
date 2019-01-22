@@ -86,6 +86,9 @@ public class KullbackLeibler {
      * while a Kullback–Leibler divergence of 1 indicates that the expectation of seeing the second given the first approaches zero
      */
     public static double kullbackLeiblerDivergence( String x, String y ) {
+        double check = CheckValues.checkNullAndEmpty(x, y);
+        if (check != -1) return 1 - check;
+
         return kullbackLeiblerDivergence( new SparseDistro( topAndTail( x ) ).toProbability(),new SparseDistro(topAndTail( y )).toProbability());
     }
 
@@ -94,6 +97,10 @@ public class KullbackLeibler {
      * @return the Kullback–Leibler divergence
      */
     public static double kullbackLeiblerDivergence22(SparseDistro distro_p, SparseDistro distro_q ) {
+
+        if( distro_p.equals(distro_q)) { // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+            return 0.0;
+        }
 
         Iterator<QgramDistribution> p_iter = distro_p.getIterator();
         Iterator<QgramDistribution> q_iter = distro_q.getIterator();
@@ -144,6 +151,10 @@ public class KullbackLeibler {
      * @return the Kullback–Leibler divergence
      */
     public static double kullbackLeiblerDivergence(SparseDistro distro_p, SparseDistro distro_q ) {
+
+        if( distro_p.equals(distro_q)) { // can have sane sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+            return 1;
+        }
 
         Iterator<QgramDistribution> p_iter = distro_p.getIterator();
 

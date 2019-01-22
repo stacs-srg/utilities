@@ -38,14 +38,23 @@ public class Dice implements NamedMetric<String> {
         double check = CheckValues.checkNullAndEmpty(A, B);
         if (check != -1) return check;
 
-        Collection agrams = Shingle.ngrams(A,2);
-        Collection bgrams = Shingle.ngrams(B,2);
+        Collection agrams = Shingle.ngrams(topAndTail(A), 2);
+        Collection bgrams = Shingle.ngrams(topAndTail(B), 2);
 
         if (agrams.isEmpty() && bgrams.isEmpty()) {
             return 1.0;
         } else {
             return !agrams.isEmpty() && !bgrams.isEmpty() ? 2.0 * intersection(agrams, bgrams).size() / (double) (agrams.size() + bgrams.size()) : 0.0;
         }
+    }
+
+    /**
+     * Adds a character to the front and end of the string - ensures that even empty strings contain 1 2-gram.
+     * @param x - a string to be encapsulated
+     * @return an a string encapsulated with ^ and $
+     */
+    private static String topAndTail(String x) {
+        return "^" + x + "$";
     }
 
 

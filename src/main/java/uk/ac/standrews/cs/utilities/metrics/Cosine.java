@@ -44,6 +44,10 @@ public class Cosine implements StringMetric, NamedMetric<String> {
 
     public double distance(SparseDistro p, SparseDistro q) {
 
+        if( p.equals(q)) { // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+            return 0.0;
+        }
+
         p = p.toProbability();
         q = q.toProbability();
 
@@ -63,6 +67,10 @@ public class Cosine implements StringMetric, NamedMetric<String> {
 
         double cosine_similarity = dot_product / (p.magnitude() * q.magnitude());
         double angular_distance = 2.0 * Math.acos( cosine_similarity ) / Math.PI;
+
+        if( Double.isNaN(angular_distance) ) {
+            throw new RuntimeException( "Cosine.distance returned Nan" );
+        }
 
         return angular_distance;
     }
@@ -109,7 +117,7 @@ public class Cosine implements StringMetric, NamedMetric<String> {
         System.out.println("s2/s3: " + s2 + "/" + s3 + ": " + cos.distance(s2, s3));
         System.out.println("s1/s3: " + s1 + "/" + s3 + ": " + cos.distance(s1, s3));
 
-        System.out.println( "D(s1,s2)>D(s2,s3)+D(s1,s3): " + ( cos.distance(s1, s2) > cos.distance(s2, s3) + cos.distance(s1, s3) ) );
+        System.out.println( "KATARINA KRISTINA/KRISTINA KATARINA"+ cos.distance("KATARINA KRISTINA", "KRISTINA KATARINA"));
 
     }
 
