@@ -22,69 +22,66 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import java.util.List;
 
 /**
- * Class to calculate confidence intervals for values within columns in a rectangular numerical table.
+ * Class to calculate confidence intervals. It probably assumes that the data is normally distributed...
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-public class ConfidenceIntervals extends StatisticValues {
+public class ConfidenceIntervals {
 
     /**
-     * The probability that the real mean lies within the confidence interval.
+     * The default confidence level.
      */
-    @SuppressWarnings("WeakerAccess")
-    public static final double CONFIDENCE_LEVEL = 0.95;
-
-    private static final double ONE_TAILED_CONFIDENCE_LEVEL = 1 - (1 - CONFIDENCE_LEVEL) / 2;
+    public static final double DEFAULT_CONFIDENCE_LEVEL = 0.95;
 
     /**
-     * Creates a new calculation.
+     * Calculates the confidence interval for a list of values, using the default confidence level.
      *
-     * @param data the numerical table
+     * @param values the values
+     * @return half the range of the confidence interval, such that the confidence interval is the mean plus/minus this value
      */
-    @SuppressWarnings({"UnusedDeclaration", "WeakerAccess"})
-    public ConfidenceIntervals(List<List<Double>> data) {
+    public static double calculateConfidenceInterval(final List<Double> values) {
 
-        super(data);
+        return calculateConfidenceInterval(values, DEFAULT_CONFIDENCE_LEVEL);
     }
 
     /**
      * Calculates the confidence interval for a list of values.
      *
      * @param values the values
-     * @return the confidence interval of the values
+     * @param confidence_level the desired confidence level, i.e. the probability that the real mean lies within the confidence interval.
+     * @return half the range of the confidence interval, such that the confidence interval is the mean plus/minus this value
      */
-    @SuppressWarnings("WeakerAccess")
-    public static double calculateConfidenceInterval(List<Double> values) {
+    public static double calculateConfidenceInterval(final List<Double> values, final double confidence_level) {
 
-        return standardError(values) * criticalValue(sampleSize(values));
+        return standardError(values) * criticalValue(sampleSize(values), confidence_level);
     }
 
-    protected double calculateColumnResult(List<Double> values) {
-
-        return calculateConfidenceInterval(values);
-    }
-
-    private static double standardError(List<Double> values) {
+    private static double standardError(final List<Double> values) {
 
         return standardDeviation(values) / Math.sqrt(sampleSize(values));
     }
 
-    private static double standardDeviation(List<Double> values) {
+    private static double standardDeviation(final List<Double> values) {
 
-        double[] array = new double[values.size()];
+        final double[] array = new double[values.size()];
         for (int i = 0; i < array.length; i++) {
             array[i] = values.get(i);
         }
         return new StandardDeviation().evaluate(array);
     }
 
-    private static double criticalValue(int number_of_values) {
+    private static double criticalValue(final int number_of_values, final double confidence_level) {
 
-        int degrees_of_freedom = number_of_values - 1;
-        return new TDistribution(degrees_of_freedom).inverseCumulativeProbability(ONE_TAILED_CONFIDENCE_LEVEL);
+        final int degrees_of_freedom = number_of_values - 1;
+        return new TDistribution(degrees_of_freedom).inverseCumulativeProbability(oneTailedConfidenceLevel(confidence_level));
     }
 
-    private static int sampleSize(List<Double> values) {
+    private static double oneTailedConfidenceLevel(final double confidence_level) {
+
+        return 1 - (1 - confidence_level) / 2;
+    }
+
+    private static int sampleSize(final List<Double> values) {
 
         return values.size();
     }
