@@ -23,8 +23,13 @@ import java.util.BitSet;
 
 public class Hamming implements NamedMetric<BitSet> {
 
+    /**
+     *
+     * @param x - a bitset over which to caclulate Hamming distance
+     * @param y - a bitset over which to caclulate Hamming distance
+     * @return - return the normalised Hamming distance - if all bits are different return 1, if all the same return 0
+     */
     public double distance(BitSet x, BitSet y) {
-
 
         long[] x_as_longs = x.toLongArray();
         long[] y_as_longs = y.toLongArray();
@@ -38,7 +43,17 @@ public class Hamming implements NamedMetric<BitSet> {
         for( int i = 0; i < x_as_longs.length; i++ ) {
             count += distance(x_as_longs[i],y_as_longs[i] );
         }
-        return count;
+        return count / x_as_longs.length;
+    }
+
+    /**
+     *
+     * @param x - a bitset over which to caclulate Hamming distance
+     * @param y - a bitset over which to caclulate Hamming distance
+     * @return - return the normalised Hamming similarity - if all bits are different return 0, if all the same return 1
+     */
+    public double similarity(BitSet x, BitSet y) {
+        return 1 - distance(x,y);
     }
 
 
