@@ -23,30 +23,30 @@ package uk.ac.standrews.cs.utilities;
 public class ClassificationMetrics {
 
     // Precision is TP / (TP + FP).
-    public static double precision(int true_positives, int false_positives) {
+    public static double precision(long true_positives, long false_positives) {
 
-        final int denominator = true_positives + false_positives;
+        final long denominator = true_positives + false_positives;
         return denominator == 0 ? 0.0 : (double) true_positives / denominator;
     }
 
     // Recall is TP / (TP + FN)
-    public static double recall(int true_positives, int false_negatives) {
+    public static double recall(long true_positives, long false_negatives) {
 
-        final int denominator = true_positives + false_negatives;
+        final long denominator = true_positives + false_negatives;
         return denominator == 0 ? 0.0 : (double) true_positives / denominator;
     }
 
     // Accuracy is (TP + TN) / (TP + TN + FP + FN)
-    public static double accuracy(int true_positives, int true_negatives, int false_positives, int false_negatives) {
+    public static double accuracy(long true_positives, long true_negatives, long false_positives, long false_negatives) {
 
-        final int denominator = true_positives + true_negatives + false_positives + false_negatives;
+        final long denominator = true_positives + true_negatives + false_positives + false_negatives;
         return denominator == 0 ? 0.0 : (double) (true_positives + true_negatives) / denominator;
     }
 
     // F1 is (2 * TP) / (2 * TP + FP + FN)
-    public static double F1(int true_positives, int false_positives, int false_negatives) {
+    public static double F1(long true_positives, long false_positives, long false_negatives) {
 
-        final int denominator = true_positives * 2 + false_positives + false_negatives;
+        final long denominator = true_positives * 2 + false_positives + false_negatives;
         return denominator == 0 ? 0.0 : (double) (true_positives * 2) / denominator;
     }
 }
