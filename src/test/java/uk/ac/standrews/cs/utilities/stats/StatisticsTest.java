@@ -18,6 +18,7 @@ package uk.ac.standrews.cs.utilities.stats;
 
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.junit.Test;
+import uk.ac.standrews.cs.utilities.Statistics;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,13 +34,13 @@ public class StatisticsTest {
     @Test(expected = NotStrictlyPositiveException.class)
     public void confidenceIntervalOfEmptyListThrowsException() {
 
-        assertTrue(Double.isNaN(ConfidenceIntervals.calculateConfidenceInterval(new ArrayList<>())));
+        assertTrue(Double.isNaN(Statistics.confidenceInterval(new ArrayList<>())));
     }
 
     @Test(expected = NotStrictlyPositiveException.class)
     public void confidenceIntervalOfSingleElementListThrowsException() {
 
-        assertTrue(Double.isNaN(ConfidenceIntervals.calculateConfidenceInterval(Collections.singletonList(1.0))));
+        assertTrue(Double.isNaN(Statistics.confidenceInterval(Collections.singletonList(1.0))));
     }
 
     @Test
@@ -47,21 +48,21 @@ public class StatisticsTest {
 
         // Expected values calculated in Excel.
 
-        assertEquals(12.7062047, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0)), EPSILON);
-        assertEquals(6.3531024, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0)), EPSILON);
-        assertEquals(0.0, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0)), EPSILON);
+        assertEquals(12.7062047, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0)), EPSILON);
+        assertEquals(6.3531024, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0)), EPSILON);
+        assertEquals(0.0, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0)), EPSILON);
 
-        assertEquals(3.7945830, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0, 36.0)), EPSILON);
-        assertEquals(1.4342176, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0, 51.0)), EPSILON);
-        assertEquals(14.3421758, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0, 60.0)), EPSILON);
+        assertEquals(3.7945830, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0, 36.0)), EPSILON);
+        assertEquals(1.4342176, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0, 51.0)), EPSILON);
+        assertEquals(14.3421758, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0, 60.0)), EPSILON);
 
-        assertEquals(4.6844341, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0)), EPSILON);
-        assertEquals(38.4618748, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0)), EPSILON);
-        assertEquals(12.9922826, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0)), EPSILON);
+        assertEquals(4.6844341, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0)), EPSILON);
+        assertEquals(38.4618748, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0)), EPSILON);
+        assertEquals(12.9922826, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0)), EPSILON);
 
-        assertEquals(3.3547914, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0, 34.0)), EPSILON);
-        assertEquals(27.0899102, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0, 53.0)), EPSILON);
-        assertEquals(8.7798903, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0, 70.0)), EPSILON);
+        assertEquals(3.3547914, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0, 34.0)), EPSILON);
+        assertEquals(27.0899102, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0, 53.0)), EPSILON);
+        assertEquals(8.7798903, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0, 70.0)), EPSILON);
     }
 
     @Test
@@ -71,20 +72,20 @@ public class StatisticsTest {
 
         final double confidence_level = 0.99;
 
-        assertEquals(63.6567412, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0), confidence_level), EPSILON);
-        assertEquals(31.8283706, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0), confidence_level), EPSILON);
-        assertEquals(0.0, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0), confidence_level), EPSILON);
+        assertEquals(63.6567412, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0), confidence_level), EPSILON);
+        assertEquals(31.8283706, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0), confidence_level), EPSILON);
+        assertEquals(0.0, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0), confidence_level), EPSILON);
 
-        assertEquals(8.7528890, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0, 36.0), confidence_level), EPSILON);
-        assertEquals(3.3082811, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0, 51.0), confidence_level), EPSILON);
-        assertEquals(33.0828107, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0, 60.0), confidence_level), EPSILON);
+        assertEquals(8.7528890, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0, 36.0), confidence_level), EPSILON);
+        assertEquals(3.3082811, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0, 51.0), confidence_level), EPSILON);
+        assertEquals(33.0828107, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0, 60.0), confidence_level), EPSILON);
 
-        assertEquals(8.5975857, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0), confidence_level), EPSILON);
-        assertEquals(70.5910803, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0), confidence_level), EPSILON);
-        assertEquals(23.8454124, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0), confidence_level), EPSILON);
+        assertEquals(8.5975857, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0), confidence_level), EPSILON);
+        assertEquals(70.5910803, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0), confidence_level), EPSILON);
+        assertEquals(23.8454124, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0), confidence_level), EPSILON);
 
-        assertEquals(5.5631490, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0, 34.0), confidence_level), EPSILON);
-        assertEquals(44.9223780, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0, 53.0), confidence_level), EPSILON);
-        assertEquals(14.5594264, ConfidenceIntervals.calculateConfidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0, 70.0), confidence_level), EPSILON);
+        assertEquals(5.5631490, Statistics.confidenceInterval(Arrays.asList(37.0, 39.0, 36.0, 32.0, 34.0), confidence_level), EPSILON);
+        assertEquals(44.9223780, Statistics.confidenceInterval(Arrays.asList(51.0, 52.0, 51.0, 3.0, 53.0), confidence_level), EPSILON);
+        assertEquals(14.5594264, Statistics.confidenceInterval(Arrays.asList(70.0, 70.0, 60.0, 80.0, 70.0), confidence_level), EPSILON);
     }
 }

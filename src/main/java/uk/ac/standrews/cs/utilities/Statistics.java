@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.stats;
+package uk.ac.standrews.cs.utilities;
 
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
@@ -26,12 +26,32 @@ import java.util.List;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-public class ConfidenceIntervals {
+public class Statistics {
 
     /**
      * The default confidence level.
      */
     public static final double DEFAULT_CONFIDENCE_LEVEL = 0.95;
+
+    public static double mean(final List<Double> values) {
+
+        double total = 0.0;
+
+        for (final double d : values) {
+            total += d;
+        }
+
+        return total / values.size();
+    }
+
+    public static double standardDeviation(final List<Double> values) {
+
+        final double[] array = new double[values.size()];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = values.get(i);
+        }
+        return new StandardDeviation().evaluate(array);
+    }
 
     /**
      * Calculates the confidence interval for a list of values, using the default confidence level.
@@ -39,9 +59,9 @@ public class ConfidenceIntervals {
      * @param values the values
      * @return half the range of the confidence interval, such that the confidence interval is the mean plus/minus this value
      */
-    public static double calculateConfidenceInterval(final List<Double> values) {
+    public static double confidenceInterval(final List<Double> values) {
 
-        return calculateConfidenceInterval(values, DEFAULT_CONFIDENCE_LEVEL);
+        return confidenceInterval(values, DEFAULT_CONFIDENCE_LEVEL);
     }
 
     /**
@@ -51,32 +71,23 @@ public class ConfidenceIntervals {
      * @param confidence_level the desired confidence level, i.e. the probability that the real mean lies within the confidence interval.
      * @return half the range of the confidence interval, such that the confidence interval is the mean plus/minus this value
      */
-    public static double calculateConfidenceInterval(final List<Double> values, final double confidence_level) {
+    public static double confidenceInterval(final List<Double> values, final double confidence_level) {
 
         return standardError(values) * criticalValue(sampleSize(values), confidence_level);
     }
 
-    private static double standardError(final List<Double> values) {
+    public static double standardError(final List<Double> values) {
 
         return standardDeviation(values) / Math.sqrt(sampleSize(values));
     }
 
-    private static double standardDeviation(final List<Double> values) {
-
-        final double[] array = new double[values.size()];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = values.get(i);
-        }
-        return new StandardDeviation().evaluate(array);
-    }
-
-    private static double criticalValue(final int number_of_values, final double confidence_level) {
+    public static double criticalValue(final int number_of_values, final double confidence_level) {
 
         final int degrees_of_freedom = number_of_values - 1;
         return new TDistribution(degrees_of_freedom).inverseCumulativeProbability(oneTailedConfidenceLevel(confidence_level));
     }
 
-    private static double oneTailedConfidenceLevel(final double confidence_level) {
+    public static double oneTailedConfidenceLevel(final double confidence_level) {
 
         return 1 - (1 - confidence_level) / 2;
     }
