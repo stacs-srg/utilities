@@ -18,5 +18,5 @@ package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
 public interface Metric<T> {
 
-    public double distance(T x, T y);
+    double distance(T x, T y);
 }

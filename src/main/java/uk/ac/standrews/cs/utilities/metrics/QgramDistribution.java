@@ -40,6 +40,7 @@ public class QgramDistribution implements Comparable<QgramDistribution> {
      */
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         QgramDistribution that = (QgramDistribution) o;
@@ -52,9 +53,8 @@ public class QgramDistribution implements Comparable<QgramDistribution> {
         return Objects.hash(key);
     }
 
-
     @Override
     public int compareTo(QgramDistribution other) {
-        return this.key.compareTo( other.key );
+        return key.compareTo(other.key);
     }
 }

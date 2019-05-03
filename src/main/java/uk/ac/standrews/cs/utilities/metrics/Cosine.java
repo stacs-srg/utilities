@@ -18,11 +18,14 @@
 package uk.ac.standrews.cs.utilities.metrics;
 
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
-
 import java.util.Iterator;
 
-public class Cosine implements StringMetric, NamedMetric<String> {
+public class Cosine implements NamedMetric<String> {
+
+    @Override
+    public String getMetricName() {
+        return "Cosine";
+    }
 
     public double distance(String x, String y) {
 
@@ -33,18 +36,18 @@ public class Cosine implements StringMetric, NamedMetric<String> {
             return 1.0;
         }
 
-        SparseDistro sdx = new SparseDistro(topAndTail(x));
-        SparseDistro sdy = new SparseDistro(topAndTail(y));
+        SparseDistro sdx = new SparseDistro(NamedMetric.topAndTail(x));
+        SparseDistro sdy = new SparseDistro(NamedMetric.topAndTail(y));
         return distance(sdx, sdy);
     }
 
     public double distance(FeatureVector x, FeatureVector y) {
-        return distance( new SparseDistro(x),new SparseDistro(y) );
+        return distance(new SparseDistro(x), new SparseDistro(y));
     }
 
     public double distance(SparseDistro p, SparseDistro q) {
 
-        if( p.equals(q)) { // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+        if (p.equals(q)) { // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
             return 0.0;
         }
 
@@ -59,66 +62,24 @@ public class Cosine implements StringMetric, NamedMetric<String> {
 
             QgramDistribution next_qgram = p_iter.next();
 
-            QgramDistribution qi = q.getEntry( next_qgram.key );
-            if( qi != null  ) {
+            QgramDistribution qi = q.getEntry(next_qgram.key);
+            if (qi != null) {
                 dot_product += next_qgram.count * qi.count;
             }
         }
 
         double cosine_similarity = dot_product / (p.magnitude() * q.magnitude());
-        double angular_distance = 2.0 * Math.acos( cosine_similarity ) / Math.PI;
+        double angular_distance = 2.0 * Math.acos(cosine_similarity) / Math.PI;
 
-        if( Double.isNaN(angular_distance) ) {
-            throw new RuntimeException( "Cosine.distance returned Nan" );
+        if (Double.isNaN(angular_distance)) {
+            throw new RuntimeException("Cosine.distance returned Nan");
         }
 
         return angular_distance;
     }
 
-    @Override
-    public String getMetricName() {
-        return "Cosine";
-    }
-
-    //---------------------------- utility code ----------------------------//
-
-    /**
-     * Adds a character to the front and end of the string - ensures that even empty strings contain 1 2-gram.
-     * @param x - a string to be encapsulated
-     * @return an a string encapsulated with ^ and $
-     */
-    private static String topAndTail(String x) {
-        return "^" + x + "$";
-    }
-
     public static void main(String[] args) {
 
-        Cosine cos = new Cosine();
-
-        System.out.println("Cosine:");
-        System.out.println("empty/a: " + cos.distance("", "a"));
-        System.out.println("a/a: " + cos.distance("a", "a"));
-        System.out.println("mclauchlan/mclauchlan: " + cos.distance("mclauchlan", "mclauchlan"));
-        System.out.println("mclauchlan/mclauchln: " + cos.distance("mclauchlan", "mclauchln"));
-        System.out.println("pillar/caterpillar: " + cos.distance("pillar", "caterpillar"));  //  6/11 correct
-        System.out.println("bat/cat: " + cos.distance("bat", "cat"));
-        System.out.println("cat/bat: " + cos.distance("cat", "bat"));        System.out.println("cat/cart: " + cos.distance("cat", "cart"));
-        System.out.println("cat/caterpillar: " + cos.distance("cat", "caterpillar"));
-        System.out.println("caterpillar/cat: " + cos.distance("caterpillar", "cat"));
-        System.out.println("cat/zoo: " + cos.distance("cat", "zoo"));
-        System.out.println("n/zoological: " + cos.distance("n", "zoological"));
-        System.out.println("abcdefghijklmnopqrstuvwxyz/zyxwvutsrqponmlkjihgfedcba: " + cos.distance("abcdefghijklmnopqrstuvwxyz", "zyxwvutsrqponmlkjihgfedcba"));
-
-        String s1 = "NILSSJÖBERGINGRIDERSDOTTER------------";
-        String s2 = "JONJONSSON LENBERGINGRID GRETANILSDR20051835----";
-        String s3 = "JONJONSSON LENBERGINGRID GRETANILSDOTTER20051835----";
-
-        System.out.println("s1/s2: " + s1 + "/" + s2 + ": " + cos.distance(s1, s2));
-        System.out.println("s2/s3: " + s2 + "/" + s3 + ": " + cos.distance(s2, s3));
-        System.out.println("s1/s3: " + s1 + "/" + s3 + ": " + cos.distance(s1, s3));
-
-        System.out.println( "KATARINA KRISTINA/KRISTINA KATARINA"+ cos.distance("KATARINA KRISTINA", "KRISTINA KATARINA"));
-
+        NamedMetric.printExamples(new Cosine());
     }
-
 }

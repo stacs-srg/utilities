@@ -56,12 +56,13 @@ package uk.ac.standrews.cs.utilities.metrics;
  *
  * Code included for speed tests - modified to comply with our interfaces.
  */
-
-
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
-public final class Jaro implements NamedMetric<String> {
-    public Jaro() {
+public class Jaro implements NamedMetric<String> {
+
+    @Override
+    public String getMetricName() {
+        return "Jaro";
     }
 
     public double distance(String a, String b) {
@@ -69,15 +70,18 @@ public final class Jaro implements NamedMetric<String> {
     }
 
     public double compare(String a, String b) {
-        double check = CheckValues.checkNullAndEmpty(a, b);
+
+        double check = NamedMetric.checkNullAndEmpty(a, b);
         if (check != -1) return check;
 
         if (!a.isEmpty() && !b.isEmpty()) {
+
             int halfLength = Math.max(0, Math.max(a.length(), b.length()) / 2 - 1);
             char[] charsA = a.toCharArray();
             char[] charsB = b.toCharArray();
             int[] commonA = getCommonCharacters(charsA, charsB, halfLength);
             int[] commonB = getCommonCharacters(charsB, charsA, halfLength);
+
             double transpositions = 0.0;
             int commonCharacters = 0;
 
@@ -101,6 +105,7 @@ public final class Jaro implements NamedMetric<String> {
     }
 
     private static int[] getCommonCharacters(char[] charsA, char[] charsB, int separation) {
+
         int[] common = new int[Math.min(charsA.length, charsB.length)];
         boolean[] matched = new boolean[charsB.length];
         int commonIndex = 0;
@@ -123,6 +128,7 @@ public final class Jaro implements NamedMetric<String> {
     }
 
     private static int indexOf(char character, char[] buffer, int fromIndex, int toIndex, boolean[] matched) {
+
         int j = Math.max(0, fromIndex);
 
         for(int length = Math.min(toIndex, buffer.length); j < length; ++j) {
@@ -134,35 +140,9 @@ public final class Jaro implements NamedMetric<String> {
         return -1;
     }
 
-    @Override
-    public String getMetricName() {
-        return "Jaro";
-    }
-
-    static int max(int a, int b, int c, int d) {
-        return java.lang.Math.max(java.lang.Math.max(java.lang.Math.max(a, b), c), d);
-    }
-
-    static float min(float a, float b, float c) {
-        return java.lang.Math.min(java.lang.Math.min(a, b), c);
-    }
-
     public static void main(String[] a) {
-        Jaro jaro = new Jaro();
 
-        System.out.println("jaro:" );
-
-        System.out.println("empty string/empty string: " + jaro.distance("", ""));
-        System.out.println("empty string/cat: " + jaro.distance("", "cat"));
-        System.out.println("cat/empty string: " + jaro.distance("cat", ""));
-        System.out.println("cat/cat: " + jaro.distance("cat", "cat"));
-        System.out.println( "pillar/caterpillar: " +  jaro.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "bat/cat: " + jaro.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + jaro.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " +jaro.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + jaro.distance( "cat", "zoo" ) );
-        System.out.println( "n/zoological: " + jaro.distance( "n", "zoological" ) );
+        NamedMetric.printExamples(new Jaro());
     }
-
 }
 

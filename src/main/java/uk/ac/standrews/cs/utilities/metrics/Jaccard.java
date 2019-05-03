@@ -25,49 +25,50 @@ import java.util.*;
  */
 public class Jaccard implements NamedMetric<String> {
 
-    public double distance(Collection A, Collection B ) {
-        return 1 - similarity(A,B);
-    }
-
-    public double distance(String A, String B ) {
-        return 1 - similarity(A,B);
-    }
-
-    public double distance(BitSet A, BitSet B ) {
-        return 1 - similarity(A,B);
-    }
-
-    public double similarity(Collection A, Collection B ) {
-        return ( (double) ( intersection( A,B ).size() ) ) / union( A, B ).size();
-    }
-
-    public double similarity(String A, String B ) {
-
-        double check = CheckValues.checkNullAndEmpty(A, B);
-        if (check != -1) return check;
-
-        Collection agrams = Shingle.ngrams(topAndTail(A),2);
-        Collection bgrams = Shingle.ngrams(topAndTail(B),2);
-
-        return ( (double) ( intersection( agrams,bgrams ).size() ) ) / union( agrams, bgrams ).size();
-    }
-
-    public double similarity(BitSet A, BitSet B ) {
-        BitSet union = A.get(0,A.length());   // and and or are destructive in BitSet
-        union.or(B);
-        BitSet intersection = A.get(0,A.length());
-        intersection.and(B);
-        return ( (double) intersection.cardinality() ) / union.cardinality();
-    }
-
-
     @Override
     public String getMetricName() {
         return "Jaccard";
     }
 
+    public double distance(Collection A, Collection B) {
+        return 1 - similarity(A, B);
+    }
 
-    public static Set union(Collection a, Collection b) {
+    public double distance(String A, String B) {
+        return 1 - similarity(A, B);
+    }
+
+    public double distance(BitSet A, BitSet B) {
+        return 1 - similarity(A, B);
+    }
+
+    public double similarity(Collection A, Collection B) {
+
+        return ((double) (intersection(A, B).size())) / union(A, B).size();
+    }
+
+    public double similarity(String A, String B) {
+
+        double check = NamedMetric.checkNullAndEmpty(A, B);
+        if (check != -1) return check;
+
+        Collection agrams = Shingle.ngrams(NamedMetric.topAndTail(A), 2);
+        Collection bgrams = Shingle.ngrams(NamedMetric.topAndTail(B), 2);
+
+        return ((double) (intersection(agrams, bgrams).size())) / union(agrams, bgrams).size();
+    }
+
+    public double similarity(BitSet A, BitSet B) {
+
+        BitSet union = A.get(0, A.length());   // and and or are destructive in BitSet
+        union.or(B);
+        BitSet intersection = A.get(0, A.length());
+        intersection.and(B);
+        return ((double) intersection.cardinality()) / union.cardinality();
+    }
+
+     public static Set union(Collection a, Collection b) {
+
         Set result = new HashSet();
         result.addAll(a);
         result.addAll(b);
@@ -75,46 +76,20 @@ public class Jaccard implements NamedMetric<String> {
     }
 
     public static Set intersection(Collection a, Collection b) {
+
         Set result = new HashSet();
-        Iterator a_iter = a.iterator();
-        while( a_iter.hasNext() ) {
-            Object next = a_iter.next();
-            if( b.contains( next ) ) {
-                result.add( next );
+
+        for (Object x : a) {
+            if (b.contains(x)) {
+                result.add(x);
             }
         }
+
         return result;
     }
 
-    /**
-     * Adds a character to the front and end of the string - ensures that even empty strings contain 1 2-gram.
-     * @param x - a string to be encapsulated
-     * @return an a string encapsulated with ^ and $
-     */
-    private static String topAndTail(String x) {
-        return "^" + x + "$";
-    }
-
-
     public static void main(String[] args) {
 
-        Jaccard jacc = new Jaccard();
-
-        System.out.println("Jaccard:");
-        System.out.println("empty/a: " + jacc.distance("", "a"));
-        System.out.println("a/a: " + jacc.distance("a", "a"));
-        System.out.println( "cat/cat" + jacc.distance("cat", "cat"));
-        System.out.println("mclauchlan/mclauchlan: " + jacc.distance("mclauchlan", "mclauchlan"));
-        System.out.println("pillar/caterpillar: " + jacc.distance("pillar", "caterpillar"));  //  6/11 correct
-        System.out.println("bat/cat: " + jacc.distance("bat", "cat"));
-        System.out.println("cat/bat: " + jacc.distance("cat", "bat"));        System.out.println("cat/cart: " + jacc.distance("cat", "cart"));
-        System.out.println("cat/caterpillar: " + jacc.distance("cat", "caterpillar"));
-        System.out.println("carterpillar/caterpillar: " + jacc.distance("carterpillar", "caterpillar"));
-        System.out.println("caterpillar/cat: " + jacc.distance("caterpillar", "cat"));
-        System.out.println("cat/zoo: " + jacc.distance("cat", "zoo"));
-        System.out.println("n/zoological: " + jacc.distance("n", "zoological"));
-        System.out.println("abcdefghijklmnopqrstuvwxyz/zyxwvutsrqponmlkjihgfedcba: " + jacc.distance("abcdefghijklmnopqrstuvwxyz", "zyxwvutsrqponmlkjihgfedcba"));
-
-
+        NamedMetric.printExamples(new Jaccard());
     }
 }

@@ -61,31 +61,29 @@ import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
  *
  *  Code included for speed tests - modified to comply with our interfaces.
  */
-
-
 public final class JaroWinkler implements NamedMetric<String> {
+
     private final Jaro jaro;
-    private static final double PREFIX_SCALE = 0.1F;
-    private static final double WINKLER_BOOST_THRESHOLD = 0.7F;
-    private static final double BOOST_THRESHOLD = 0.0;
-    private static final int MAX_PREFIX_LENGTH = 4;
     private final double boostThreshold;
     private final double prefixScale;
     private final int maxPrefixLength;
+
+    @Override
+    public String getMetricName() {
+        return "JaroWinkler";
+    }
 
     public JaroWinkler() {
         this(0.0, 0.1F, 4);
     }
 
-    public static JaroWinkler createWithBoostThreshold() {
-        return new JaroWinkler(0.7F, 0.1F, 4);
-    }
-
     public JaroWinkler(double boostThreshold, double prefixScale, int maxPrefixLength) {
-        this.jaro = new Jaro();
+
+        jaro = new Jaro();
         Preconditions.checkArgument(boostThreshold >= 0.0);
         Preconditions.checkArgument(0.0 <= prefixScale && prefixScale <= 1.0);
         Preconditions.checkArgument(maxPrefixLength >= 0);
+
         this.boostThreshold = boostThreshold;
         this.prefixScale = prefixScale;
         this.maxPrefixLength = maxPrefixLength;
@@ -97,15 +95,15 @@ public final class JaroWinkler implements NamedMetric<String> {
 
     public double compare(String a, String b) {
 
-        double check = CheckValues.checkNullAndEmpty(a, b);
+        double check = NamedMetric.checkNullAndEmpty(a, b);
         if (check != -1) return check;
 
-        double jaroScore = this.jaro.compare(a, b);
-        if (jaroScore < this.boostThreshold) {
+        double jaroScore = jaro.compare(a, b);
+        if (jaroScore < boostThreshold) {
             return jaroScore;
         } else {
-            int prefixLength = Math.min(Strings.commonPrefix(a, b).length(), this.maxPrefixLength);
-            return jaroScore + (double)prefixLength * this.prefixScale * (1.0 - jaroScore);
+            int prefixLength = Math.min(Strings.commonPrefix(a, b).length(), maxPrefixLength);
+            return jaroScore + (double)prefixLength * prefixScale * (1.0 - jaroScore);
         }
     }
 
@@ -113,25 +111,8 @@ public final class JaroWinkler implements NamedMetric<String> {
         return "JaroWinkler [boostThreshold=" + this.boostThreshold + ", prefixScale=" + this.prefixScale + ", maxPrefixLength=" + this.maxPrefixLength + "]";
     }
 
-    @Override
-    public String getMetricName() {
-        return "JaroWinkler";
-    }
-
     public static void main(String[] a) {
-        JaroWinkler jaro = new JaroWinkler();
 
-        System.out.println("JaroWinkler:" );
-
-        System.out.println("empty string/empty string: " + jaro.distance("", ""));
-        System.out.println("empty string/cat: " + jaro.distance("", "cat"));
-        System.out.println("cat/empty string: " + jaro.distance("cat", ""));
-        System.out.println("cat/cat: " + jaro.distance("cat", "cat"));
-        System.out.println( "pillar/caterpillar: " +  jaro.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "bat/cat: " + jaro.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + jaro.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " +jaro.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + jaro.distance( "cat", "zoo" ) );
-        System.out.println( "n/zoological: " + jaro.distance( "n", "zoological" ) );
+        NamedMetric.printExamples(new JaroWinkler());
     }
 }

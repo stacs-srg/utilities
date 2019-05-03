@@ -35,31 +35,33 @@ public class SparseDistro {
 
     public SparseDistro(String x) {
 
-        this.counting = true;
+        counting = true;
         Iterator<String> iter = ngramIterator(x, 2);
 
-        while( iter.hasNext() ) {
+        while (iter.hasNext()) {
             try {
-                average_value( iter.next(),1 );
+                average_value(iter.next(), 1);
             } catch (Exception e) {
-               // cannot happen in this instance - we are in constructor and counting is true;
+                // cannot happen in this instance - we are in constructor and counting is true;
             }
         }
     }
 
     /**
      * Convertor Constructor to convert between formats used.
+     *
      * @param fv
      */
     public SparseDistro(FeatureVector fv) {
-        for( KeyFreqPair kf : fv.getFeatures() ) {
-            QgramDistribution new_sc = new QgramDistribution( kf.qgram, kf.frequency );
-            list.add( new_sc );
+        for (KeyFreqPair kf : fv.getFeatures()) {
+            QgramDistribution new_sc = new QgramDistribution(kf.qgram, kf.frequency);
+            list.add(new_sc);
         }
     }
 
     /**
      * Constructor that makes a copy of another SparseDistro
+     *
      * @param source - the distro to be copied.
      */
     public SparseDistro(SparseDistro source) {
@@ -67,21 +69,17 @@ public class SparseDistro {
         this.counting = source.counting;
         Iterator<QgramDistribution> iter = source.getIterator();
 
-        while( iter.hasNext() ) { // make a deep copy of the distribution.
+        while (iter.hasNext()) { // make a deep copy of the distribution.
 
             QgramDistribution sc = iter.next();
-            QgramDistribution new_sc = new QgramDistribution( sc.key );
+            QgramDistribution new_sc = new QgramDistribution(sc.key);
 
-            list.add( new_sc );
+            list.add(new_sc);
         }
     }
 
     public int size() {
         return list.size();
-    }
-
-    public boolean is_counting() {
-        return counting;
     }
 
     public Iterator<QgramDistribution> getIterator() {
@@ -91,15 +89,15 @@ public class SparseDistro {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for( QgramDistribution sc : list ) {
-            sb.append( sc.key + ":" + sc.count + " " );
+        for (QgramDistribution sc : list) {
+            sb.append(sc.key).append(":").append(sc.count).append(" ");
         }
         return sb.toString();
     }
 
     public void average_value(String key, double value) {
 
-        if( counting ) {
+        if (counting) {
             QgramDistribution sc = new QgramDistribution(key, value);
 
             int position = list.indexOf(sc);
@@ -108,66 +106,65 @@ public class SparseDistro {
                 insert(sc);
             } else {
                 QgramDistribution already = list.get(position);
-                already.count = ( already.count + value ) / 2;
+                already.count = (already.count + value) / 2;
             }
         } else {
-            throw new RuntimeException( "Cannot average_value to a probability distribution");
+            throw new RuntimeException("Cannot average_value to a probability distribution");
         }
     }
 
-    private void insert(QgramDistribution sc ) {
+    private void insert(QgramDistribution sc) {
         int i = 0;
-        for( ; i < list.size(); i++ ) {
-            if( sc.compareTo(list.get(i)) < 1 )  {
+        for (; i < list.size(); i++) {
+            if (sc.compareTo(list.get(i)) < 1) {
                 break;
             }
         }
-        list.add(i,sc);
+        list.add(i, sc);
     }
 
     public static void main(String[] args) {
-        SparseDistro sd1 = new SparseDistro( "AABBABACVXSAB");
-        System.out.println( sd1 );
 
-        SparseDistro sd2 = new SparseDistro( "AABBABACVXSAB").toProbability();
-        System.out.println( sd2 );
+        SparseDistro sd1 = new SparseDistro("AABBABACVXSAB");
+        System.out.println(sd1);
 
+        SparseDistro sd2 = new SparseDistro("AABBABACVXSAB").toProbability();
+        System.out.println(sd2);
     }
 
     /**
      * Converts a distribution from counting to probabilities
      */
     public SparseDistro toProbability() {
-        if( counting ) {
+        if (counting) {
             counting = false;
-            divide_entries( count_counts() );
+            divide_entries(count_counts());
         }
         return this;
     }
 
     private void divide_entries(double denominator) {
-        for( QgramDistribution distro : list ) {
+        for (QgramDistribution distro : list) {
             distro.count = distro.count / denominator;
         }
     }
 
     private double count_counts() {
         double total = 0.0;
-        for( QgramDistribution distro : list ) {
-            total+= distro.count;
+        for (QgramDistribution distro : list) {
+            total += distro.count;
         }
         return total;
     }
 
     public QgramDistribution getEntry(String key) {
-        for(  QgramDistribution entry : list ) {
+        for (QgramDistribution entry : list) {
 
             int compare = key.compareTo(entry.key);
-            if( compare == 0 ) {
+            if (compare == 0) {
                 // found it
                 return entry;
-            }
-            else if( compare < 1 )  {
+            } else if (compare < 1) {
                 // past it - it isn't there
                 return null;
             }
@@ -177,10 +174,10 @@ public class SparseDistro {
 
     public double magnitude() {
         double sumsq = 0.0;
-        for( QgramDistribution distro : list ) {
-            sumsq+= distro.count * distro.count;
+        for (QgramDistribution distro : list) {
+            sumsq += distro.count * distro.count;
         }
-        return Math.sqrt( sumsq );
+        return Math.sqrt(sumsq);
     }
 
     @Override

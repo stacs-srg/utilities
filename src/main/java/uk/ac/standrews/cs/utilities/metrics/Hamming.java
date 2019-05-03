@@ -23,6 +23,11 @@ import java.util.BitSet;
 
 public class Hamming implements NamedMetric<BitSet> {
 
+    @Override
+    public String getMetricName() {
+        return "Hamming";
+    }
+
     /**
      *
      * @param x - a bitset over which to caclulate Hamming distance
@@ -56,8 +61,8 @@ public class Hamming implements NamedMetric<BitSet> {
         return 1 - distance(x,y);
     }
 
-
     public int distance(long x, long y) {
+
         int count = 0;
         while (x > 0 || y > 0) { // keep going until all zeros.
             if (x % 2 != y % 2) {
@@ -67,10 +72,5 @@ public class Hamming implements NamedMetric<BitSet> {
             y = y / 2;  // shift fill with 0
         }
         return count;
-    }
-
-    @Override
-    public String getMetricName() {
-        return "Hamming";
     }
 }

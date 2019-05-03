@@ -23,6 +23,7 @@ import java.util.Collection;
 import static uk.ac.standrews.cs.utilities.metrics.Jaccard.intersection;
 
 public class Dice implements NamedMetric<String> {
+
     @Override
     public String getMetricName() {
         return "Dice";
@@ -35,11 +36,11 @@ public class Dice implements NamedMetric<String> {
 
     public double compare(String A, String B) {
 
-        double check = CheckValues.checkNullAndEmpty(A, B);
+        double check = NamedMetric.checkNullAndEmpty(A, B);
         if (check != -1) return check;
 
-        Collection agrams = Shingle.ngrams(topAndTail(A), 2);
-        Collection bgrams = Shingle.ngrams(topAndTail(B), 2);
+        Collection agrams = Shingle.ngrams(NamedMetric.topAndTail(A), 2);
+        Collection bgrams = Shingle.ngrams(NamedMetric.topAndTail(B), 2);
 
         if (agrams.isEmpty() && bgrams.isEmpty()) {
             return 1.0;
@@ -48,31 +49,8 @@ public class Dice implements NamedMetric<String> {
         }
     }
 
-    /**
-     * Adds a character to the front and end of the string - ensures that even empty strings contain 1 2-gram.
-     * @param x - a string to be encapsulated
-     * @return an a string encapsulated with ^ and $
-     */
-    private static String topAndTail(String x) {
-        return "^" + x + "$";
-    }
-
-
     public static void main(String[] a) {
-        Dice dice = new Dice();
 
-        System.out.println("Dice:" );
-
-        System.out.println("empty string/empty string: " + dice.distance("", ""));
-        System.out.println("empty string/cat: " + dice.distance("", "cat"));
-        System.out.println("cat/empty string: " + dice.distance("cat", ""));
-        System.out.println("cat/cat: " + dice.distance("cat", "cat"));
-        System.out.println( "pillar/caterpillar: " +  dice.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "bat/cat: " + dice.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + dice.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " +dice.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + dice.distance( "cat", "zoo" ) );
-        System.out.println( "n/zoological: " + dice.distance( "n", "zoological" ) );
+        NamedMetric.printExamples(new Dice());
     }
-
 }

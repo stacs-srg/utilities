@@ -27,12 +27,7 @@ public class FeatureVector {
     private List<KeyFreqPair> state = new Vector<>();
     private HashMap<String,KeyFreqPair> frequencies = new HashMap<>();
 
-    private String document;
-
-
     public FeatureVector(String document, int shingle_size) {
-
-        this.document = document;
 
         for (int i = 0; i < document.length() - shingle_size + 1; i++) {
             String next_gram = document.substring(i, i + shingle_size);
@@ -56,20 +51,8 @@ public class FeatureVector {
         return state.iterator();
     }
 
-    private int maxweight() {
-        try {
-            return state.get( 0 ).frequency;  // in sorted order so highest is first.
-        } catch( IndexOutOfBoundsException e ) {
-            return 0;
-        }
-
-    }
-
-    public String getDocument() {
-        return document;
-    }
-
     public int getFrequency(String qgram) {
+
         KeyFreqPair p = frequencies.get(qgram);
         if (p == null) {
             return 0;

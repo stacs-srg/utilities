@@ -58,32 +58,31 @@ import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
  * <p>
  * Code included for speed tests - modified to comply with our interfaces.
  */
-
-
 public final class LongestCommonSubstring implements NamedMetric<String> {
 
-    public LongestCommonSubstring() {
+    @Override
+    public String getMetricName() {
+        return "LongestCommonSubstring";
     }
 
     public double compare(String a, String b) {
-        if( a == null || b == null ) {
+        if (a == null || b == null) {
             return 1.0;
         }
         if (a.isEmpty() || b.isEmpty()) {
             return 1.0;
-        }
-        else {
+        } else {
             return (float) lcs(a, b) / (float) Math.max(a.length(), b.length());
         }
     }
 
     public double distance(String a, String b) {
-        if( a.equals(b) ) {
+        if (a.equals(b)) {
             return 0.0;
         }
         if (a.isEmpty() && b.isEmpty()) {
             return 0.0;
-        } else if (a.isEmpty() ) {
+        } else if (a.isEmpty()) {
             return (double) b.length();
         } else {
             return b.isEmpty() ? (double) a.length() : (double) (a.length() + b.length() - 2 * lcs(a, b));
@@ -126,25 +125,8 @@ public final class LongestCommonSubstring implements NamedMetric<String> {
         return "LongestCommonSubstring";
     }
 
-    @Override
-    public String getMetricName() {
-        return "LongestCommonSubstring";
-    }
-
     public static void main(String[] a) {
-        LongestCommonSubstring lcs = new LongestCommonSubstring();
 
-        System.out.println("LongestCommonSubstring:" );
-
-        System.out.println("empty string/empty string: " + lcs.distance("", ""));
-        System.out.println("empty string/cat: " + lcs.distance("", "cat"));
-        System.out.println("cat/empty string: " + lcs.distance("cat", ""));
-        System.out.println("cat/cat: " + lcs.distance("cat", "cat"));
-        System.out.println( "pillar/caterpillar: " +  lcs.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "bat/cat: " + lcs.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + lcs.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " +lcs.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + lcs.distance( "cat", "zoo" ) );
-        System.out.println( "n/zoological: " + lcs.distance( "n", "zoological" ) );
+        NamedMetric.printExamples(new LongestCommonSubstring());
     }
 }

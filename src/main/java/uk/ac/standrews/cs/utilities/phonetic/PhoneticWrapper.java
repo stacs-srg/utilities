@@ -20,15 +20,14 @@ package uk.ac.standrews.cs.utilities.phonetic;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.StringEncoder;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 public class PhoneticWrapper implements NamedMetric<String> {
 
     private final StringEncoder encoder;
-    private final StringMetric metric;
+    private final NamedMetric<String> metric;
     private final String metric_name;
 
-    public PhoneticWrapper(StringEncoder encoder, StringMetric metric) {
+    public PhoneticWrapper(StringEncoder encoder, NamedMetric<String> metric) {
 
         this.encoder = encoder;
         this.metric = metric;

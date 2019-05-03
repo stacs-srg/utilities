@@ -31,6 +31,6 @@ public class KeyFreqPair implements Comparable<KeyFreqPair> {
 
     @Override
     public int compareTo(KeyFreqPair other) {
-        return Integer.compare(this.frequency, other.frequency);
+        return Integer.compare(frequency, other.frequency);
     }
 }

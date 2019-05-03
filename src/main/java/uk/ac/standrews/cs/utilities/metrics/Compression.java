@@ -35,7 +35,9 @@ import java.util.zip.Deflater;
 
 public class Compression implements NamedMetric<String> {
 
-    public Compression() {
+    @Override
+    public String getMetricName() {
+        return "Compression";
     }
 
     public double distance(String str1, String str2) {
@@ -44,7 +46,7 @@ public class Compression implements NamedMetric<String> {
 
     public double similarity( String str1, String str2 ) {
 
-        double check = CheckValues.checkNullAndEmpty(str1, str2);
+        double check = NamedMetric.checkNullAndEmpty(str1, str2);
         if (check != -1) return check;
 
         try {
@@ -56,9 +58,7 @@ public class Compression implements NamedMetric<String> {
                 return 0.0; // Maximal distance
             }
 
-            double w = 1.0 - (c12 - Math.min(c1,c2)) / Math.max(c1,c2);
-
-            return w;
+            return 1.0 - (c12 - Math.min(c1,c2)) / Math.max(c1,c2);
 
         } catch (UnsupportedEncodingException e) {
             return 0.0; // // Maximal distance
@@ -66,6 +66,7 @@ public class Compression implements NamedMetric<String> {
     }
 
     private double zlibcompress(String str1) throws UnsupportedEncodingException {
+
         Deflater compresser = new Deflater();
         byte[] input = str1.getBytes("UTF-8");
         byte[] output = new byte[100];
@@ -76,27 +77,8 @@ public class Compression implements NamedMetric<String> {
         return compressedDataLength;
     }
 
-
-    @Override
-    public String getMetricName() {
-        return "Compression";
-    }
-
     public static void main(String[] a) {
-        Compression cmpr = new Compression();
 
-        System.out.println("Compression:" );
-
-        System.out.println("empty string/empty string: " + cmpr.distance("", ""));
-        System.out.println("empty string/cat: " + cmpr.distance("", "cat"));
-        System.out.println("cat/empty string: " + cmpr.distance("cat", ""));
-        System.out.println("cat/cat: " + cmpr.distance("cat", "cat"));
-        System.out.println( "pillar/caterpillar: " +  cmpr.distance( "pillar", "caterpillar" ) );  //  6/11 correct
-        System.out.println( "bat/cat: " + cmpr.distance( "bat", "cat" ) );
-        System.out.println( "cat/cart: " + cmpr.distance( "cat", "cart" ) );
-        System.out.println( "cat/caterpillar: " +cmpr.distance( "cat", "caterpillar" ) );
-        System.out.println( "cat/zoo: " + cmpr.distance( "cat", "zoo" ) );
-        System.out.println( "n/zoological: " + cmpr.distance( "n", "zoological" ) );
+        NamedMetric.printExamples(new Compression());
     }
-
 }
