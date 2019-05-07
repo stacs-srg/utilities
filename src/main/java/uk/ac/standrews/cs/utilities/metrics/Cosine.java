@@ -38,6 +38,7 @@ public class Cosine implements NamedMetric<String> {
 
         SparseDistro sdx = new SparseDistro(NamedMetric.topAndTail(x));
         SparseDistro sdy = new SparseDistro(NamedMetric.topAndTail(y));
+
         return distance(sdx, sdy);
     }
 
@@ -45,14 +46,14 @@ public class Cosine implements NamedMetric<String> {
         return distance(new SparseDistro(x), new SparseDistro(y));
     }
 
-    public double distance(SparseDistro p, SparseDistro q) {
+    private double distance(SparseDistro p, SparseDistro q) {
 
         if (p.equals(q)) { // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
             return 0.0;
         }
 
-        p = p.toProbability();
-        q = q.toProbability();
+        p.convertToProbabilityBased();
+        q.convertToProbabilityBased();
 
         Iterator<QgramDistribution> p_iter = p.getIterator();
 

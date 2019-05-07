@@ -18,6 +18,6 @@ package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
 public interface ICountedMetric<T> extends NamedMetric<T>  {
 
-    public int reset();
-    public int getComparisonCount();
+    int reset();
+    int getComparisonCount();
 }

@@ -16,13 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.archive.ErrorHandling;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import static uk.ac.standrews.cs.utilities.metrics.KullbackLeibler.kullbackLeiblerDivergence;
 
@@ -87,9 +83,9 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
 
         SparseDistro average = average(p1_distro, p2_distro);
 
-        p1_distro = p1_distro.toProbability();
-        p2_distro = p2_distro.toProbability();
-        average = average.toProbability();
+        p1_distro.convertToProbabilityBased();
+        p2_distro.convertToProbabilityBased();
+        average.convertToProbabilityBased();
 
         double kl1 = kullbackLeiblerDivergence(p1_distro, average);
         double kl2 = kullbackLeiblerDivergence(p2_distro, average);
@@ -104,7 +100,7 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
         Iterator<QgramDistribution> yy_iter = yy.getIterator();
         while (yy_iter.hasNext()) {
             QgramDistribution nxt = yy_iter.next();
-            ave.average_value(nxt.key, nxt.count);
+            ave.averageValue(nxt.key, nxt.count);
         }
         return ave;
     }

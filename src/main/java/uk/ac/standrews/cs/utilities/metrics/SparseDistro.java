@@ -40,7 +40,7 @@ public class SparseDistro {
 
         while (iter.hasNext()) {
             try {
-                average_value(iter.next(), 1);
+                averageValue(iter.next(), 1);
             } catch (Exception e) {
                 // cannot happen in this instance - we are in constructor and counting is true;
             }
@@ -49,8 +49,6 @@ public class SparseDistro {
 
     /**
      * Convertor Constructor to convert between formats used.
-     *
-     * @param fv
      */
     public SparseDistro(FeatureVector fv) {
         for (KeyFreqPair kf : fv.getFeatures()) {
@@ -95,7 +93,7 @@ public class SparseDistro {
         return sb.toString();
     }
 
-    public void average_value(String key, double value) {
+    public void averageValue(String key, double value) {
 
         if (counting) {
             QgramDistribution sc = new QgramDistribution(key, value);
@@ -109,7 +107,7 @@ public class SparseDistro {
                 already.count = (already.count + value) / 2;
             }
         } else {
-            throw new RuntimeException("Cannot average_value to a probability distribution");
+            throw new RuntimeException("Cannot average a probability distribution");
         }
     }
 
@@ -128,28 +126,28 @@ public class SparseDistro {
         SparseDistro sd1 = new SparseDistro("AABBABACVXSAB");
         System.out.println(sd1);
 
-        SparseDistro sd2 = new SparseDistro("AABBABACVXSAB").toProbability();
+        SparseDistro sd2 = new SparseDistro("AABBABACVXSAB");
+        sd2.convertToProbabilityBased();
         System.out.println(sd2);
     }
 
     /**
      * Converts a distribution from counting to probabilities
      */
-    public SparseDistro toProbability() {
+    public void convertToProbabilityBased() {
         if (counting) {
             counting = false;
-            divide_entries(count_counts());
+            divideEntries(countCounts());
         }
-        return this;
     }
 
-    private void divide_entries(double denominator) {
+    private void divideEntries(double denominator) {
         for (QgramDistribution distro : list) {
             distro.count = distro.count / denominator;
         }
     }
 
-    private double count_counts() {
+    private double countCounts() {
         double total = 0.0;
         for (QgramDistribution distro : list) {
             total += distro.count;

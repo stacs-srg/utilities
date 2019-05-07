@@ -56,16 +56,14 @@ public class BagDistance implements NamedMetric<String> {
         List<Character> list1 = toList(str1);
         List<Character> list2 = toList(str2);
 
-        for (char ch : list1) {
-            if (list2.contains(ch)) {
-                list2.remove(ch);
-            }
+        for (Character ch : list1) {
+            list2.remove(ch);                 // only removes if in the list
         }
 
-        for (char ch : str2.toCharArray()) {
-            if (list1.contains(ch)) {
-                list1.remove(ch);
-            }
+        // ch must be typed as Character not char, since otherwise we call List.remove(index)...
+
+        for (Character ch : toList(str2)) {   // note make a copy of list2 because we have removed characters from original above.
+            list1.remove(ch);                 // only removes if in the list
         }
 
         return 1.0 - (((double) Math.max(list1.size(), list2.size())) / Math.max(n, m));

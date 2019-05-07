@@ -20,7 +20,6 @@ package uk.ac.standrews.cs.utilities.metrics;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 public class KullbackLeibler {
 
@@ -90,7 +89,13 @@ public class KullbackLeibler {
         double check = NamedMetric.checkNullAndEmpty(x, y);
         if (check != -1) return 1 - check;
 
-        return kullbackLeiblerDivergence(new SparseDistro(NamedMetric.topAndTail(x)).toProbability(), new SparseDistro(NamedMetric.topAndTail(y)).toProbability());
+        SparseDistro x_distro = new SparseDistro(NamedMetric.topAndTail(x));
+        SparseDistro y_distro = new SparseDistro(NamedMetric.topAndTail(y));
+
+        x_distro.convertToProbabilityBased();
+        y_distro.convertToProbabilityBased();
+
+        return kullbackLeiblerDivergence(x_distro, y_distro);
     }
 
     /**
