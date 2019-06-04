@@ -19,7 +19,6 @@ package uk.ac.standrews.cs.utilities.metrics;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /*

@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.Iterator;
@@ -42,6 +43,12 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
         if (check != -1) return check;
 
         return Math.sqrt(jensenShannonDivergence(x, y));
+    }
+
+    @Override
+    public double normalisedDistance(String s1, String s2) {
+        // TODO: Should we normalise?
+        return Metric.normalise(distance(s1, s2));
     }
 
     /**

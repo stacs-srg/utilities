@@ -33,6 +33,9 @@ public class Jaccard implements NamedMetric<String> {
     public double distance(Collection A, Collection B) {
         return 1 - similarity(A, B);
     }
+    public double normalisedDistance(String A, String B ) {
+        return distance(A,B);
+    }
 
     public double distance(String A, String B) {
         return 1 - similarity(A, B);

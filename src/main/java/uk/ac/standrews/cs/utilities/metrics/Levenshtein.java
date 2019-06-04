@@ -22,6 +22,7 @@ package uk.ac.standrews.cs.utilities.metrics;
 //
 
 import com.google.common.base.Preconditions;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 public final class Levenshtein implements NamedMetric<String> {
@@ -88,6 +89,11 @@ public final class Levenshtein implements NamedMetric<String> {
 
             return v0[tLength];
         }
+    }
+
+    @Override
+    public double normalisedDistance(String a, String b) {
+        return Metric.normalise(distance(a, b));
     }
 
     private double min(double a, double b, double c) {

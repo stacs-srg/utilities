@@ -41,6 +41,7 @@ package uk.ac.standrews.cs.utilities.metrics;
  * Code included for speed tests - modified to comply with our interfaces.
  */
 
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import java.util.HashMap;
@@ -184,7 +185,12 @@ public class DamerauLevenshtein implements NamedMetric<String> {
         return table[source.length() - 1][target.length() - 1];
     }
 
-    public static void main(String[] a) {
+    public double normalisedDistance(String source, String target) {
+        return Metric.normalise( distance(source,target));
+    }
+
+
+        public static void main(String[] a) {
 
         NamedMetric.printExamples(new DamerauLevenshtein(1, 1, 1, 1));
     }

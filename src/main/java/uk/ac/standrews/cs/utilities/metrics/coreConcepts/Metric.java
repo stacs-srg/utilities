@@ -18,5 +18,16 @@ package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
 public interface Metric<T> {
 
-    double distance(T x, T y);
+    public double distance(T x, T y);
+    public double normalisedDistance(T x, T y);
+
+    /**
+     * @param distance - the distance to be normalised
+     * @return the distance in the range 0-1:  1 - ( 1 / d + 1 )
+     */
+    static public double normalise(double distance) {
+        return 1d - (1d / (distance + 1d));
+    }
+
+
 }
