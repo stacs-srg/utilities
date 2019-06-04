@@ -48,6 +48,23 @@ public class Hamming implements NamedMetric<BitSet> {
         for( int i = 0; i < x_as_longs.length; i++ ) {
             count += distance(x_as_longs[i],y_as_longs[i] );
         }
+        return count;
+    }
+
+    @Override
+    public double normalisedDistance(BitSet x, BitSet y) {
+        long[] x_as_longs = x.toLongArray();
+        long[] y_as_longs = y.toLongArray();
+
+        if( x_as_longs.length != y_as_longs.length ) {
+            throw new RuntimeException( "inputs to Happing.distance must be of same length");
+        }
+
+        double count = 0;
+
+        for( int i = 0; i < x_as_longs.length; i++ ) {
+            count += distance(x_as_longs[i],y_as_longs[i] );
+        }
         return count / x_as_longs.length;
     }
 

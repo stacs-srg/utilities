@@ -18,6 +18,7 @@
 package uk.ac.standrews.cs.utilities.richard.dataPoints.cartesian;
 
 import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 /**
@@ -37,6 +38,11 @@ public class Euclidean<T extends CartesianPoint>  implements NamedMetric<T> {
 			acc += diff * diff;
 		}
 		return (double) Math.sqrt(acc);
+	}
+
+	@Override
+	public double normalisedDistance(T a, T b) {
+		return Metric.normalise(distance(a, b));
 	}
 
 	@Override

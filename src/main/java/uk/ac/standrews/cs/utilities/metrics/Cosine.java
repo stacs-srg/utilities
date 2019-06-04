@@ -42,6 +42,10 @@ public class Cosine implements NamedMetric<String> {
         return distance(sdx, sdy);
     }
 
+    public double normalisedDistance(String x, String y) {
+        return distance(x, y);
+    }
+
     public double distance(FeatureVector x, FeatureVector y) {
         return distance(new SparseDistro(x), new SparseDistro(y));
     }

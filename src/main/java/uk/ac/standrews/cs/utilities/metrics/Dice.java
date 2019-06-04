@@ -34,6 +34,11 @@ public class Dice implements NamedMetric<String> {
         return 1.0 - this.compare(x, y);
     }
 
+    @Override
+    public double normalisedDistance(String a, String b) {
+        return distance(a, b);
+    }
+
     public double compare(String A, String B) {
 
         double check = NamedMetric.checkNullAndEmpty(A, B);

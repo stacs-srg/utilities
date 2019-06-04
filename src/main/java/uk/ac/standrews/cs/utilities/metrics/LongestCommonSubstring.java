@@ -16,6 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 /**
@@ -87,6 +88,11 @@ public final class LongestCommonSubstring implements NamedMetric<String> {
         } else {
             return b.isEmpty() ? (double) a.length() : (double) (a.length() + b.length() - 2 * lcs(a, b));
         }
+    }
+
+    @Override
+    public double normalisedDistance(String s1, String s2) {
+        return Metric.normalise(distance(s1, s2));
     }
 
     private static int lcs(String a, String b) {

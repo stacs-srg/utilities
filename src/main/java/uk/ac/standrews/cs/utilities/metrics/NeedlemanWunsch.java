@@ -91,6 +91,11 @@ public class NeedlemanWunsch implements NamedMetric<String> {
         return 1.0 - compare(a, b);
     }
 
+    @Override
+    public double normalisedDistance(String a, String b) {
+        return distance(a, b);
+    }
+
     public double compare(String a, String b) {
 
         double check = NamedMetric.checkNullAndEmpty(a, b);

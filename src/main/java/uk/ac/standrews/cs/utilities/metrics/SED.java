@@ -198,6 +198,11 @@ public class SED implements NamedMetric<String> {
     }
 
     @Override
+    public double normalisedDistance(String s1, String s2) {
+        return distance(s1, s2);
+    }
+
+    @Override
     public String getMetricName() {
         return "SED";
     }

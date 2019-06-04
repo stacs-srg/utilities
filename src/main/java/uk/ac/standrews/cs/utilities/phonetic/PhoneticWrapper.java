@@ -51,4 +51,18 @@ public class PhoneticWrapper implements NamedMetric<String> {
             return 1.0;
         }
     }
+
+    @Override
+    public double normalisedDistance(String x, String y) {
+        try {
+            String str1 = encoder.encode(x);
+            String str2 = encoder.encode(y);
+
+            return metric.normalisedDistance(str1, str2);
+
+        } catch (EncoderException e) {
+            return 1.0;
+        }
+
+    }
 }

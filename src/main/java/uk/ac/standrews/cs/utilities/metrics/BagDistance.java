@@ -45,6 +45,11 @@ public class BagDistance implements NamedMetric<String> {
         return 1 - similarity(str1, str2);
     }
 
+    @Override
+    public double normalisedDistance(String a, String b) {
+        return distance(a, b);
+    }
+
     public double similarity(String str1, String str2) {
 
         double check = NamedMetric.checkNullAndEmpty(str1, str2);

@@ -19,6 +19,7 @@ package uk.ac.standrews.cs.utilities.m_tree;
 import org.junit.Before;
 import org.junit.Test;
 import org.simmetrics.metrics.Levenshtein;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 import static org.junit.Assert.assertEquals;
@@ -76,6 +77,11 @@ public class MTreeStringEditDistanceTest {
         public double distance(String s1, String s2) {
 
             return levenshtein.distance(s1, s2);
+        }
+
+        @Override
+        public double normalisedDistance(String x, String y) {
+            return Metric.normalise(distance(x, y));
         }
 
         @Override

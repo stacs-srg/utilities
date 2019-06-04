@@ -33,6 +33,12 @@ public class CountedMetric<T> implements ICountedMetric<T> {
 	}
 
 	@Override
+	public double normalisedDistance(T x, T y) {
+		this.count++;
+		return this.m.normalisedDistance(x, y);
+	}
+
+	@Override
 	public String getMetricName() {
 		return m.getMetricName();
 	}
