@@ -18,59 +18,17 @@ package uk.ac.standrews.cs.utilities.metrics;
 
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by al on 06/09/2017.
  */
 public class Jaccard implements NamedMetric<String> {
 
-    @Override
-    public String getMetricName() {
-        return "Jaccard";
-    }
-
-    public double distance(Collection A, Collection B) {
-        return 1 - similarity(A, B);
-    }
-    public double normalisedDistance(String A, String B ) {
-        return distance(A,B);
-    }
-
-    public double distance(String A, String B) {
-        return 1 - similarity(A, B);
-    }
-
-    public double distance(BitSet A, BitSet B) {
-        return 1 - similarity(A, B);
-    }
-
-    public double similarity(Collection A, Collection B) {
-
-        return ((double) (intersection(A, B).size())) / union(A, B).size();
-    }
-
-    public double similarity(String A, String B) {
-
-        double check = NamedMetric.checkNullAndEmpty(A, B);
-        if (check != -1) return check;
-
-        Collection agrams = Shingle.ngrams(NamedMetric.topAndTail(A), 2);
-        Collection bgrams = Shingle.ngrams(NamedMetric.topAndTail(B), 2);
-
-        return ((double) (intersection(agrams, bgrams).size())) / union(agrams, bgrams).size();
-    }
-
-    public double similarity(BitSet A, BitSet B) {
-
-        BitSet union = A.get(0, A.length());   // and and or are destructive in BitSet
-        union.or(B);
-        BitSet intersection = A.get(0, A.length());
-        intersection.and(B);
-        return ((double) intersection.cardinality()) / union.cardinality();
-    }
-
-     public static Set union(Collection a, Collection b) {
+    public static Set union(Collection a, Collection b) {
 
         Set result = new HashSet();
         result.addAll(a);
@@ -94,5 +52,51 @@ public class Jaccard implements NamedMetric<String> {
     public static void main(String[] args) {
 
         NamedMetric.printExamples(new Jaccard());
+    }
+
+    @Override
+    public String getMetricName() {
+        return "Jaccard";
+    }
+
+    public double distance(String A, String B) {
+        return 1 - similarity(A, B);
+    }
+
+    public double distance(Collection A, Collection B) {
+        return 1 - similarity(A, B);
+    }
+
+    public double distance(BitSet A, BitSet B) {
+        return 1 - similarity(A, B);
+    }
+
+    public double normalisedDistance(String A, String B) {
+        return distance(A, B);
+    }
+
+    public double similarity(Collection A, Collection B) {
+
+        return ((double) (intersection(A, B).size())) / union(A, B).size();
+    }
+
+    public double similarity(String A, String B) {
+
+        double check = NamedMetric.checkNullAndEmpty(A, B);
+        if (check != -1) return check;
+
+        Collection bigrams_a = Shingle.ngrams(NamedMetric.topAndTail(A), 2);
+        Collection bigrams_b = Shingle.ngrams(NamedMetric.topAndTail(B), 2);
+
+        return similarity(bigrams_a, bigrams_b);
+    }
+
+    public double similarity(BitSet A, BitSet B) {
+
+        BitSet union = A.get(0, A.length());   // and and or are destructive in BitSet
+        union.or(B);
+        BitSet intersection = A.get(0, A.length());
+        intersection.and(B);
+        return ((double) intersection.cardinality()) / union.cardinality();
     }
 }
