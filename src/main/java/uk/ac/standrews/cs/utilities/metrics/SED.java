@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,201 +14,30 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
+package uk.ac.standrews.cs.utilities.metrics;
+
+import uk.ac.standrews.cs.utilities.metrics.implementation.SparseProbabilityMetric;
 
 /**
  * @author Richard Connor richard.connor@strath.ac.uk
  * Implements Structural Entropic Distance
  */
-package uk.ac.standrews.cs.utilities.metrics;
-
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
-public class SED implements NamedMetric<String> {
-
-    private int charValUpb;
-    private Map<String, SparseProbabilityArray> memoTable;
-    private static double log2 = Math.log(2);
-
-    private static double h(double d) {
-        return -d * Math.log(d);
-    }
-
-    private static double hCalc(double d1, double d2) {
-        assert d1 != 0;
-        assert d2 != 0;
-        return h(d1) + h(d2) - h(d1 + d2);
-    }
-
-    protected static class SparseProbabilityArray {
-        /*
-         * used to build up the structure event by event, counting cardinalities
-         */
-        private Map<Integer, Integer> cardMap;
-        private int acc;
-
-        /*
-         * once finalised, these are populated in order with probabilities that
-         * average_value to ones
-         */
-        private double[] finalProbs;
-        private int[] finalEvents;
-
-        public SparseProbabilityArray() {
-            cardMap = new TreeMap<>();
-            acc = 0;
-        }
-
-        @SuppressWarnings("boxing")
-        public void addEvent(int event, int card) {
-            if (!cardMap.keySet().contains(event)) {
-                cardMap.put(event, 0);
-            }
-            cardMap.put(event, cardMap.get(event) + card);
-            acc += card;
-        }
-
-        @SuppressWarnings("boxing")
-        public void finalise() {
-            final int size = cardMap.size();
-            finalEvents = new int[size];
-            finalProbs = new double[size];
-
-            int ptr = 0;
-            for (int event : cardMap.keySet()) {
-                finalEvents[ptr] = event;
-                finalProbs[ptr++] = (double) cardMap.get(event)                        / acc;
-            }
-            cardMap = null;
-        }
-
-        public static double SEDistance(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {
-            double k = doCalc(ar1, ar2);
-            return Math.pow(Math.pow(2, Math.max(0, k)) - 1, 0.486);
-        }
-
-        public static double JSDistance(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {
-            double k = doCalc(ar1, ar2);
-            return Math.sqrt(Math.max(0, k));
-        }
-
-        private static double doCalc(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {
-            int ar1Ptr = 0;
-            int ar2Ptr = 0;
-            int ar1Event = ar1.finalEvents[ar1Ptr];
-            int ar2Event = ar2.finalEvents[ar2Ptr];
-
-            boolean finished = false;
-            double simAcc = 0;
-            while (!finished) {
-
-                if (ar1Event == ar2Event) {
-                    simAcc += hCalc(ar1.finalProbs[ar1Ptr],
-                            ar2.finalProbs[ar2Ptr]);
-                    ar1Ptr++;
-                    ar2Ptr++;
-                } else if (ar1Event < ar2Event) {
-                    ar1Ptr++;
-                } else {
-                    ar2Ptr++;
-                }
-                if (ar1Ptr == ar1.finalEvents.length) {
-                    ar1Event = Integer.MAX_VALUE;
-                } else {
-
-                    ar1Event = ar1.finalEvents[ar1Ptr];
-                }
-                if (ar2Ptr == ar2.finalEvents.length) {
-                    ar2Event = Integer.MAX_VALUE;
-                } else {
-                    ar2Event = ar2.finalEvents[ar2Ptr];
-                }
-                finished = ar1Ptr == ar1.finalEvents.length
-                        && ar2Ptr == ar2.finalEvents.length;
-            }
-            return (1 - (simAcc / log2) / 2);
-        }
-    }
-
-    /**
-     * @param maxCharVal
-     */
-    public SED(int maxCharVal) {
-        if (maxCharVal > Math.sqrt(Integer.MAX_VALUE)) {
-            throw new RuntimeException("char val too large for SED");
-        }
-        charValUpb = maxCharVal + 1;
-        memoTable = new HashMap<>();
-    }
-
-    protected SparseProbabilityArray stringToSparseArray(String s) {
-        if (memoTable.containsKey(s)) {
-            return memoTable.get(s);
-        } else {
-            SparseProbabilityArray spa = new SparseProbabilityArray();
-
-            for (int i = -1; i < s.length(); i++) {
-                char ch1 = 0;
-                char ch2 = 0;
-                try {
-                    ch1 = s.charAt(i);
-                    spa.addEvent(ch1, 2);
-                    if (ch1 > charValUpb || ch1 == 0) {
-                        throw new RuntimeException("incorrect char in SED: " + ch1 + " charval: " + ((int) (ch1)) + " from string: " + s);
-                    }
-                    ch2 = s.charAt(i + 1);
-                } catch (IndexOutOfBoundsException e) {
-                    if (i == -1) {
-                        ch1 = 1;
-                        ch2 = s.charAt(0);
-                    } else {
-                        ch2 = 1;
-                    }
-                }
-                spa.addEvent(ch1 * charValUpb + ch2, 1);
-            }
-            spa.finalise();
-            memoTable.put(s, spa);
-            return spa;
-        }
-    }
-
-    @Override
-    public double distance(String x, String y) {
-        if (x == null || x.equals("")) {
-            if (y == null || y.equals("")) {
-                return 0;
-            } else {
-                return 1;
-            }
-        }
-        if (y == null || y.equals("")) {
-            return 1;
-        }
-        if (x.equals(y)) {
-            return 0;
-        }
-
-        SparseProbabilityArray s1 = stringToSparseArray(x);
-        SparseProbabilityArray s2 = stringToSparseArray(y);
-        return SparseProbabilityArray.SEDistance(s1, s2);
-    }
-
-    @Override
-    public double normalisedDistance(String s1, String s2) {
-        return distance(s1, s2);
-    }
+public class SED extends SparseProbabilityMetric {
 
     @Override
     public String getMetricName() {
         return "SED";
     }
 
+    @Override
+    public double calculateStringDistance(String x, String y) {
+
+        double k = doCalc(stringToSparseArray(x), stringToSparseArray(y));
+        return Math.pow(Math.pow(2, Math.max(0, k)) - 1, 0.486); // TODO magic number
+    }
+
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new SED(255));
+        new SED().printExamples();
     }
 }

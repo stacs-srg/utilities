@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,11 +16,10 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,23 +28,18 @@ import java.util.Random;
 
 public class PositivesAndNegativesEuclideanClusteringExploration {
 
-    private MTree<Point> tree;
-
-    private Random random;
-    private List<Point> points;
+    private static final double range = 100.0f;
+    private static final long SEED = 3459873497234L;
+    private static final double[] radii = new double[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
     private final int number_of_points;
     private final int repetition_number;
     private final boolean duplicate_values;
-
-    private static final double range = 100.0f;
-    private static final long SEED = 3459873497234L;
-
-    private Point positve_nucleus = new Point( range * 1.5f, range * 1.5f ); // a double positive node around which to nucleate positive points.
-    private Point negative_nucleus = new Point( - range * 1.5f, - range * 1.5f ); // a double positive node around which to nucleate positive points.
-
     private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Double.compare(o1.distance, o2.distance);
-
-    private static final double[] radii = new double[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
+    private MTree<Point> tree;
+    private Random random;
+    private List<Point> points;
+    private Point positive_nucleus = new Point(range * 1.5f, range * 1.5f); // a double positive node around which to nucleate positive points.
+    private Point negative_nucleus = new Point(-range * 1.5f, -range * 1.5f); // a double positive node around which to nucleate positive points.
 
     public PositivesAndNegativesEuclideanClusteringExploration(final int number_of_points, final int repetition_number, final boolean duplicate_values) throws Exception {
 
@@ -58,10 +52,13 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
         tree.showStructure().printStats();
     }
 
+    public static void main(String[] args) throws Exception {
+        PositivesAndNegativesEuclideanClusteringExploration pandn = new PositivesAndNegativesEuclideanClusteringExploration(30, 1, false);
+    }
 
-    public void setUp() throws Exception {
+    public void setUp() {
 
-        final NamedMetric distance_metric = new EuclideanDistance();
+        final Metric<Point> distance_metric = new EuclideanDistance();
 
         tree = new MTree<>(distance_metric);
 
@@ -95,7 +92,7 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
 
     /*
      * Create all positives and then all negatives
-    */
+     */
     private void createPoints2() {
 
         points = new ArrayList<>();
@@ -125,7 +122,6 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
         }
     }
 
-
     private void addPoints() {
 
         for (final Point p : points) {
@@ -136,16 +132,11 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
 
     private Point randomPositivePoint() {
 
-        return new Point( positve_nucleus.x + random.nextFloat() * range , positve_nucleus.y +  random.nextFloat() * range);
+        return new Point(positive_nucleus.x + random.nextFloat() * range, positive_nucleus.y + random.nextFloat() * range);
     }
 
     private Point randomNegativePoint() {
 
-        return new Point( negative_nucleus.x + random.nextFloat() * range, negative_nucleus.y +  random.nextFloat() * range);
+        return new Point(negative_nucleus.x + random.nextFloat() * range, negative_nucleus.y + random.nextFloat() * range);
     }
-
-    public static void main( String[] args ) throws Exception {
-        PositivesAndNegativesEuclideanClusteringExploration pandn = new PositivesAndNegativesEuclideanClusteringExploration( 30,1, false);
-    }
-
 }

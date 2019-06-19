@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -19,9 +19,7 @@ package uk.ac.standrews.cs.utilities.metrics;
 import com.google.common.base.Preconditions;
 import org.simmetrics.metrics.functions.MatchMismatch;
 import org.simmetrics.metrics.functions.Substitution;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
-
-import java.util.Objects;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 /**
  * SimMetrics - SimMetrics is a java library of Similarity or Distance
@@ -64,16 +62,11 @@ import java.util.Objects;
  * Code included for speed tests - modified to comply with our interfaces.
  */
 
-public class NeedlemanWunsch implements NamedMetric<String> {
+public class NeedlemanWunsch extends StringMetric {
 
     private static final Substitution MATCH_0_MISMATCH_1 = new MatchMismatch(0.0F, -1.0F);
     private final Substitution substitution;
     private final double gapValue;
-
-    @Override
-    public String getMetricName() {
-        return "NeedlemanWunsch";
-    }
 
     public NeedlemanWunsch() {
         this(-2.0F, MATCH_0_MISMATCH_1);
@@ -87,62 +80,52 @@ public class NeedlemanWunsch implements NamedMetric<String> {
         this.substitution = substitution;
     }
 
-    public double distance(String a, String b) {
-        return 1.0 - compare(a, b);
+    static double min(double a, double b, double c) {
+        return Math.min(Math.min(a, b), c);
     }
 
     @Override
-    public double normalisedDistance(String a, String b) {
-        return distance(a, b);
+    public String getMetricName() {
+        return "NeedlemanWunsch";
     }
 
-    public double compare(String a, String b) {
+    public double calculateStringDistance(String a, String b) {
+        return 1.0 - similarity(a, b);
+    }
 
-        double check = NamedMetric.checkNullAndEmpty(a, b);
-        if (check != -1) return check;
+    private double similarity(String a, String b) {
 
         double maxDistance = (double) Math.max(a.length(), b.length()) * Math.max(substitution.max(), gapValue);
         double minDistance = (double) Math.max(a.length(), b.length()) * Math.min(substitution.min(), gapValue);
+
         return (-needlemanWunsch(a, b) - minDistance) / (maxDistance - minDistance);
     }
 
     private double needlemanWunsch(String s, String t) {
 
-        if (Objects.equals(s, t)) {
-            return 0.0;
-        } else if (s.isEmpty()) {
-            return -gapValue * (double) t.length();
-        } else if (t.isEmpty()) {
-            return -gapValue * (double) s.length();
-        } else {
-            int n = s.length();
-            int m = t.length();
-            double[] v0 = new double[m + 1];
-            double[] v1 = new double[m + 1];
+        int n = s.length();
+        int m = t.length();
+        double[] v0 = new double[m + 1];
+        double[] v1 = new double[m + 1];
 
-            int i;
-            for (i = 0; i <= m; ++i) {
-                v0[i] = (double) i;
-            }
-
-            for (i = 1; i <= n; ++i) {
-                v1[0] = (double) i;
-
-                for (int j = 1; j <= m; ++j) {
-                    v1[j] = min(v0[j] - gapValue, v1[j - 1] - gapValue, v0[j - 1] - substitution.compare(s, i - 1, t, j - 1));
-                }
-
-                double[] swap = v0;
-                v0 = v1;
-                v1 = swap;
-            }
-
-            return v0[m];
+        int i;
+        for (i = 0; i <= m; ++i) {
+            v0[i] = (double) i;
         }
-    }
 
-    static double min(double a, double b, double c) {
-        return Math.min(Math.min(a, b), c);
+        for (i = 1; i <= n; ++i) {
+            v1[0] = (double) i;
+
+            for (int j = 1; j <= m; ++j) {
+                v1[j] = min(v0[j] - gapValue, v1[j - 1] - gapValue, v0[j - 1] - substitution.compare(s, i - 1, t, j - 1));
+            }
+
+            double[] swap = v0;
+            v0 = v1;
+            v1 = swap;
+        }
+
+        return v0[m];
     }
 
     public String toString() {
@@ -151,6 +134,6 @@ public class NeedlemanWunsch implements NamedMetric<String> {
 
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new NeedlemanWunsch());
+        new NeedlemanWunsch().printExamples();
     }
 }

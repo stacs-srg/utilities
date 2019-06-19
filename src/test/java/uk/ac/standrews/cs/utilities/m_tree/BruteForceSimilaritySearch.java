@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,9 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,7 +25,7 @@ import java.util.List;
 
 public class BruteForceSimilaritySearch<T> {
 
-    final NamedMetric<T> distance_metric;
+    final Metric<T> distance_metric;
 
     private List<T> values;
     private double[][] distances;
@@ -34,7 +33,7 @@ public class BruteForceSimilaritySearch<T> {
     private boolean arrays_initialised = false;
     final Comparator<? super DataDistance<T>> distance_comparator = (Comparator<DataDistance<T>>) (o1, o2) -> Double.compare(o1.distance, o2.distance);
 
-    public BruteForceSimilaritySearch(final NamedMetric<T> distance_metric) {
+    public BruteForceSimilaritySearch(final Metric<T> distance_metric) {
 
         this.distance_metric = distance_metric;
         values = new ArrayList<>();

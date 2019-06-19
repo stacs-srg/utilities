@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -25,31 +25,19 @@ public class Band {
     private static final int someprime = 16777619;
     private int the_hash;
 
-//    Band( int[] signature, int band_number, int band_size ) {
-//
-//        int offset = band_number * band_size;
-//
-//        the_hash = bigprime;
-//
-//        for( int index = offset; index < offset + band_size; index++ ) {
-//
-//                the_hash = the_hash * signature[index];
-//        }
-//    }
-
-    Band( int[] signature, int band_number, int band_size ) {
+    Band(Integer[] signature, int band_number, int band_size) {
 
         int offset = band_number * band_size;
 
-        the_hash = salt_hash( bigprime, band_number );  // seed the hash function with the band - every band hashes differently.
+        the_hash = salt_hash(bigprime, band_number);  // seed the hash function with the band - every band hashes differently.
 
-        for( int index = offset; index < offset + band_size; index++ ) {
-                the_hash = salt_hash( the_hash,signature[index] ); // use all the integers in the nad to calculate the hash code for this band,
+        for (int index = offset; index < offset + band_size; index++) {
+            the_hash = salt_hash(the_hash, signature[index]); // use all the integers in the nad to calculate the hash code for this band,
         }
     }
 
-    private static int salt_hash(int salt, int value ) {
-            return (salt * someprime ) ^ value;
+    private static int salt_hash(int salt, int value) {
+        return (salt * someprime) ^ value;
     }
 
     @Override
@@ -61,7 +49,7 @@ public class Band {
         return Integer.toString(the_hash);
     }
 
-    public boolean equals( Object o ) {
+    public boolean equals(Object o) {
         return o instanceof Band && (o.hashCode() == this.hashCode());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -15,14 +15,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+package uk.ac.standrews.cs.utilities.metrics.implementation;
 
-package uk.ac.standrews.cs.utilities.metrics;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
-
-import static uk.ac.standrews.cs.utilities.metrics.Shingle.ngramIterator;
 
 /**
  * A class to represent sparse distributions of Strings and their frequencies
@@ -36,19 +35,14 @@ public class SparseDistro {
     public SparseDistro(String x) {
 
         counting = true;
-        Iterator<String> iter = ngramIterator(x, 2);
 
-        while (iter.hasNext()) {
-            try {
-                averageValue(iter.next(), 1);
-            } catch (Exception e) {
-                // cannot happen in this instance - we are in constructor and counting is true;
-            }
+        for (final String s : StringMetric.extractNGrams(x, 2)) {
+            averageValue(s, 1);
         }
     }
 
     /**
-     * Convertor Constructor to convert between formats used.
+     * Convertor constructor to convert between formats used.
      */
     public SparseDistro(FeatureVector fv) {
         for (KeyFreqPair kf : fv.getFeatures()) {
@@ -121,16 +115,6 @@ public class SparseDistro {
         list.add(i, sc);
     }
 
-    public static void main(String[] args) {
-
-        SparseDistro sd1 = new SparseDistro("AABBABACVXSAB");
-        System.out.println(sd1);
-
-        SparseDistro sd2 = new SparseDistro("AABBABACVXSAB");
-        sd2.convertToProbabilityBased();
-        System.out.println(sd2);
-    }
-
     /**
      * Converts a distribution from counting to probabilities
      */
@@ -190,5 +174,15 @@ public class SparseDistro {
     @Override
     public int hashCode() {
         return Objects.hash(list, counting);
+    }
+
+    public static void main(String[] args) {
+
+        SparseDistro sd1 = new SparseDistro("AABBABACVXSAB");
+        System.out.println(sd1);
+
+        SparseDistro sd2 = new SparseDistro("AABBABACVXSAB");
+        sd2.convertToProbabilityBased();
+        System.out.println(sd2);
     }
 }

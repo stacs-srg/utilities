@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,23 +16,16 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
 
-
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
-public class EuclideanDistance implements NamedMetric<Point> {
+public class EuclideanDistance extends Metric<Point> {
 
-    public double distance(Point p1, Point p2) {
+    public double calculateDistance(Point p1, Point p2) {
 
-        double xdistance = p1.x - p2.x;
-        double ydistance = p1.y - p2.y;
+        double x_distance = p1.x - p2.x;
+        double y_distance = p1.y - p2.y;
 
-        return (double) Math.sqrt((xdistance * xdistance) + (ydistance * ydistance));
-    }
-
-    @Override
-    public double normalisedDistance(Point p1, Point p2) {
-        return Metric.normalise(distance(p1, p2));
+        return normaliseArbitraryPositiveDistance(Math.sqrt((x_distance * x_distance) + (y_distance * y_distance)));
     }
 
     @Override
@@ -40,4 +33,3 @@ public class EuclideanDistance implements NamedMetric<Point> {
         return "EuclideanDistance (2D)";
     }
 }
-

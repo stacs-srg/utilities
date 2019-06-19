@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -21,7 +21,7 @@ import org.simmetrics.metrics.functions.AffineGap;
 import org.simmetrics.metrics.functions.Gap;
 import org.simmetrics.metrics.functions.MatchMismatch;
 import org.simmetrics.metrics.functions.Substitution;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 /**
  * SimMetrics - SimMetrics is a java library of Similarity or Distance
@@ -64,7 +64,7 @@ import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
  * <p>
  * Code included for speed tests - modified to comply with our interfaces.
  */
-public class SmithWaterman implements NamedMetric<String> {
+public class SmithWaterman extends StringMetric {
 
     private final Gap gap;
     private final Substitution substitution;
@@ -89,22 +89,14 @@ public class SmithWaterman implements NamedMetric<String> {
         this.windowSize = windowSize;
     }
 
-    public double distance(String a, String b) {
-        return 1.0 - compare(a, b);
+    public double calculateStringDistance(String a, String b) {
+        return 1.0 - similarity(a, b);
     }
 
-    @Override
-    public double normalisedDistance(String a, String b) {
-        return distance(a, b);
-    }
-
-    public double compare(String a, String b) {
-
-        double check = NamedMetric.checkNullAndEmpty(a, b);
-        if (check != -1) return check;
+    private double similarity(String a, String b) {
 
         double maxDistance = (double) Math.min(a.length(), b.length()) * Math.max(substitution.max(), gap.min());
-        return this.smithWaterman(a, b) / maxDistance;
+        return smithWaterman(a, b) / maxDistance;
     }
 
     private double smithWaterman(String a, String b) {
@@ -169,6 +161,6 @@ public class SmithWaterman implements NamedMetric<String> {
 
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new SmithWaterman());
+        new SmithWaterman().printExamples();
     }
 }

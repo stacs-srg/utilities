@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,8 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 /**
  * SimMetrics - SimMetrics is a java library of Similarity or Distance
@@ -59,43 +58,24 @@ import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
  * <p>
  * Code included for speed tests - modified to comply with our interfaces.
  */
-public final class LongestCommonSubstring implements NamedMetric<String> {
+public final class LongestCommonSubstring extends StringMetric {
 
     @Override
     public String getMetricName() {
         return "LongestCommonSubstring";
     }
 
-    public double compare(String a, String b) {
-        if (a == null || b == null) {
-            return 1.0;
-        }
-        if (a.isEmpty() || b.isEmpty()) {
-            return 1.0;
-        } else {
-            return (float) lcs(a, b) / (float) Math.max(a.length(), b.length());
-        }
+    public double calculateStringDistance(String a, String b) {
+
+        return normaliseArbitraryPositiveDistance(a.length() + b.length() - 2 * lengthOfLongestCommonSubstring(a, b));
     }
 
-    public double distance(String a, String b) {
-        if (a.equals(b)) {
-            return 0.0;
-        }
-        if (a.isEmpty() && b.isEmpty()) {
-            return 0.0;
-        } else if (a.isEmpty()) {
-            return (double) b.length();
-        } else {
-            return b.isEmpty() ? (double) a.length() : (double) (a.length() + b.length() - 2 * lcs(a, b));
-        }
+    public String toString() {
+        return "LongestCommonSubstring";
     }
 
-    @Override
-    public double normalisedDistance(String s1, String s2) {
-        return Metric.normalise(distance(s1, s2));
-    }
+    private int lengthOfLongestCommonSubstring(String a, String b) {
 
-    private static int lcs(String a, String b) {
         int m = a.length();
         int n = b.length();
         int[] v0 = new int[n];
@@ -127,12 +107,8 @@ public final class LongestCommonSubstring implements NamedMetric<String> {
         return z;
     }
 
-    public String toString() {
-        return "LongestCommonSubstring";
-    }
-
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new LongestCommonSubstring());
+        new LongestCommonSubstring().printExamples();
     }
 }

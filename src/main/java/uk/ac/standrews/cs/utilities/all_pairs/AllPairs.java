@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -17,8 +17,8 @@
 package uk.ac.standrews.cs.utilities.all_pairs;
 
 import uk.ac.standrews.cs.utilities.metrics.Cosine;
-import uk.ac.standrews.cs.utilities.metrics.FeatureVector;
-import uk.ac.standrews.cs.utilities.metrics.KeyFreqPair;
+import uk.ac.standrews.cs.utilities.metrics.implementation.FeatureVector;
+import uk.ac.standrews.cs.utilities.metrics.implementation.KeyFreqPair;
 
 import java.util.ArrayList;
 import java.util.HashMap;

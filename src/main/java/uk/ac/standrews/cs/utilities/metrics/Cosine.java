@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,39 +14,29 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.metrics.implementation.FeatureVector;
+import uk.ac.standrews.cs.utilities.metrics.implementation.QgramDistribution;
+import uk.ac.standrews.cs.utilities.metrics.implementation.SparseDistro;
+
 import java.util.Iterator;
 
-public class Cosine implements NamedMetric<String> {
+public class Cosine extends StringMetric {
 
     @Override
     public String getMetricName() {
         return "Cosine";
     }
 
-    public double distance(String x, String y) {
+    protected double calculateStringDistance(String x, String y) {
 
-        if (x.equals(y)) {
-            return 0.0;
-        }
-        if (x.isEmpty() || y.isEmpty()) {
-            return 1.0;
-        }
-
-        SparseDistro sdx = new SparseDistro(NamedMetric.topAndTail(x));
-        SparseDistro sdy = new SparseDistro(NamedMetric.topAndTail(y));
-
-        return distance(sdx, sdy);
-    }
-
-    public double normalisedDistance(String x, String y) {
-        return distance(x, y);
+        return distance(new SparseDistro(topAndTail(x)), new SparseDistro(topAndTail(y)));
     }
 
     public double distance(FeatureVector x, FeatureVector y) {
+
         return distance(new SparseDistro(x), new SparseDistro(y));
     }
 
@@ -59,15 +49,15 @@ public class Cosine implements NamedMetric<String> {
         p.convertToProbabilityBased();
         q.convertToProbabilityBased();
 
-        Iterator<QgramDistribution> p_iter = p.getIterator();
-
         double dot_product = 0.0d;
 
-        while (p_iter.hasNext()) {
+        Iterator<QgramDistribution> p_iterator = p.getIterator();
 
-            QgramDistribution next_qgram = p_iter.next();
+        while (p_iterator.hasNext()) {
 
+            QgramDistribution next_qgram = p_iterator.next();
             QgramDistribution qi = q.getEntry(next_qgram.key);
+
             if (qi != null) {
                 dot_product += next_qgram.count * qi.count;
             }
@@ -85,6 +75,6 @@ public class Cosine implements NamedMetric<String> {
 
     public static void main(String[] args) {
 
-        NamedMetric.printExamples(new Cosine());
+        new Cosine().printExamples();
     }
 }

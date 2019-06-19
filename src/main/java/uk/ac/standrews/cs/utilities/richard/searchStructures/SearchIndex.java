@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,18 +16,18 @@
  */
 package uk.ac.standrews.cs.utilities.richard.searchStructures;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.*;
 
 
 public abstract class SearchIndex<T> {
 
-	public NamedMetric<T> metric;
+	public Metric<T> metric;
 	public List<T> data;
 	protected Random rand;
 
-	protected SearchIndex(List<T> data, NamedMetric<T> metric) {
+	protected SearchIndex(List<T> data, Metric<T> metric) {
 		this.metric = metric;
 		this.data = data;
 		this.rand = new Random(0);

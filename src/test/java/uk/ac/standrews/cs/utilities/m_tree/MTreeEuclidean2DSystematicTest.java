@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -21,7 +21,7 @@ import org.junit.Test;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,9 +57,9 @@ public abstract class MTreeEuclidean2DSystematicTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp()  {
 
-        final NamedMetric distance_metric = new EuclideanDistance();
+        final Metric<Point> distance_metric = new EuclideanDistance();
 
         tree = new MTree<>(distance_metric);
         brute_force = new BruteForceSimilaritySearch<>(distance_metric);

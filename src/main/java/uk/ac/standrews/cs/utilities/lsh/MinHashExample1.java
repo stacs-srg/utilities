@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -17,10 +17,9 @@
 package uk.ac.standrews.cs.utilities.lsh;
 
 import uk.ac.standrews.cs.utilities.metrics.Jaccard;
-import uk.ac.standrews.cs.utilities.metrics.Shingle;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -28,30 +27,16 @@ import java.util.Set;
  */
 public class MinHashExample1 {
 
-    /**
-     * A utility method used for debugging
-     *
-     * @param arrai - an array to be turned into a colection
-     * @return the array as a collection
-     */
-    private static Collection<Integer> toCollection(int[] arrai) {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        for (int i = 0; i < arrai.length; i++) {
-            result.add(arrai[i]);
-        }
-        return result;
-    }
-
     public static void main(String[] args) {
 
         String input1 = "The attribute to awe and majesty.";
         String input2 = "But there's but one in all doth hold his place.";
 
-        Set<String> input1_2grams = Shingle.ngrams(input1, 2);
-        Set<String> input2_2grams = Shingle.ngrams(input2, 2);
+        Set<String> input1_2grams = StringMetric.extractNGrams(input1, 2);
+        Set<String> input2_2grams = StringMetric.extractNGrams(input2, 2);
 
-        int[] input1_minHashSignature = MinHash.createMinHashSignature(input1, 50, 2);
-        int[] input2_minHashSignature = MinHash.createMinHashSignature(input2, 50, 2);
+        Integer[] input1_minHashSignature = MinHash.createMinHashSignature(input1, 50, 2);
+        Integer[] input2_minHashSignature = MinHash.createMinHashSignature(input2, 50, 2);
 
         System.out.println("Input 1 = " + input1);
         System.out.println("Input 2 = " + input2);
@@ -63,8 +48,7 @@ public class MinHashExample1 {
 
         System.out.println();
 
-        System.out.println("minhash intersection = " + Jaccard.intersection(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)).size() + ", union = " + Jaccard.union(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)).size());
-        System.out.println("Jaccard (minhash) = " + new Jaccard().distance(toCollection(input1_minHashSignature), toCollection(input2_minHashSignature)));
-
+        System.out.println("minhash intersection = " + Jaccard.intersection(Arrays.asList(input1_minHashSignature), Arrays.asList(input2_minHashSignature)).size() + ", union = " + Jaccard.union(Arrays.asList(input1_minHashSignature), Arrays.asList(input2_minHashSignature)).size());
+        System.out.println("Jaccard (minhash) = " + new Jaccard().distance(Arrays.asList(input1_minHashSignature), Arrays.asList(input2_minHashSignature)));
     }
 }

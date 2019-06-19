@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,10 +14,23 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
+package uk.ac.standrews.cs.utilities.metrics.implementation;
 
-public interface ICountedMetric<T> extends NamedMetric<T>  {
+/**
+ * Created by al on 27/09/2017.
+ */
+public class KeyFreqPair implements Comparable<KeyFreqPair> {
 
-    int reset();
-    int getComparisonCount();
+    public String qgram;
+    public int frequency;
+
+    public KeyFreqPair( String qgram, int frequency ){
+        this.qgram = qgram;
+        this.frequency = frequency;
+    }
+
+    @Override
+    public int compareTo(KeyFreqPair other) {
+        return Integer.compare(frequency, other.frequency);
+    }
 }

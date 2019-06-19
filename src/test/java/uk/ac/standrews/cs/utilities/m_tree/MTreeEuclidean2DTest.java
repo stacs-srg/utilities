@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -234,7 +234,7 @@ public class MTreeEuclidean2DTest {
         List<DataDistance<Point>> result = tree.rangeSearch(p, 10.0F);
         List<Point> values = tree.mapValues(result);
 
-        assertEquals(6,result.size());
+        assertEquals(60,result.size());
 
         for (Point pp : values) {
             assertTrue(tree.contains(pp));                 // point added to the tree

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,26 +16,22 @@
  */
 package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-public class CountedMetric<T> implements ICountedMetric<T> {
+public class CountedMetric<T> extends Metric<T> {
 
 	int count;
-	NamedMetric<T> m;
+	Metric<T> m;
 
-	public CountedMetric(NamedMetric<T> m) {
-		this.count = 0;
+	public CountedMetric(Metric<T> m) {
+
+		count = 0;
 		this.m = m;
 	}
 
 	@Override
-	public double distance(T x, T y) {
-		this.count++;
-		return this.m.distance(x, y);
-	}
+	public double calculateDistance(T x, T y) {
 
-	@Override
-	public double normalisedDistance(T x, T y) {
-		this.count++;
-		return this.m.normalisedDistance(x, y);
+		count++;
+		return m.distance(x, y);
 	}
 
 	@Override
@@ -44,13 +40,13 @@ public class CountedMetric<T> implements ICountedMetric<T> {
 	}
 
 	public int reset() {
-		int res = this.count;
-		this.count = 0;
+
+		int res = count;
+		count = 0;
 		return res;
 	}
 
 	public int getComparisonCount() {
 		return count;
 	}
-
 }

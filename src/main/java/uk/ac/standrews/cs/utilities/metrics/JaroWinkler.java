@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,9 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 /**
  * SimMetrics - SimMetrics is a java library of Similarity or Distance
@@ -61,12 +60,12 @@ import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
  *
  *  Code included for speed tests - modified to comply with our interfaces.
  */
-public final class JaroWinkler implements NamedMetric<String> {
+public final class JaroWinkler extends StringMetric {
 
     private final Jaro jaro;
-    private final double boostThreshold;
-    private final double prefixScale;
-    private final int maxPrefixLength;
+    private final double boostThreshold = 0.0;
+    private final double prefixScale = 0.1F;
+    private final int maxPrefixLength = 4;
 
     @Override
     public String getMetricName() {
@@ -74,36 +73,18 @@ public final class JaroWinkler implements NamedMetric<String> {
     }
 
     public JaroWinkler() {
-        this(0.0, 0.1F, 4);
-    }
-
-    public JaroWinkler(double boostThreshold, double prefixScale, int maxPrefixLength) {
 
         jaro = new Jaro();
-        Preconditions.checkArgument(boostThreshold >= 0.0);
-        Preconditions.checkArgument(0.0 <= prefixScale && prefixScale <= 1.0);
-        Preconditions.checkArgument(maxPrefixLength >= 0);
-
-        this.boostThreshold = boostThreshold;
-        this.prefixScale = prefixScale;
-        this.maxPrefixLength = maxPrefixLength;
     }
 
-    public double distance(String a, String b) {
-        return 1.0 - this.compare(a, b);
+    public double calculateStringDistance(String a, String b) {
+        return 1.0 - similarity(a, b);
     }
 
-    @Override
-    public double normalisedDistance(String a, String b) {
-        return distance(a, b);
-    }
+    private double similarity(String a, String b) {
 
-    public double compare(String a, String b) {
+        double jaroScore = jaro.similarity(a, b);
 
-        double check = NamedMetric.checkNullAndEmpty(a, b);
-        if (check != -1) return check;
-
-        double jaroScore = jaro.compare(a, b);
         if (jaroScore < boostThreshold) {
             return jaroScore;
         } else {
@@ -118,6 +99,6 @@ public final class JaroWinkler implements NamedMetric<String> {
 
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new JaroWinkler());
+        new JaroWinkler().printExamples();
     }
 }

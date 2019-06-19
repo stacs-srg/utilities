@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,20 +16,18 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
-import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.metrics.Jaccard;
-import uk.ac.standrews.cs.utilities.metrics.Shingle;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- *
  * @author Alan Dearle (alan.dearle@st-andrews.ac.uk)
  */
 public class MinHashTest {
@@ -38,61 +36,48 @@ public class MinHashTest {
 
     Jaccard jaccard = new Jaccard();
 
-    /**
-     * A utility method used for debugging
-     * @param arrai - an array to be turned into a colection
-     * @return the array as a collection
-     */
-    private static Collection<Integer> toCollection(int[] arrai ) {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        for( int i = 0; i < arrai.length; i++) {
-            result.add( arrai[i]);
-        }
-        return result;
-    }
-
     @Test
-    public void jacquard_minhash_same_as_2grams() {
+    public void jaccard_minhash_same_as_2grams() {
 
         String input1 = "The attribute to awe and majesty.";
         String input2 = "The attribute to awe and majesty.";
 
-        double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
+        double jaccard_ngrams = jaccard.distance(StringMetric.extractNGrams(input1, 2), StringMetric.extractNGrams(input2, 2));
 
-        double jacquard_minhash = jaccard.distance(
-                toCollection(MinHash.createMinHashSignature( input1, DEFAULTSIGNATURESIZE_TEST, 2 )),
-                toCollection(MinHash.createMinHashSignature( input2, DEFAULTSIGNATURESIZE_TEST, 2)));
+        double jaccard_minhash = jaccard.distance(
+                Arrays.asList(MinHash.createMinHashSignature(input1, DEFAULTSIGNATURESIZE_TEST, 2)),
+                Arrays.asList(MinHash.createMinHashSignature(input2, DEFAULTSIGNATURESIZE_TEST, 2)));
 
-        assertEquals(0.0, Math.abs(jacquard_ngrams-jacquard_minhash) );
+        assertEquals(0.0, Math.abs(jaccard_ngrams - jaccard_minhash));
     }
 
     @Test
-    public void jacquard_minhash_similar_to_2grams() {
+    public void jaccard_minhash_similar_to_2grams() {
 
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "Jul. O Romeo, 12345! wherefore art thou Romeo?";
 
-        double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
+        double jaccard_ngrams = jaccard.distance(StringMetric.extractNGrams(input1, 2), StringMetric.extractNGrams(input2, 2));
 
-        double jacquard_minhash = jaccard.distance(
-                toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
-                toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
+        double jaccard_minhash = jaccard.distance(
+                Arrays.asList(MinHash.createMinHashSignature(input1, 20, 2)),
+                Arrays.asList(MinHash.createMinHashSignature(input2, 20, 2)));
 
-        assertTrue(Math.abs(jacquard_ngrams-jacquard_minhash) < 0.2 );
+        assertTrue(Math.abs(jaccard_ngrams - jaccard_minhash) < 0.2);
     }
 
     @Test
-    public void jacquard_minhash__similar_to_2grams_diff_strings() {
+    public void jaccard_minhash__similar_to_2grams_diff_strings() {
 
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "This is a totally different string than above!";
 
-        double jacquard_ngrams = jaccard.distance(Shingle.ngrams(input1, 2), Shingle.ngrams(input2, 2));
+        double jaccard_ngrams = jaccard.distance(StringMetric.extractNGrams(input1, 2), StringMetric.extractNGrams(input2, 2));
 
-        double jacquard_minhash = jaccard.distance(
-                toCollection(MinHash.createMinHashSignature( input1,20, 2 )),
-                toCollection(MinHash.createMinHashSignature( input2,20, 2 )));
+        double jaccard_minhash = jaccard.distance(
+                Arrays.asList(MinHash.createMinHashSignature(input1, 20, 2)),
+                Arrays.asList(MinHash.createMinHashSignature(input2, 20, 2)));
 
-        assertTrue(Math.abs(jacquard_ngrams-jacquard_minhash) < 0.2 );
+        assertTrue(Math.abs(jaccard_ngrams - jaccard_minhash) < 0.2);
     }
 }

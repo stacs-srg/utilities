@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -41,8 +41,7 @@ package uk.ac.standrews.cs.utilities.metrics;
  * Code included for speed tests - modified to comply with our interfaces.
  */
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,7 +78,7 @@ import java.util.Map;
  *
  * @author Kevin L. Stern
  */
-public class DamerauLevenshtein implements NamedMetric<String> {
+public class DamerauLevenshtein extends StringMetric {
 
     @Override
     public String getMetricName() {
@@ -114,19 +113,7 @@ public class DamerauLevenshtein implements NamedMetric<String> {
      * Compute the Damerau-Levenshtein distance between the specified source
      * string and the specified target string.
      */
-    public double distance(String source, String target) {
-
-        if (source == null || target == null) {
-            return 0.0;
-        }
-
-        if (source.length() == 0) {
-            return target.length() * insertCost;
-        }
-
-        if (target.length() == 0) {
-            return source.length() * deleteCost;
-        }
+    public double calculateStringDistance(String source, String target) {
 
         int[][] table = new int[source.length()][target.length()];
         Map<Character, Integer> sourceIndexByCharacter = new HashMap<>();
@@ -182,16 +169,12 @@ public class DamerauLevenshtein implements NamedMetric<String> {
             }
             sourceIndexByCharacter.put(source.charAt(i), i);
         }
-        return table[source.length() - 1][target.length() - 1];
+
+        return normaliseArbitraryPositiveDistance(table[source.length() - 1][target.length() - 1]);
     }
 
-    public double normalisedDistance(String source, String target) {
-        return Metric.normalise( distance(source,target));
-    }
+    public static void main(String[] a) {
 
-
-        public static void main(String[] a) {
-
-        NamedMetric.printExamples(new DamerauLevenshtein(1, 1, 1, 1));
+        new DamerauLevenshtein(1, 1, 1, 1).printExamples();
     }
 }

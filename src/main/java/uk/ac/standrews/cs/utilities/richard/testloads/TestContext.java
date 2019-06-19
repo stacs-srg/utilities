@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,205 +14,196 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.standrews.cs.utilities.richard.testloads;
 
-
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.richard.dataPoints.cartesian.Euclidean;
-import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
 
 import java.util.List;
 
 /**
- * 
  * idea is to create, with as little syntactic fuss as possible, various test
  * loads useful for measuring metric space indexing techniques
- * 
- * @author Richard Connor
  *
+ * @author Richard Connor
  */
 public class TestContext {
 
-	/**
-	 * 
-	 * different types of data; SISAP colors and nasa files, various dimensions
-	 * of generated Euclidean spaces
-	 * 
-	 * @author Richard Connor
-	 *
-	 */
-	public enum Context {
-		colors, nasa, euc10, euc20, euc30, euc100, euc1000, euc10000
-	};
+    private Context context;
 
-	private Context context;
+    private TestLoad tl;
+    private List<CartesianPoint> queries;
+    private List<CartesianPoint> refPoints;
+    private List<CartesianPoint> data;
+    private Metric<CartesianPoint> metric;
+    private int dataSize;
+    private double threshold;
 
-	/**
-	 * @return the context
-	 */
-	public Context getContext() {
-		return this.context;
-	}
+    /**
+     * standard 10 dimensional test context, most commonly used!
+     *
+     * @param size the size of the dataset created
+     * @throws Exception
+     */
+    public TestContext(int size) throws Exception {
+        setParams(Context.euc10);
+        initialise(size);
+    }
 
-	private TestLoad tl;
-	private List<CartesianPoint> queries;
-	private List<CartesianPoint> refPoints;
-	private List<CartesianPoint> data;
-	private NamedMetric<CartesianPoint> metric;
-	private int dataSize;
-	private double threshold;
+    public TestContext(Context c, int datasize) throws Exception {
+        setParams(c);
+        initialise(datasize);
+    }
 
-	/**
-	 * standard 10 dimensional test context, most commonly used!
-	 * 
-	 * @param size
-	 *            the size of the dataset created
-	 * 
-	 * @throws Exception
-	 */
-	public TestContext(int size) throws Exception {
-		setParams(Context.euc10);
-		initialise(size);
-	}
+    public TestContext(Context c) throws Exception {
+        setParams(c);
+        initialise(1000 * 1000);
+    }
 
-	public TestContext(Context c, int datasize) throws Exception {
-		setParams(c);
-		initialise(datasize);
-	}
+    /**
+     * @return the context
+     */
+    public Context getContext() {
+        return this.context;
+    }
 
-	public TestContext(Context c) throws Exception {
-		setParams(c);
-		initialise(1000 * 1000);
-	}
+    protected void initialise(int datasize) throws Exception {
 
-	protected void initialise(int datasize) throws Exception {
-		switch (this.context) {
-		case euc10: {
-			this.tl = new TestLoad(10, datasize, true, true);
-			this.setThreshold(CartesianThresholds.getThreshold("euc", 10, 1));
-		}
-			;
-			break;
-		case euc20: {
-			this.tl = new TestLoad(20, datasize, true, true);
-			this.setThreshold(CartesianThresholds.getThreshold("euc", 20, 1));
-		}
-			;
-			break;
-		case euc30: {
-			this.tl = new TestLoad(30, datasize, true, true);
-			this.setThreshold(CartesianThresholds.getThreshold("euc", 30, 1));
-		}
-			;
-			break;
-		case euc100: {
-			this.tl = new TestLoad(100, datasize, true, true);
-			this.setThreshold(CartesianThresholds.getThreshold("euc", 100, 1));
-		}
-			;
-			break;
-		case euc1000: {
-			this.tl = new TestLoad(1000, datasize, true, true);
-			this.setThreshold(CartesianThresholds.getThreshold("euc", 1000, 1));
-		}
-			;
-			break;
-		case euc10000: {
-			this.tl = new TestLoad(10000, datasize, true, true);
-			this.setThreshold(CartesianThresholds.getThreshold("euc", 10000, 1));
-		}
-			;
-			break;
-		case nasa: {
-			this.tl = new TestLoad(TestLoad.SisapFile.nasa);
-			this.setThreshold(TestLoad
-					.getSisapThresholds(TestLoad.SisapFile.nasa)[0]);
-		}
-			;
-			break;
-		case colors: {
-			this.tl = new TestLoad(TestLoad.SisapFile.colors);
-			this.setThreshold(TestLoad
-					.getSisapThresholds(TestLoad.SisapFile.colors)[0]);
-		}
-			;
-			break;
-		default: {
-			throw new Exception("unexpected test data specified");
-		}
-		}
-	}
+        switch (context) {
+            case euc10: {
+                tl = new TestLoad(10, datasize, true, true);
+                setThreshold(CartesianThresholds.getThreshold("euc", 10, 1));
+            }
+            break;
 
-	protected void setParams(Context c) {
-		this.dataSize = -1;
-		this.context = c;
-		this.metric = new Euclidean();
-	}
+            case euc20: {
+                tl = new TestLoad(20, datasize, true, true);
+                setThreshold(CartesianThresholds.getThreshold("euc", 20, 1));
+            }
+            break;
 
-	public List<CartesianPoint> getData() {
-		return this.tl.getDataCopy();
-	}
+            case euc30: {
+                tl = new TestLoad(30, datasize, true, true);
+                setThreshold(CartesianThresholds.getThreshold("euc", 30, 1));
+            }
+            break;
 
-	public List<CartesianPoint> getDataCopy() {
-		return this.tl.getDataCopy();
-	}
+            case euc100: {
+                tl = new TestLoad(100, datasize, true, true);
+                setThreshold(CartesianThresholds.getThreshold("euc", 100, 1));
+            }
+            break;
 
-	public List<CartesianPoint> getRefPoints() {
-		return this.refPoints;
-	}
+            case euc1000: {
+                tl = new TestLoad(1000, datasize, true, true);
+                setThreshold(CartesianThresholds.getThreshold("euc", 1000, 1));
+            }
+            break;
 
-	public List<CartesianPoint> getQueries() {
-		return this.queries;
-	}
+            case euc10000: {
+                tl = new TestLoad(10000, datasize, true, true);
+                setThreshold(CartesianThresholds.getThreshold("euc", 10000, 1));
+            }
+            break;
 
-	public void setSizes(int queries, int refPoints) {
-		this.queries = this.tl.getQueries(queries);
-		this.refPoints = this.tl.getQueries(refPoints);
-	}
+            case nasa: {
+                tl = new TestLoad(TestLoad.SisapFile.nasa);
+                setThreshold(TestLoad.getSisapThresholds(TestLoad.SisapFile.nasa)[0]);
+            }
+            break;
 
-	public double getThreshold() {
-		return threshold;
-	}
+            case colors: {
+                tl = new TestLoad(TestLoad.SisapFile.colors);
+                setThreshold(TestLoad.getSisapThresholds(TestLoad.SisapFile.colors)[0]);
+            }
+            break;
 
-	public double[] getThresholds() {
-		switch (this.context) {
-		case colors: {
-			return TestLoad.getSisapThresholds(TestLoad.SisapFile.colors);
-		}
-		case nasa: {
-			return TestLoad.getSisapThresholds(TestLoad.SisapFile.nasa);
-		}
-		case euc10: {
-			double[] t = new double[3];
-			t[0] = CartesianThresholds.getThreshold("euc", 10, 1);
-			t[1] = CartesianThresholds.getThreshold("euc", 10, 2);
-			t[2] = CartesianThresholds.getThreshold("euc", 10, 4);
-			return t;
-		}
-		case euc20: {
-			double[] t = new double[3];
-			t[0] = CartesianThresholds.getThreshold("euc", 20, 1);
-			t[1] = CartesianThresholds.getThreshold("euc", 20, 2);
-			t[2] = CartesianThresholds.getThreshold("euc", 20, 4);
-			return t;
-		}
-		default: {
-			throw new RuntimeException("not implemented in TestContext");
-		}
-		}
-	}
+            default: {
+                throw new Exception("unexpected test data specified");
+            }
+        }
+    }
 
-	public void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
+    protected void setParams(Context c) {
+        this.dataSize = -1;
+        this.context = c;
+        this.metric = new Euclidean();
+    }
 
-	public NamedMetric<CartesianPoint> metric() {
-		return this.metric;
-	}
+    public List<CartesianPoint> getData() {
+        return tl.getDataCopy();
+    }
 
-	public int dataSize() {
-		return this.tl.dataSize();
-	}
+    public List<CartesianPoint> getDataCopy() {
+        return tl.getDataCopy();
+    }
+
+    public List<CartesianPoint> getRefPoints() {
+        return refPoints;
+    }
+
+    public List<CartesianPoint> getQueries() {
+        return queries;
+    }
+
+    public void setSizes(int queries, int refPoints) {
+        this.queries = tl.getQueries(queries);
+        this.refPoints = tl.getQueries(refPoints);
+    }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(double threshold) {
+        this.threshold = threshold;
+    }
+
+    public double[] getThresholds() {
+        switch (context) {
+            case colors: {
+                return TestLoad.getSisapThresholds(TestLoad.SisapFile.colors);
+            }
+            case nasa: {
+                return TestLoad.getSisapThresholds(TestLoad.SisapFile.nasa);
+            }
+            case euc10: {
+                double[] t = new double[3];
+                t[0] = CartesianThresholds.getThreshold("euc", 10, 1);
+                t[1] = CartesianThresholds.getThreshold("euc", 10, 2);
+                t[2] = CartesianThresholds.getThreshold("euc", 10, 4);
+                return t;
+            }
+            case euc20: {
+                double[] t = new double[3];
+                t[0] = CartesianThresholds.getThreshold("euc", 20, 1);
+                t[1] = CartesianThresholds.getThreshold("euc", 20, 2);
+                t[2] = CartesianThresholds.getThreshold("euc", 20, 4);
+                return t;
+            }
+            default: {
+                throw new RuntimeException("not implemented in TestContext");
+            }
+        }
+    }
+
+    public Metric<CartesianPoint> metric() {
+        return metric;
+    }
+
+    public int dataSize() {
+        return tl.dataSize();
+    }
+
+    /**
+     * different types of data; SISAP colors and nasa files, various dimensions
+     * of generated Euclidean spaces
+     *
+     * @author Richard Connor
+     */
+    public enum Context {
+        colors, nasa, euc10, euc20, euc30, euc100, euc1000, euc10000
+    }
 
 }

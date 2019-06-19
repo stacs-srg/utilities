@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,7 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
-import uk.ac.standrews.cs.utilities.metrics.Shingle;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 import java.util.*;
 
@@ -29,7 +29,6 @@ public class MinHash<Data> {
     private final static int someprime = 1190699; // this is a fine prime to use from https://primes.utm.edu/lists/small/small2.html
     private final static int bigprime = 2147483647; // the biggest 32 bit prime integer?
     private final static int anotherprime = 16777619;
-
 
     protected int shingle_size;
     protected int signature_size;
@@ -53,8 +52,7 @@ public class MinHash<Data> {
     }
 
     /**
-     * The hash function used to calculate minhash - stolen from this post:
-     * from http://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode
+     * The hash function used to calculate minhash
      * By altering the params can create a family of different unique hash functions.
      *
      * @param inputData - the object for which we are creating a hash
@@ -62,9 +60,11 @@ public class MinHash<Data> {
      * @param seedTwo   - the second seed used to generate a particular unique hash
      * @return the hash of the inputData supplied to the method.
      */
-    private static int hashFunction(Object inputData, Integer seedOne, Integer seedTwo) {
-        int hash = bigprime * anotherprime ^ seedOne.hashCode();
-        hash = hash * anotherprime ^ seedTwo.hashCode();
+    private static int hashFunction(Object inputData, int seedOne, int seedTwo) {
+
+        // TODO is this intended to overflow?
+        int hash = bigprime * anotherprime ^ seedOne;
+        hash = hash * anotherprime ^ seedTwo;
         hash = hash * anotherprime ^ inputData.hashCode();
         return hash;
     }
@@ -75,13 +75,12 @@ public class MinHash<Data> {
      * @param sig_size the size of the signature created
      * @return the minhash signature
      */
-    public static int[] createMinHashSignature(String src, int sig_size, int shingle_size) {
-//        String stripped = src.replaceAll( "\\s","" ). // replace all whitespace with nothing.
-//                replaceAll("[.,~{}()!\\\\]", ""); // replace other punctuation stops with nothing
-        Set<String> set_ngrams = Shingle.ngrams(src, shingle_size);
+    public static Integer[] createMinHashSignature(String src, int sig_size, int shingle_size) {
 
-        //Create a min hash array initialized to all int max values
-        int[] signature = new int[sig_size];
+        Set<String> set_ngrams = StringMetric.extractNGrams(src, shingle_size);
+
+        // Create a min hash array initialized to all int max values
+        Integer[] signature = new Integer[sig_size];
         for (int index = 0; index < sig_size; index++) {
             signature[index] = Integer.MAX_VALUE;
         }
@@ -102,17 +101,14 @@ public class MinHash<Data> {
         return signature;
     }
 
-
     /**
      * Put the value into a LSH Map with key key.
      * @param key - the key to which the data should be mapped
      * @param value - the value to addHint in the map.
      */
     public void put(String key, Data value) {
-        int[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
 
-//      System.out.println( "Source = " + key );
-//      System.out.println( "Signature = " + minHashSignature );
+        Integer[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
 
         for (int band_number = 0; band_number * band_size < minHashSignature.length; band_number++) {
 
@@ -120,7 +116,7 @@ public class MinHash<Data> {
 
             Set<Data> entries = lsh_map.get(b);
             if (entries == null) {
-                entries = new HashSet<Data>();   // create a new set of entries,
+                entries = new HashSet<>();   // create a new set of entries,
                 entries.add(value);               // add_worker the string to it,
                 lsh_map.put(b,entries);         // and add_worker the new entry to the map.
             } else {
@@ -137,7 +133,7 @@ public class MinHash<Data> {
 
         Set<Data> result = new HashSet<>();
 
-        int[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
+        Integer[] minHashSignature = createMinHashSignature(key, signature_size, shingle_size);
 
         for (int band_number = 0; band_number * band_size < minHashSignature.length; band_number++) {
 
@@ -158,8 +154,6 @@ public class MinHash<Data> {
         for( Map.Entry<Band, Set<Data>> me : lsh_map.entrySet() ) {
             Set<Data> entries = me.getValue();
             System.out.println( entries.size() );
-
         }
     }
-
 }

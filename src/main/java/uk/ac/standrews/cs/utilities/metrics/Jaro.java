@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -21,91 +21,79 @@ package uk.ac.standrews.cs.utilities.metrics;
  * Metrics, e.g. Levenshtein Distance, that provide float based similarity
  * measures between String Data. All metrics return consistant measures
  * rather than unbounded similarity scores.
- *
+ * <p>
  * Copyright (C) 2005 Sam Chapman - Open Source Release v1.1
- *
+ * <p>
  * Please Feel free to contact me about this library, I would appreciate
  * knowing quickly what you wish to use it for and any criticisms/comments
  * upon the SimMetric library.
- *
+ * <p>
  * email:       s.chapman@dcs.shef.ac.uk
  * www:         http://www.dcs.shef.ac.uk/~sam/
  * www:         http://www.dcs.shef.ac.uk/~sam/stringmetrics.html
- *
+ * <p>
  * address:     Sam Chapman,
- *              Department of Computer Science,
- *              University of Sheffield,
- *              Sheffield,
- *              S. Yorks,
- *              S1 4DP
- *              United Kingdom,
- *
+ * Department of Computer Science,
+ * University of Sheffield,
+ * Sheffield,
+ * S. Yorks,
+ * S1 4DP
+ * United Kingdom,
+ * <p>
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
+ * <p>
  * Code included for speed tests - modified to comply with our interfaces.
  */
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-public class Jaro implements NamedMetric<String> {
+public class Jaro extends StringMetric {
 
     @Override
     public String getMetricName() {
         return "Jaro";
     }
 
-    public double distance(String a, String b) {
-        return 1.0 - this.compare(a, b);
+    public double calculateStringDistance(String a, String b) {
+
+        return 1.0 - similarity(a, b);
     }
 
-    @Override
-    public double normalisedDistance(String a, String b) {
-        return distance(a, b);
-    }
+    protected double similarity(String a, String b) {
 
-    public double compare(String a, String b) {
+        int halfLength = Math.max(0, Math.max(a.length(), b.length()) / 2 - 1);
+        char[] charsA = a.toCharArray();
+        char[] charsB = b.toCharArray();
+        int[] commonA = getCommonCharacters(charsA, charsB, halfLength);
+        int[] commonB = getCommonCharacters(charsB, charsA, halfLength);
 
-        double check = NamedMetric.checkNullAndEmpty(a, b);
-        if (check != -1) return check;
+        double transpositions = 0.0;
+        int commonCharacters = 0;
 
-        if (!a.isEmpty() && !b.isEmpty()) {
-
-            int halfLength = Math.max(0, Math.max(a.length(), b.length()) / 2 - 1);
-            char[] charsA = a.toCharArray();
-            char[] charsB = b.toCharArray();
-            int[] commonA = getCommonCharacters(charsA, charsB, halfLength);
-            int[] commonB = getCommonCharacters(charsB, charsA, halfLength);
-
-            double transpositions = 0.0;
-            int commonCharacters = 0;
-
-            for(int length = commonA.length; commonCharacters < length && commonA[commonCharacters] > -1; ++commonCharacters) {
-                if (commonA[commonCharacters] != commonB[commonCharacters]) {
-                    ++transpositions;
-                }
+        for (int length = commonA.length; commonCharacters < length && commonA[commonCharacters] > -1; ++commonCharacters) {
+            if (commonA[commonCharacters] != commonB[commonCharacters]) {
+                ++transpositions;
             }
+        }
 
-            if (commonCharacters == 0) {
-                return 0.0;
-            } else {
-                double aCommonRatio = (float)commonCharacters / (float)a.length();
-                double bCommonRatio = (float)commonCharacters / (float)b.length();
-                double transpositionRatio = ((float)commonCharacters - transpositions / 2.0) / (float)commonCharacters;
-                return (aCommonRatio + bCommonRatio + transpositionRatio) / 3.0;
-            }
-        } else {
+        if (commonCharacters == 0) {
             return 0.0;
+        } else {
+            double aCommonRatio = (float) commonCharacters / (float) a.length();
+            double bCommonRatio = (float) commonCharacters / (float) b.length();
+            double transpositionRatio = ((float) commonCharacters - transpositions / 2.0) / (float) commonCharacters;
+            return (aCommonRatio + bCommonRatio + transpositionRatio) / 3.0;
         }
     }
 
@@ -116,7 +104,7 @@ public class Jaro implements NamedMetric<String> {
         int commonIndex = 0;
         int i = 0;
 
-        for(int length = charsA.length; i < length; ++i) {
+        for (int length = charsA.length; i < length; ++i) {
             char character = charsA[i];
             int index = indexOf(character, charsB, i - separation, i + separation + 1, matched);
             if (index > -1) {
@@ -136,7 +124,7 @@ public class Jaro implements NamedMetric<String> {
 
         int j = Math.max(0, fromIndex);
 
-        for(int length = Math.min(toIndex, buffer.length); j < length; ++j) {
+        for (int length = Math.min(toIndex, buffer.length); j < length; ++j) {
             if (buffer[j] == character && !matched[j]) {
                 return j;
             }
@@ -147,7 +135,7 @@ public class Jaro implements NamedMetric<String> {
 
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new Jaro());
+        new Jaro().printExamples();
     }
 }
 

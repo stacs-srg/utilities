@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,21 +16,23 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-/**
- * Created by al on 27/09/2017.
- */
-public class KeyFreqPair implements Comparable<KeyFreqPair> {
+public class PrintMetricExamples {
 
-    public String qgram;
-    public int frequency;
+    public static void main(String[] args) {
 
-    public KeyFreqPair( String qgram, int frequency ){
-        this.qgram = qgram;
-        this.frequency = frequency;
-    }
-
-    @Override
-    public int compareTo(KeyFreqPair other) {
-        return Integer.compare(frequency, other.frequency);
+        BagDistance.main(null);
+        Cosine.main(null);
+        DamerauLevenshtein.main(null);
+        Dice.main(null);
+        Jaccard.main(null);
+        Jaro.main(null);
+        JaroWinkler.main(null);
+        JensenShannon.main(null);
+        JensenShannonKullbackLeibler.main(null);
+        Levenshtein.main(null);
+        LongestCommonSubstring.main(null);
+        NeedlemanWunsch.main(null);
+        SED.main(null);
+        SmithWaterman.main(null);
     }
 }

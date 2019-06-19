@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.standrews.cs.utilities.richard.dataSets.fileReaders.generators;
 
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataSet;
-import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
+import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
 
 import java.util.Iterator;
 import java.util.Random;

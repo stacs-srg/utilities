@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,11 +16,10 @@
  */
 package uk.ac.standrews.cs.utilities.richard.searchStructures;
 
-
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 import uk.ac.standrews.cs.utilities.richard.util.OrderedListAlt;
 import uk.ac.standrews.cs.utilities.richard.util.Range;
-import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
+import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -202,9 +201,7 @@ public class VPTree<T> extends SearchIndex<T> {
 					this.right.query(query, threshold, results);
 				}
 			}
-
 		}
-
 	}
 
 	private VPTreeNode index;
@@ -219,7 +216,7 @@ public class VPTree<T> extends SearchIndex<T> {
 
 	private double[] dists;
 
-	public VPTree(List<T> data, NamedMetric<T> metric) {
+	public VPTree(List<T> data, Metric<T> metric) {
 		super(data, metric);
 
 		this.data = data;
@@ -244,7 +241,7 @@ public class VPTree<T> extends SearchIndex<T> {
 
 	public List<Integer> nearestNeighbour(T query, int numberOfResults) {
 		this.nnThreshold = Double.MAX_VALUE;
-		OrderedListAlt<Integer, Double> ol = new OrderedListAlt<Integer, Double>(
+		OrderedListAlt<Integer, Double> ol = new OrderedListAlt<>(
 				numberOfResults);
 		this.nnQuery = query;
 		this.index.nnquery(ol);
@@ -252,7 +249,7 @@ public class VPTree<T> extends SearchIndex<T> {
 	}
 
 	public List<Integer> thresholdQueryByReference(T query, double threshold) {
-		List<Integer> res = new ArrayList<Integer>();
+		List<Integer> res = new ArrayList<>();
 		this.index.queryRef(query, threshold, res);
 		return res;
 	}
@@ -320,7 +317,6 @@ public class VPTree<T> extends SearchIndex<T> {
 	 * 
 	 * @param from
 	 * @param to
-	 * @param medianPos
 	 */
 	protected void quickSort(int from, int to) {
 
@@ -357,5 +353,4 @@ public class VPTree<T> extends SearchIndex<T> {
 	public String getShortName() {
 		return "vpt";
 	}
-
 }

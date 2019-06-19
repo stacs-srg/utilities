@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,17 +16,16 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.metrics.implementation.QgramDistribution;
+import uk.ac.standrews.cs.utilities.metrics.implementation.SparseDistro;
 
 import java.util.Iterator;
-
-import static uk.ac.standrews.cs.utilities.metrics.KullbackLeibler.kullbackLeiblerDivergence;
 
 /**
  * Created by al on 06/09/2017.
  */
-public class JensenShannonKullbackLeibler implements NamedMetric<String> {
+public class JensenShannonKullbackLeibler extends StringMetric {
 
     @Override
     public String getMetricName() {
@@ -37,55 +36,18 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
      * @return the JensenShannonDistance
      * The square root of the Jensen-Shannon divergence is a metric
      */
-    public double distance(String x, String y) {
+    public double calculateStringDistance(String x, String y) {
 
-        double check = NamedMetric.checkNullAndEmpty(x, y);
-        if (check != -1) return check;
-
-        return Math.sqrt(jensenShannonDivergence(x, y));
+        return normaliseArbitraryPositiveDistance(Math.sqrt(jensenShannonDivergence(x, y)));
     }
 
-    @Override
-    public double normalisedDistance(String s1, String s2) {
-        // TODO: Should we normalise?
-        return Metric.normalise(distance(s1, s2));
-    }
+    private double jensenShannonDivergence(String p1, String p2) {
 
-    /**
-     * @return the JensenShannonDistance (from elsewhere):
-     * The square root of the Jensen-Shannon divergence is a metric
-     */
-    public double JensenShannonDistance(double[] x, double[] y) {
-        if (x.length != y.length)
-            throw new IllegalArgumentException(String.format("Arrays have different length: x[%d], y[%d]", x.length, y.length));
+        SparseDistro p1_distro = new SparseDistro(topAndTail(p1));
+        SparseDistro p2_distro = new SparseDistro(topAndTail(p2));
 
-        return Math.sqrt(jensenShannonDivergence(x, y));
-    }
-
-    /**
-     * @return the Jensen-Shannon divergence.
-     * The Jensen-Shannon divergence is a symmetric and smoothed version of the Kullback-Leibler divergence
-     */
-    public double jensenShannonDivergence(double[] p1, double[] p2) {
-
-        assert (p1.length == p2.length);
-        double[] average = new double[p1.length];
-        for (int i = 0; i < p1.length; i++) {
-            average[i] += (p1[i] + p2[i]) / 2;      // average of the two arrays.
-        }
-        return (kullbackLeiblerDivergence(p1, average) + kullbackLeiblerDivergence(p2, average)) / 2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
-    }
-
-    public double jensenShannonDivergence(String p1, String p2) {
-
-        double check = NamedMetric.checkNullAndEmpty(p1, p2);
-        if (check != -1) return 1 - check;
-
-        SparseDistro p1_distro = new SparseDistro(NamedMetric.topAndTail(p1));
-        SparseDistro p2_distro = new SparseDistro(NamedMetric.topAndTail(p2));
-
-        if (p1.equals(p2)) {   // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
-            return 1;
+        if (p1_distro.equals(p2_distro)) {   // can have same sparseDistro for differering strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+            return 0.0;
         }
 
         SparseDistro average = average(p1_distro, p2_distro);
@@ -100,6 +62,36 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
         return (kl1 + kl2) / 2;   // according to Richard (SISAP_2013_JS.pdf) each term should be halved
     }
 
+    /**
+     * Implements the kullbackLeiblerDivergence over sparse representations.
+     *
+     * @return the Kullback–Leibler divergence
+     */
+    private static double kullbackLeiblerDivergence(SparseDistro distro_p, SparseDistro distro_q) {
+
+        if (distro_p.equals(distro_q)) { // can have sane sparseDistro for differing strings: "KATARINA KRISTINA" and "KRISTINA KATARINA"
+            return 1;
+        }
+
+        Iterator<QgramDistribution> p_iter = distro_p.getIterator();
+
+        double divergence = 0.0;
+
+        while (p_iter.hasNext()) {
+
+            QgramDistribution pi = p_iter.next();
+            QgramDistribution qi = distro_q.getEntry(pi.key);
+
+            if (qi == null) {
+                // no coresponding bigram in q
+                return Double.POSITIVE_INFINITY;
+            }
+            // keys are the same so do comparison
+            divergence += pi.count * log2(pi.count / qi.count); //**** This is wrong!   // is it ? Math.log (natural).
+        }
+        return divergence;
+    }
+
     private static SparseDistro average(SparseDistro xx, SparseDistro yy) {
 
         SparseDistro ave = new SparseDistro(xx); // a copy of the first distribution.
@@ -112,8 +104,14 @@ public class JensenShannonKullbackLeibler implements NamedMetric<String> {
         return ave;
     }
 
+    private static double log2 = Math.log(2);
+
+    private static double log2(double x) {
+        return Math.log(x) / log2;
+    }
+
     public static void main(String[] args) {
 
-        NamedMetric.printExamples(new JensenShannonKullbackLeibler());
+        new JensenShannonKullbackLeibler().printExamples();
     }
 }

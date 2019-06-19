@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -17,48 +17,43 @@
 package uk.ac.standrews.cs.utilities.mi_file;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by al on 11/10/2017.
  */
 public class InvertedFile<T> {
 
-    private HashMap<T,PostingList<T>> map = new HashMap<>();
     final private int maxScore;     // the highest score you can get in a posting list (equal to no. ref objects).
-    final private int lexiconSize;  // number of reference used for searching
+    private Map<T, PostingList<T>> map = new HashMap<>();
 
     /**
-     *
      * @param maxScore - the number of reference objects
-     * @param lexiconSize -
      */
-    public InvertedFile(int maxScore, int lexiconSize ) {
+    public InvertedFile(int maxScore) {
         this.maxScore = maxScore;
-        this.lexiconSize = lexiconSize;
     }
 
-    public synchronized void insert(T key, T data, int score) throws Exception {
+    public synchronized void insert(T key, T data, int score) {
 
         if (score < 0 || score > maxScore) {
-            throw new Exception("Score associated to the entry being inserted must be in the interval " + 0 + ".." + maxScore);
+            throw new RuntimeException("Score associated to the entry being inserted must be in the interval " + 0 + ".." + maxScore);
         }
 
-        PostingListEntry ple = new PostingListEntry( data,score );
-        PostingList<T> list = map.get( key );
-        if( list == null ) {
+        PostingListEntry ple = new PostingListEntry(data, score);
+        PostingList<T> list = map.get(key);
+        if (list == null) {
             list = new PostingList();
-            map.put(key,list);
+            map.put(key, list);
         }
-        list.add( ple );
+        list.add(ple);
     }
 
-
     public PostingList<T> getPostingList(T pivot, int from, int to) {
-        PostingList<T> list = map.get( pivot );
-        if( list != null ) {
-            list = list.getSubRange( from, to );
+        PostingList<T> list = map.get(pivot);
+        if (list != null) {
+            list = list.getSubRange(from, to);
         }
         return list;
     }
-
 }

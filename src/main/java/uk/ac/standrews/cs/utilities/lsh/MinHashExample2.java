@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -17,30 +17,17 @@
 package uk.ac.standrews.cs.utilities.lsh;
 
 import uk.ac.standrews.cs.utilities.metrics.Jaccard;
-import uk.ac.standrews.cs.utilities.metrics.Shingle;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by al on 08/09/2017.
  */
 public class MinHashExample2 {
-
-    /**
-     * A utility method used for debugging
-     * @param arrai - an array to be turned into a colection
-     * @return the array as a collection
-     */
-    private static Collection<Integer> toCollection(int[] arrai ) {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        for( int i = 0; i < arrai.length; i++) {
-            result.add( arrai[i]);
-        }
-        return result;
-    }
 
     public static final String[] ozs_words = {
             "It is becoming more and more important to find effective ways of drawing",
@@ -85,48 +72,42 @@ public class MinHashExample2 {
             "For a survey on string comparison algorithms, see~cite{christen2012field}.",
             "String comparison algorithms are at the heart of probabilistic linkage methods.",
             "Without good string comparison algorithms, and a good understanding of the trade-offs between options,",
-            "there is little hope of e};" };
+            "there is little hope of e};"};
 
-    public static HashMap<String,int[]> map = new HashMap<>();
+    public static Map<String, Integer[]> map = new HashMap<>();
 
-    public static void loadupdata( MinHash mh ) {
+    public static void loadupdata(MinHash mh) {
 
-        for( int i = 0; i < ozs_words.length; i++ ) {
-            String sentence = ozs_words[i];
-            int[] hash = mh.createMinHashSignature( sentence, 50, 2);
-            map.put( sentence,hash );
+        for (String sentence : ozs_words) {
+            Integer[] hash = MinHash.createMinHashSignature(sentence, 50, 2);
+            map.put(sentence, hash);
         }
     }
 
-    public static void showSimilarities( MinHash mh ) {
+    public static void showSimilarities(MinHash mh) {
 
-        for( int i = 0; i < ozs_words.length; i++ ) {
-            String sentence = ozs_words[i];
+        for (String sentence : ozs_words) {
+            for (String key : map.keySet()) {
 
-            int[] hash = mh.createMinHashSignature( sentence, 50, 2);
-            for( String key : map.keySet() ) {
+                Set<String> sentence_2grams = StringMetric.extractNGrams(sentence, 2);
+                Set<String> key_2grams = StringMetric.extractNGrams(key, 2);
 
-                Set<String> sentence_2grams = Shingle.ngrams(sentence,2);
-                Set<String> key_2grams = Shingle.ngrams(key,2);
+                Integer[] sentence_minHashSignature = MinHash.createMinHashSignature(sentence, 50, 2);
+                Integer[] key_minHashSignature = MinHash.createMinHashSignature(key, 50, 2);
 
-                int[] sentence_minHashSignature = MinHash.createMinHashSignature( sentence, 50, 2 );
-                int[] key_minHashSignature = MinHash.createMinHashSignature( key, 50, 2 );
-
-                System.out.println( "Sentence 1 = " + sentence );
-                System.out.println( "Sentence 2 = " + key );
+                System.out.println("Sentence 1 = " + sentence);
+                System.out.println("Sentence 2 = " + key);
                 Set intersection = Jaccard.intersection(sentence_2grams, key_2grams);
-                System.out.println( "2grams intersection = " + intersection + " size = " + intersection.size() + ", union = " + Jaccard.union( sentence_2grams, key_2grams ).size() );
-                System.out.println( "Jaccard (ngrams) = " + new Jaccard().distance(sentence_2grams,key_2grams ) );
-                System.out.println( "minhash intersection = " + Jaccard.intersection( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() + ", union = " + Jaccard.union( toCollection(sentence_minHashSignature), toCollection(key_minHashSignature) ).size() );
-                System.out.println( "Jaccard (minhash) = " + new Jaccard().distance(toCollection(sentence_minHashSignature), toCollection(key_minHashSignature)) );
-                System.out.println( "----" );
-
+                System.out.println("2grams intersection = " + intersection + " size = " + intersection.size() + ", union = " + Jaccard.union(sentence_2grams, key_2grams).size());
+                System.out.println("Jaccard (ngrams) = " + new Jaccard().distance(sentence_2grams, key_2grams));
+                System.out.println("minhash intersection = " + Jaccard.intersection(Arrays.asList(sentence_minHashSignature), Arrays.asList(key_minHashSignature)).size() + ", union = " + Jaccard.union(Arrays.asList(sentence_minHashSignature), Arrays.asList(key_minHashSignature)).size());
+                System.out.println("Jaccard (minhash) = " + new Jaccard().distance(Arrays.asList(sentence_minHashSignature), Arrays.asList(key_minHashSignature)));
+                System.out.println("----");
             }
         }
     }
 
-
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
 
         MinHash mh = new MinHash(2, 50, 2);
         loadupdata(mh);

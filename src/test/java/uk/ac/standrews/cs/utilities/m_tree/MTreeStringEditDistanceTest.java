@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -18,9 +18,7 @@ package uk.ac.standrews.cs.utilities.m_tree;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.simmetrics.metrics.Levenshtein;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.Levenshtein;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,9 +28,9 @@ public class MTreeStringEditDistanceTest {
     private MTree<String> tree;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
-        tree = new MTree<>(new EditDistance());
+        tree = new MTree<>(new Levenshtein());
     }
 
     /**
@@ -67,26 +65,5 @@ public class MTreeStringEditDistanceTest {
         assertEquals("moon", tree.nearestNeighbour("soon").value);
         assertEquals("fish", tree.nearestNeighbour("fist").value);
         assertEquals("shed", tree.nearestNeighbour("shod").value);
-    }
-
-    public class EditDistance implements NamedMetric<String> {
-
-        Levenshtein levenshtein = new Levenshtein();
-
-        @Override
-        public double distance(String s1, String s2) {
-
-            return levenshtein.distance(s1, s2);
-        }
-
-        @Override
-        public double normalisedDistance(String x, String y) {
-            return Metric.normalise(distance(x, y));
-        }
-
-        @Override
-        public String getMetricName() {
-            return "Levenshtein";
-        }
     }
 }

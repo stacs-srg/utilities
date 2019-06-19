@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,16 +16,44 @@
  */
 package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-public interface Metric<T> {
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-    double distance(T x, T y);
-    double normalisedDistance(T x, T y);
+public abstract class Metric<T> {
+
+    public abstract String getMetricName();
+
+    protected abstract double calculateDistance(T x, T y);
+
+    public final double distance(T x, T y) {
+
+        final double result = calculateDistance(x, y);
+        if (result < 0.0 || result > 1.0) throw new RuntimeException("non-normalised distance: " + result);
+
+        return result;
+    }
 
     /**
      * @param distance - the distance to be normalised
      * @return the distance in the range 0-1:  1 - ( 1 / d + 1 )
      */
-    static double normalise(double distance) {
+    protected static double normaliseArbitraryPositiveDistance(double distance) {
         return 1d - (1d / (distance + 1d));
+    }
+
+    public static <T> Set<T> union(Collection<T> a, Collection<T> b) {
+
+        Set<T> result = new HashSet<>(a);
+        result.addAll(b);
+        return result;
+    }
+
+    public static <T> Set<T> intersection(Collection<T> a, Collection<T> b) {
+
+        Set<T> result = new HashSet<>(a);
+        result.retainAll(b);
+
+        return result;
     }
 }

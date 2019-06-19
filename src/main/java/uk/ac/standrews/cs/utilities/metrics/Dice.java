@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,13 +16,11 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-import java.util.Collection;
+import java.util.Set;
 
-import static uk.ac.standrews.cs.utilities.metrics.Jaccard.intersection;
-
-public class Dice implements NamedMetric<String> {
+public class Dice extends StringMetric {
 
     @Override
     public String getMetricName() {
@@ -30,22 +28,15 @@ public class Dice implements NamedMetric<String> {
     }
 
     @Override
-    public double distance(String x, String y) {
-        return 1.0 - this.compare(x, y);
+    public double calculateStringDistance(String x, String y) {
+
+        return 1.0 - similarity(x, y);
     }
 
-    @Override
-    public double normalisedDistance(String a, String b) {
-        return distance(a, b);
-    }
+    private double similarity(String A, String B) {
 
-    public double compare(String A, String B) {
-
-        double check = NamedMetric.checkNullAndEmpty(A, B);
-        if (check != -1) return check;
-
-        Collection agrams = Shingle.ngrams(NamedMetric.topAndTail(A), 2);
-        Collection bgrams = Shingle.ngrams(NamedMetric.topAndTail(B), 2);
+        Set<String> agrams = extractNGrams(topAndTail(A), 2);
+        Set<String> bgrams = extractNGrams(topAndTail(B), 2);
 
         if (agrams.isEmpty() && bgrams.isEmpty()) {
             return 1.0;
@@ -56,6 +47,6 @@ public class Dice implements NamedMetric<String> {
 
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new Dice());
+        new Dice().printExamples();
     }
 }

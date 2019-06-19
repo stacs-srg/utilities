@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.standrews.cs.utilities.phonetic;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.StringEncoder;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-public class PhoneticWrapper implements NamedMetric<String> {
+public class PhoneticWrapper extends StringMetric {
 
     private final StringEncoder encoder;
-    private final NamedMetric<String> metric;
+    private final Metric<String> metric;
     private final String metric_name;
 
-    public PhoneticWrapper(StringEncoder encoder, NamedMetric<String> metric) {
+    public PhoneticWrapper(StringEncoder encoder, Metric<String> metric) {
 
         this.encoder = encoder;
         this.metric = metric;
@@ -40,7 +40,7 @@ public class PhoneticWrapper implements NamedMetric<String> {
     }
 
     @Override
-    public double distance(String x, String y) {
+    public double calculateStringDistance(String x, String y) {
         try {
             String str1 = encoder.encode(x);
             String str2 = encoder.encode(y);
@@ -50,19 +50,5 @@ public class PhoneticWrapper implements NamedMetric<String> {
         } catch (EncoderException e) {
             return 1.0;
         }
-    }
-
-    @Override
-    public double normalisedDistance(String x, String y) {
-        try {
-            String str1 = encoder.encode(x);
-            String str2 = encoder.encode(y);
-
-            return metric.normalisedDistance(str1, str2);
-
-        } catch (EncoderException e) {
-            return 1.0;
-        }
-
     }
 }

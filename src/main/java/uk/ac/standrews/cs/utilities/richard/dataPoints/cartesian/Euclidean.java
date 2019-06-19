@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,39 +14,32 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.standrews.cs.utilities.richard.dataPoints.cartesian;
 
-import uk.ac.standrews.cs.utilities.metrics.CartesianPoint;
+import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
 
 /**
+ * @param <T>
  * @author Richard Connor
  * Changed by al to return doubles to fit in with Distance elsewhere
- *
- * @param <T>
  */
-public class Euclidean<T extends CartesianPoint>  implements NamedMetric<T> {
+public class Euclidean<T extends CartesianPoint> extends Metric<T> {
 
-	public double distance(T x, T y) {
-		double[] ys = y.getPoint();
-		double acc = 0;
-		int ptr = 0;
-		for( double xVal : x.getPoint()){
-			final double diff = xVal - ys[ptr++];
-			acc += diff * diff;
-		}
-		return (double) Math.sqrt(acc);
-	}
+    public double calculateDistance(T x, T y) {
 
-	@Override
-	public double normalisedDistance(T a, T b) {
-		return Metric.normalise(distance(a, b));
-	}
+        double[] ys = y.getPoint();
+        double acc = 0;
+        int ptr = 0;
+        for (double xVal : x.getPoint()) {
+            final double diff = xVal - ys[ptr++];
+            acc += diff * diff;
+        }
+        return normaliseArbitraryPositiveDistance(Math.sqrt(acc));
+    }
 
-	@Override
-	public String getMetricName() {
-		return "euc";
-	}
+    @Override
+    public String getMetricName() {
+        return "euc";
+    }
 }

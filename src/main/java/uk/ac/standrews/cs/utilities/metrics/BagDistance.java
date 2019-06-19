@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -16,13 +16,12 @@
  */
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /*
- *
  *         Bag distance is a cheap method to calculate the distance between two
  *         strings. It is always smaller or equal to the edit distance, and therefore
  *         the similarity measure returned by the method is always larger than the
@@ -33,26 +32,18 @@ import java.util.List;
  *         in Proceedings of the 9th International Symposium on String Processing
  *         and Information Retrieval, Lisbone, Purtugal, September 2002.
  */
-public class BagDistance implements NamedMetric<String> {
+public class BagDistance extends StringMetric {
 
     @Override
     public String getMetricName() {
         return "BagDistance";
     }
 
-    public double distance(String str1, String str2) {
+    public double calculateStringDistance(String str1, String str2) {
         return 1 - similarity(str1, str2);
     }
 
-    @Override
-    public double normalisedDistance(String a, String b) {
-        return distance(a, b);
-    }
-
     public double similarity(String str1, String str2) {
-
-        double check = NamedMetric.checkNullAndEmpty(str1, str2);
-        if (check != -1) return check;
 
         int n = str1.length();
         int m = str2.length();
@@ -84,6 +75,6 @@ public class BagDistance implements NamedMetric<String> {
 
     public static void main(String[] a) {
 
-        NamedMetric.printExamples(new BagDistance());
+        new BagDistance().printExamples();
     }
 }

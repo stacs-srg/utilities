@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Systems Research Group, University of St Andrews:
+ * Copyright 2019 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-
 package uk.ac.standrews.cs.utilities.metrics;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.NamedMetric;
+import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
 
 import java.util.BitSet;
 
-public class Hamming implements NamedMetric<BitSet> {
+public class Hamming extends Metric<BitSet> {
 
     @Override
     public String getMetricName() {
@@ -29,56 +28,28 @@ public class Hamming implements NamedMetric<BitSet> {
     }
 
     /**
-     *
-     * @param x - a bitset over which to caclulate Hamming distance
-     * @param y - a bitset over which to caclulate Hamming distance
+     * @param x - a bitset over which to calculate Hamming distance
+     * @param y - a bitset over which to calculate Hamming distance
      * @return - return the normalised Hamming distance - if all bits are different return 1, if all the same return 0
      */
-    public double distance(BitSet x, BitSet y) {
+    public double calculateDistance(BitSet x, BitSet y) {
 
         long[] x_as_longs = x.toLongArray();
         long[] y_as_longs = y.toLongArray();
 
-        if( x_as_longs.length != y_as_longs.length ) {
-            throw new RuntimeException( "inputs to Happing.distance must be of same length");
+        if (x_as_longs.length != y_as_longs.length) {
+            throw new RuntimeException("inputs to Hamming distance must be of same length");
         }
 
         double count = 0;
 
-        for( int i = 0; i < x_as_longs.length; i++ ) {
-            count += distance(x_as_longs[i],y_as_longs[i] );
-        }
-        return count;
-    }
-
-    @Override
-    public double normalisedDistance(BitSet x, BitSet y) {
-        long[] x_as_longs = x.toLongArray();
-        long[] y_as_longs = y.toLongArray();
-
-        if( x_as_longs.length != y_as_longs.length ) {
-            throw new RuntimeException( "inputs to Happing.distance must be of same length");
-        }
-
-        double count = 0;
-
-        for( int i = 0; i < x_as_longs.length; i++ ) {
-            count += distance(x_as_longs[i],y_as_longs[i] );
+        for (int i = 0; i < x_as_longs.length; i++) {
+            count += distance(x_as_longs[i], y_as_longs[i]);
         }
         return count / x_as_longs.length;
     }
 
-    /**
-     *
-     * @param x - a bitset over which to caclulate Hamming distance
-     * @param y - a bitset over which to caclulate Hamming distance
-     * @return - return the normalised Hamming similarity - if all bits are different return 0, if all the same return 1
-     */
-    public double similarity(BitSet x, BitSet y) {
-        return 1 - distance(x,y);
-    }
-
-    public int distance(long x, long y) {
+    private int distance(long x, long y) {
 
         int count = 0;
         while (x > 0 || y > 0) { // keep going until all zeros.
