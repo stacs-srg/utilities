@@ -24,13 +24,11 @@ import java.util.Map;
 
 public abstract class SparseProbabilityMetric extends StringMetric {
 
-    private static final int CHAR_VAL_UPPER_BOUND = 512;
     private static final double LOG_TWO = Math.log(2);
 
     private static Map<String, SparseProbabilityArray> memoTable = new HashMap<>();
 
-    protected static SparseProbabilityArray stringToSparseArray(String s) {
-
+    protected static SparseProbabilityArray stringToSparseArray(String s, int CHAR_VAL_UPPER_BOUND) {
         if (memoTable.containsKey(s)) {
             return memoTable.get(s);
 
@@ -61,6 +59,11 @@ public abstract class SparseProbabilityMetric extends StringMetric {
             memoTable.put(s, sparse_array);
             return sparse_array;
         }
+    }
+
+    protected static SparseProbabilityArray stringToSparseArray(String s) {
+        int CHAR_VAL_UPPER_BOUND = 512;
+        return stringToSparseArray(s, CHAR_VAL_UPPER_BOUND);
     }
 
     protected static double doCalc(SparseProbabilityArray ar1, SparseProbabilityArray ar2) {

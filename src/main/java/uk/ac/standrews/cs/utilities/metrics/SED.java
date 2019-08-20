@@ -24,6 +24,14 @@ import uk.ac.standrews.cs.utilities.metrics.implementation.SparseProbabilityMetr
  */
 public class SED extends SparseProbabilityMetric {
 
+    private int CHAR_VAL_UPPER_BOUND = 512;
+
+    public SED() {}
+
+    public SED(int CHAR_VAL_UPPER_BOUND) {
+        this.CHAR_VAL_UPPER_BOUND = CHAR_VAL_UPPER_BOUND;
+    }
+
     @Override
     public String getMetricName() {
         return "SED";
@@ -32,12 +40,11 @@ public class SED extends SparseProbabilityMetric {
     @Override
     public double calculateStringDistance(String x, String y) {
 
-        double k = doCalc(stringToSparseArray(x), stringToSparseArray(y));
+        double k = doCalc(stringToSparseArray(x, CHAR_VAL_UPPER_BOUND), stringToSparseArray(y, CHAR_VAL_UPPER_BOUND));
         return Math.pow(Math.pow(2, Math.max(0, k)) - 1, 0.486); // TODO magic number
     }
 
     public static void main(String[] a) {
-
         new SED().printExamples();
     }
 }

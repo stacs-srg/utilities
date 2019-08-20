@@ -23,6 +23,14 @@ import uk.ac.standrews.cs.utilities.metrics.implementation.SparseProbabilityMetr
  */
 public class JensenShannon extends SparseProbabilityMetric {
 
+    private int CHAR_VAL_UPPER_BOUND = 512;
+
+    public JensenShannon() {}
+
+    public JensenShannon(int CHAR_VAL_UPPER_BOUND) {
+        this.CHAR_VAL_UPPER_BOUND = CHAR_VAL_UPPER_BOUND;
+    }
+
     @Override
     public String getMetricName() {
         return "JensenShannon";
@@ -30,7 +38,7 @@ public class JensenShannon extends SparseProbabilityMetric {
 
     public double calculateStringDistance(String x, String y) {
 
-        double k = doCalc(stringToSparseArray(x), stringToSparseArray(y));
+        double k = doCalc(stringToSparseArray(x, CHAR_VAL_UPPER_BOUND), stringToSparseArray(y, CHAR_VAL_UPPER_BOUND));
         return Math.sqrt(Math.max(0, k));
     }
 

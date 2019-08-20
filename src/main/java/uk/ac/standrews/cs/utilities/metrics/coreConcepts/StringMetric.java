@@ -16,8 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.metrics.coreConcepts;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public abstract class StringMetric extends Metric<String> {
 
@@ -55,11 +54,18 @@ public abstract class StringMetric extends Metric<String> {
      */
     public static Set<String> extractNGrams(String source, int n) {
 
-        Set<String> ngrams = new HashSet<>();
+        Set<String> ngrams = null;
+
+        ngrams = new HashSet<>();
         for (int i = 0; i < source.length() - n + 1; i++)
             ngrams.add(source.substring(i, i + n));
+
         return ngrams;
+
+
     }
+
+//    private static Map<Integer, Map<String, Set<String>>> nGramCache = new HashMap<>();
 
     public void printExamples() {
 
