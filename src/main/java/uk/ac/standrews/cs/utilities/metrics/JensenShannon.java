@@ -24,6 +24,7 @@ import uk.ac.standrews.cs.utilities.metrics.implementation.SparseProbabilityMetr
 public class JensenShannon extends SparseProbabilityMetric {
 
     private int CHAR_VAL_UPPER_BOUND = 512;
+    public static final String metricName = "JensenShannon";
 
     public JensenShannon() {}
 
@@ -33,7 +34,7 @@ public class JensenShannon extends SparseProbabilityMetric {
 
     @Override
     public String getMetricName() {
-        return "JensenShannon";
+        return metricName;
     }
 
     public double calculateStringDistance(String x, String y) {
