@@ -131,11 +131,6 @@
             <url>https://maven.cs.st-andrews.ac.uk/</url>
         </repository>
 
-        <repository>
-            <id>ebi-repo</id>
-            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
-        </repository>
-
     </repositories>
 
 </project>
