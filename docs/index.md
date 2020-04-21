@@ -11,3 +11,5 @@ This project provides various utility classes.
 
 ![Java CI with Maven](https://github.com/stacs-srg/utilities/workflows/Java%20CI%20with%20Maven/badge.svg) 
 [![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
+
+Website generated from dev branch.
