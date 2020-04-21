@@ -23,7 +23,7 @@ import java.util.TreeMap;
 /**
  * @author newrichard
  *
- *         the map is from dimensions to metric to results per million ->
+ *         the map is from dimensions to metric to results per million -&gt;
  *         threshold
  */
 public class CartesianThresholds extends

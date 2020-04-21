@@ -377,10 +377,10 @@ public class Duration implements Comparable<Duration>, Serializable {
     }
 
     /**
-     * Returns a string representation of this duration with the largest time unit this duration can be converted to where <code>length > 0</code>.
+     * Returns a string representation of this duration with the largest time unit this duration can be converted to where <code>length &gt; 0</code>.
      * Returns {@link #toString()} if no such time unit exists excluding this duration's time unit, or <code>length = 0</code>.
      *
-     * @return a string representation of this duration with largest time unit this duration can be converted to where <code>length > 0</code>
+     * @return a string representation of this duration with largest time unit this duration can be converted to where <code>length &gt; 0</code>
      */
     @SuppressWarnings("WeakerAccess")
     public String toStringAsLargestTimeUnit() {
@@ -389,12 +389,12 @@ public class Duration implements Comparable<Duration>, Serializable {
     }
 
     /**
-     * Returns a string representation of this duration with the largest time unit this duration can be converted to where <code>length > 0</code>.
+     * Returns a string representation of this duration with the largest time unit this duration can be converted to where <code>length &gt; 0</code>.
      * Returns {@link #toString()} if no such time unit exists excluding this duration's time unit, or <code>length = 0</code>.
      *
      * @param length the length
      * @param unit   the unit
-     * @return a string representation of this duration with largest time unit this duration can be converted to where <code>length > 0</code>
+     * @return a string representation of this duration with largest time unit this duration can be converted to where <code>length &gt; 0</code>
      */
     @SuppressWarnings("WeakerAccess")
     public static String toStringAsLargestTimeUnit(final long length, final TimeUnit unit) {

@@ -27,16 +27,6 @@ public class Pair<X, Y> {
     private final X x;
     private final Y y;
 
-    /**
-     * Construct a pair of two values.
-     * Examples:
-     * - new Pair<>(1, 2)
-     * - new Pair<>("Hello", 2)
-     * - new Pair<>("Hello", "World")
-     *
-     * @param x the first element of the pair
-     * @param y the second element of the pair
-     */
     @SuppressWarnings("WeakerAccess")
     public Pair(X x, Y y) {
         this.x = x;

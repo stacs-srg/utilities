@@ -28,7 +28,7 @@ public class Range implements Iterable<Integer> {
 	 * @param upb
 	 *            end of range (exclusive)
 	 * 
-	 *            returns an Iterable<Integer> object which returns integer
+	 *            returns an Iterable&lt;Integer&gt; object which returns integer
 	 *            values from lwb (inclusive) to upb (exclusive) ; just
 	 *            syntactic sugar to avoid the now-horrible use of for loops
 	 *            over integers!

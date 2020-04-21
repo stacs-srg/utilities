@@ -30,8 +30,8 @@ import java.util.Scanner;
  * @author Richard Connor
  * 
  *         Creates a new instance of DataSet of CartesianPoint from the given
- *         filename. Can be used as a DataSet<CartesianPoint> or alternatively
- *         as an ArrayList<CartesianPoint> depending on context
+ *         filename. Can be used as a DataSet&lt;CartesianPoint&gt; or alternatively
+ *         as an ArrayList&lt;CartesianPoint&gt; depending on context
  */
 @SuppressWarnings("serial")
 public class CartesianPointFileReader extends ArrayList<CartesianPoint> {

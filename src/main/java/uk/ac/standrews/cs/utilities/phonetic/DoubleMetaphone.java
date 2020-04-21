@@ -221,13 +221,13 @@ public class DoubleMetaphone implements StringEncoder {
     }
 
     /**
-     * Check if the Double Metaphone values of two &lt;code>String&lt;/code> values
+     * Check if the Double Metaphone values of two <code>String</code> values
      * are equal.
      *
      * @param value1 The left-hand side of the encoded {@link String#equals(Object)}.
      * @param value2 The right-hand side of the encoded {@link String#equals(Object)}.
-     * @return &lt;code>true&lt;/code> if the encoded &lt;code>String&lt;/code>s are equal;
-     *          &lt;code>false&lt;/code> otherwise.
+     * @return <code>true</code> if the encoded <code>String</code>s are equal;
+     *          <code>false</code> otherwise.
      * @see #isDoubleMetaphoneEqual(String,String,boolean)
      */
     public boolean isDoubleMetaphoneEqual(final String value1, final String value2) {
@@ -235,14 +235,14 @@ public class DoubleMetaphone implements StringEncoder {
     }
 
     /**
-     * Check if the Double Metaphone values of two &lt;code>String&lt;/code> values
+     * Check if the Double Metaphone values of two <code>String</code> values
      * are equal, optionally using the alternate value.
      *
      * @param value1 The left-hand side of the encoded {@link String#equals(Object)}.
      * @param value2 The right-hand side of the encoded {@link String#equals(Object)}.
-     * @param alternate use the alternate value if &lt;code>true&lt;/code>.
-     * @return &lt;code>true&lt;/code> if the encoded &lt;code>String&lt;/code>s are equal;
-     *          &lt;code>false&lt;/code> otherwise.
+     * @param alternate use the alternate value if <code>true</code>.
+     * @return <code>true</code> if the encoded <code>String</code>s are equal;
+     *          <code>false</code> otherwise.
      */
     public boolean isDoubleMetaphoneEqual(final String value1, final String value2, final boolean alternate) {
         return StringUtils.equals(doubleMetaphone(value1, alternate), doubleMetaphone(value2, alternate));

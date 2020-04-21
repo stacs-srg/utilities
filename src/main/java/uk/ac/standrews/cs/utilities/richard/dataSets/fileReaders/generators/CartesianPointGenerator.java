@@ -35,10 +35,6 @@ public class CartesianPointGenerator implements DataSet<CartesianPoint>,
 	 * @param dimension
 	 *            The number of dimensions the generated points will contain
 	 * 
-	 * @param rand
-	 *            A random number generator to seed the generation, allowing
-	 *            repeatable experiments
-	 * 
 	 * @param gaussian
 	 *            Whether the distribution is to be Gaussian or flat for each
 	 *            dimension
