@@ -2,10 +2,12 @@
 
 This project provides various utility classes.
 
-* [API documentation](https://quicksilver.host.cs.st-andrews.ac.uk/apidocs/utilities/)
-* [download jar files](https://quicksilver.host.cs.st-andrews.ac.uk/artifacts/utilities/)
+* [download jar files](https://repo1.maven.org/maven2/com/github/stacs-srg/utilities/1.0.0/)
 * [Maven details](https://github.com/stacs-srg/utilities/blob/master/README.md)
 
-## Build and coverage status
+[![javadoc](https://javadoc.io/badge2/com.github.stacs-srg/utilities/javadoc.svg)](https://javadoc.io/doc/com.github.stacs-srg/utilities)
 
-[![TeamCity](https://quicksilver.host.cs.st-andrews.ac.uk/buildstatus/utilities/build-status.png)](https://beast.cs.st-andrews.ac.uk/teamcity/viewType.html?buildTypeId=Utilities_Build) [![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
+## Status
+
+![Java CI with Maven](https://github.com/stacs-srg/utilities/workflows/Java%20CI%20with%20Maven/badge.svg) 
+[![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
