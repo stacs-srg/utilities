@@ -2,6 +2,11 @@
 
 A collection of utility code.
 
+![Java CI with Maven](https://github.com/stacs-srg/utilities/workflows/Java%20CI%20with%20Maven/badge.svg)
+<img src="https://github.com/stacs-srg/utilities/workflows/Java%20CI%20with%20Maven/badge.svg">
+[![javadoc](https://javadoc.io/badge2/com.github.stacs-srg/utilities/javadoc.svg)](https://javadoc.io/doc/com.github.stacs-srg/ciesvium)
+[![codecov](https://codecov.io/gh/stacs-srg/utilities/branch/master/graph/badge.svg)](https://codecov.io/gh/stacs-srg/utilities)
+
 ## Usage via maven
 
 ```
