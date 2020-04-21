@@ -2,7 +2,7 @@
 
 This project provides a number of utility classes.
 
-* [download jar files](https://repo1.maven.org/maven2/com/github/stacs-srg/utilities/1.0.0/)
+* [download jar files](https://repo1.maven.org/maven2/com/github/stacs-srg/utilities/1.0.1/)
 * [Maven details](https://github.com/stacs-srg/utilities/blob/master/README.md)
 
 [![javadoc](https://javadoc.io/badge2/com.github.stacs-srg/utilities/javadoc.svg)](https://javadoc.io/doc/com.github.stacs-srg/utilities)
