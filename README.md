@@ -12,7 +12,7 @@ A collection of utility code.
 <dependency>
     <groupId>com.github.stacs-srg</groupId>
     <artifactId>utilities</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
