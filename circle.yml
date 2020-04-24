@@ -1,4 +1,0 @@
-test:
-  post:
-    - mv target/apidocs $CIRCLE_ARTIFACTS
-    - mv target/*.jar $CIRCLE_ARTIFACTS

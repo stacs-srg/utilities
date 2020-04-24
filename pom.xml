@@ -23,11 +23,11 @@
     <parent>
         <groupId>com.github.stacs-srg</groupId>
         <artifactId>common-pom</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <artifactId>utilities</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>jar</packaging>
     <name>utilities</name>
 
@@ -42,6 +42,9 @@
     </scm>
 
     <dependencies>
+
+        <!-- To check for updated versions of dependencies, run on command line:
+             mvn versions:display-dependency-updates -->
 
         <dependency>
             <!-- Manipulation of MS Access files -->
