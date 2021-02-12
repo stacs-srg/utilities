@@ -50,7 +50,6 @@ public interface DataSet<T> extends Iterable<T> {
 	 */
 	T randomValue();
 
-
 	/**
 	 * it is important to give a useful name here so that the output of
 	 * experimental systems is correctly interpreted
@@ -70,5 +69,4 @@ public interface DataSet<T> extends Iterable<T> {
 	 * @return the size of the collection, or -1 for an unbounded generator
 	 */
 	int size();
-
 }
