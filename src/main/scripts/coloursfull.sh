@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019 Systems Research Group, University of St Andrews:
+# Copyright 2021 Systems Research Group, University of St Andrews:
 # <https://github.com/stacs-srg>
 #
 # This file is part of the module utilities.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Systems Research Group, University of St Andrews:
+ * Copyright 2021 Systems Research Group, University of St Andrews:
  * <https://github.com/stacs-srg>
  *
  * This file is part of the module utilities.
@@ -646,15 +646,27 @@ public class AsymmetricEncryption {
     @SuppressWarnings("unused")
     public static void encryptAESKey(final SecretKey AES_key, final Path authorized_keys_path, final Path destination_path) throws IOException, CryptoException {
 
+        List<String> original_contents = FileManipulation.readAllLines(Files.newInputStream(authorized_keys_path));
+
         try (OutputStreamWriter writer = FileManipulation.getOutputStreamWriter(destination_path)) {
 
-            final List<PublicKey> public_keys = AsymmetricEncryption.loadPublicKeys(authorized_keys_path);
+            try {
+                final List<PublicKey> public_keys = loadPublicKeys(authorized_keys_path);
 
-            for (final PublicKey public_key : public_keys) {
-                writeEncryptedAESKey(public_key, AES_key, writer);
+                for (final PublicKey public_key : public_keys) {
+                    writeEncryptedAESKey(public_key, AES_key, writer);
+                }
+
+            } catch (IOException | CryptoException e) {
+
+                for (String line : original_contents) {
+                    writer.write(line + "\n");
+                }
+                throw e;
             }
-
-            writer.flush();
+            finally {
+                writer.flush();
+            }
         }
     }
 
