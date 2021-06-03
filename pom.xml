@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>uk.ac.standrews.cs2</groupId>
+        <groupId>uk.ac.standrews.cs</groupId>
         <artifactId>common-pom</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
@@ -34,12 +34,6 @@
     <description>Utilities</description>
     <url>https://stacs-srg.github.io/utilities/</url>
     <inceptionYear>2017</inceptionYear>
-
-<!--    <scm>-->
-<!--        <connection>scm:git:git://github.com/stacs-srg/utilities.git</connection>-->
-<!--        <developerConnection>scm:git:ssh://github.com:stacs-srg/utilities.git</developerConnection>-->
-<!--        <url>https://github.com/stacs-srg/utilities/tree/master</url>-->
-<!--    </scm>-->
 
     <properties>
 
