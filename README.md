@@ -12,6 +12,12 @@ A collection of utility code.
     <artifactId>utilities</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
+...
+<repository>
+    <id>uk.ac.standrews.cs.maven.repository</id>
+    <name>School of Computer Science Maven Repository</name>
+    <url>https://maven.cs.st-andrews.ac.uk/</url>
+</repository>
 ```
 
 ## See also
