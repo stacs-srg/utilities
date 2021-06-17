@@ -150,7 +150,8 @@ public class AsymmetricEncryption {
 
         // RSA keys must be at least 512 bits long
         // Keys longer than 4096 bits can take too long to generate
-        if (key_length < MIN_KEY_LENGTH_IN_BITS || key_length > MAX_KEY_LENGTH_IN_BITS) throw new CryptoException("Length of key is invalid");
+        if (key_length < MIN_KEY_LENGTH_IN_BITS || key_length > MAX_KEY_LENGTH_IN_BITS)
+            throw new CryptoException("Length of key is invalid");
 
         try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM);
@@ -335,7 +336,7 @@ public class AsymmetricEncryption {
     /**
      * Verifies that the pair of Public and Private keys is valid
      *
-     * @param public_key of the key pair
+     * @param public_key  of the key pair
      * @param private_key of the key pair
      * @return true if the key pair is valid
      * @throws CryptoException if unable to verify the key pair
@@ -385,7 +386,8 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKey(final Path key_path) throws CryptoException {
 
-        return getPrivateKeyFromPEMString(getKey(key_path));
+        String key = getKey(key_path);
+        return getPrivateKeyFromPEMString(key);
     }
 
     /**
@@ -548,9 +550,9 @@ public class AsymmetricEncryption {
     /**
      * Persist a key pair to the specified paths for the private and the public key
      *
-     * @param key_pair to be persisted
+     * @param key_pair             to be persisted
      * @param private_key_filename the path for the private key
-     * @param public_key_filename the path for the public key
+     * @param public_key_filename  the path for the public key
      * @throws CryptoException if the keys could not be persisted
      */
     @SuppressWarnings("WeakerAccess")
@@ -633,7 +635,7 @@ public class AsymmetricEncryption {
      * Encrypts the AES key with the given public key
      *
      * @param public_key the key used to perform the encryption
-     * @param AES_key the key to encrypt
+     * @param AES_key    the key to encrypt
      * @return the encrypted key as a String
      * @throws CryptoException if the AES key could not be encrypted
      */
@@ -663,8 +665,7 @@ public class AsymmetricEncryption {
                     writer.write(line + "\n");
                 }
                 throw e;
-            }
-            finally {
+            } finally {
                 writer.flush();
             }
         }
@@ -673,7 +674,7 @@ public class AsymmetricEncryption {
     /**
      * Decrypts the AES key with the given private key
      *
-     * @param private_key used to decrypt the key
+     * @param private_key   used to decrypt the key
      * @param encrypted_key the AES key that was encrypted using the matching public key
      * @return the AES key
      * @throws CryptoException if the AES key could not be decrypted
@@ -692,8 +693,22 @@ public class AsymmetricEncryption {
 
     private static String getKey(final Path key_path) throws CryptoException {
 
-        try {
-            return new String(Files.readAllBytes(key_path));
+        // This used to use Files.readAllBytes() which was simpler, but didn't work
+        // on Windows with the different newline encoding. This way the key string
+        // contains Java newlines whatever platform we're running on.
+
+        StringBuilder builder = new StringBuilder();
+
+        try (BufferedReader reader = Files.newBufferedReader(key_path)) {
+
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
+                builder.append("\n");
+            }
+
+            return builder.toString();
 
         } catch (final IOException e) {
             throw new CryptoException("Can't access key file: " + key_path);
