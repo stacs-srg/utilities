@@ -17,8 +17,8 @@
 package uk.ac.standrews.cs.utilities.metrics.implementation;
 
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
-import uk.ac.standrews.cs.utilities.metrics.implementation.SparseProbabilityArray;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,14 +26,14 @@ public abstract class SparseProbabilityMetric extends StringMetric {
 
     private static final double LOG_TWO = Math.log(2);
 
-    private static Map<String, SparseProbabilityArray> memoTable = new HashMap<>();
+    private static Map<String, SparseProbabilityArray> memoTable = Collections.synchronizedMap( new HashMap<>() );
 
     protected static SparseProbabilityArray stringToSparseArray(String s, int CHAR_VAL_UPPER_BOUND) {
         if (memoTable.containsKey(s)) {
             return memoTable.get(s);
 
         } else {
-            SparseProbabilityArray sparse_array = new SparseProbabilityArray();
+            final SparseProbabilityArray sparse_array = new SparseProbabilityArray();
 
             for (int i = -1; i < s.length(); i++) {
                 char ch1 = 0;
@@ -61,7 +61,7 @@ public abstract class SparseProbabilityMetric extends StringMetric {
         }
     }
 
-    protected static SparseProbabilityArray stringToSparseArray(String s) {
+    protected synchronized static SparseProbabilityArray stringToSparseArray(String s) {
         int CHAR_VAL_UPPER_BOUND = 512;
         return stringToSparseArray(s, CHAR_VAL_UPPER_BOUND);
     }
