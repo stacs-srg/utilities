@@ -18,15 +18,14 @@ package uk.ac.standrews.cs.utilities.metrics.implementation;
 
 import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SparseProbabilityMetric extends StringMetric {
 
     private static final double LOG_TWO = Math.log(2);
 
-    private static Map<String, SparseProbabilityArray> memoTable = Collections.synchronizedMap( new HashMap<>() );
+    private static Map<String, SparseProbabilityArray> memoTable = new ConcurrentHashMap<>();
 
     protected static SparseProbabilityArray stringToSparseArray(String s, int CHAR_VAL_UPPER_BOUND) {
         if (memoTable.containsKey(s)) {
