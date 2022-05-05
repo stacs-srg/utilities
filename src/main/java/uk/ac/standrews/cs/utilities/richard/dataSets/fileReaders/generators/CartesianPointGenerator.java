@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.richard.dataSets.fileReaders.generators;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataSet;
-import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataSet;
+import uk.ac.standrews.cs.utilities.measures.implementation.CartesianPoint;
 
 import java.util.Iterator;
 import java.util.Random;

@@ -16,40 +16,26 @@
  */
 package uk.ac.standrews.cs.utilities.richard.searchStructures;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 
 import java.util.*;
 
-
 public abstract class SearchIndex<T> {
 
-	public Metric<T> metric;
+	public Measure<T> measure;
 	public List<T> data;
 	protected Random rand;
 
-	protected SearchIndex(List<T> data, Metric<T> metric) {
-		this.metric = metric;
+	protected SearchIndex(List<T> data, Measure<T> measure) {
+		this.measure = measure;
 		this.data = data;
 		this.rand = new Random(0);
-	}
-
-	private List<T> chooseTwoPivotsRandom(List<T> data) {
-		List<T> res = new ArrayList<>();
-		final int r1 = this.rand.nextInt(data.size());
-		res.add(data.get(r1));
-		data.remove(r1);
-
-		final int r2 = this.rand.nextInt(data.size());
-		res.add(data.get(r2));
-		data.remove(r2);
-
-		return res;
 	}
 
 	private List<T> chooseTwoPivotsOutliers(List<T> dat, int iterations) {
 		List<T> res = new ArrayList<>();
 
-		final int r1 = this.rand.nextInt(dat.size());
+		final int r1 = rand.nextInt(dat.size());
 		T contendor1 = dat.get(r1);
 		T contendor2 = findFarthest(contendor1, dat);
 
@@ -75,7 +61,7 @@ public abstract class SearchIndex<T> {
 		T furthest = null;
 		for (T d : dat) {
 			if (d != condendor) {
-				double dist = this.metric.distance(condendor, d);
+				double dist = measure.distance(condendor, d);
 				if (dist >= max) {
 					furthest = d;
 					max = dist;
@@ -85,27 +71,12 @@ public abstract class SearchIndex<T> {
 		return furthest;
 	}
 
-	private double findSmallestDist(T condendor1, Collection<T> dat) {
-		double minDist = Double.MAX_VALUE;
-		T nearest = null;
-		for (T d : dat) {
-			if (d != condendor1) {
-				double dist = this.metric.distance(condendor1, d);
-				if (dist <= minDist) {
-					nearest = d;
-					minDist = dist;
-				}
-			}
-		}
-		return minDist;
-	}
-
 	private T findNearest(T condendor1, Collection<T> dat) {
 		double minDist = Double.MAX_VALUE;
 		T nearest = null;
 		for (T d : dat) {
 			if (d != condendor1) {
-				double dist = this.metric.distance(condendor1, d);
+				double dist = measure.distance(condendor1, d);
 				if (dist <= minDist) {
 					nearest = d;
 					minDist = dist;
@@ -132,7 +103,7 @@ public abstract class SearchIndex<T> {
 		for (T contendor : dat) {
 			double total = 0;
 			for (T pivot : collection) {
-				double d = metric.distance(contendor, pivot);
+				double d = measure.distance(contendor, pivot);
 				total += d;
 			}
 			if (total > bestTotal) {
@@ -195,8 +166,7 @@ public abstract class SearchIndex<T> {
 		} else if (bq == 0) {
 			return aq;
 		} else {
-			double cosThetaTimesAq = (ab * ab + aq * aq - bq * bq) / (2 * ab);
-			return cosThetaTimesAq;
+			return (ab * ab + aq * aq - bq * bq) / (2 * ab);
 		}
 	}
 
@@ -225,7 +195,7 @@ public abstract class SearchIndex<T> {
 	protected double listMaxDist(T t, List<T> list) {
 		double res = 0;
 		for (T d : list) {
-			res = Math.max(res, this.metric.distance(t, d));
+			res = Math.max(res, measure.distance(t, d));
 		}
 		return res;
 	}

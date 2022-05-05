@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.mi_file;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 
 import java.util.*;
 
@@ -42,7 +42,7 @@ import java.util.*;
  */
 public class MIFile<T> {
 
-    final Metric<T> distance_wrapper;
+    final Measure<T> distance_wrapper;
     final int n_ro;         // number of reference objects - AMATO
     private final Set<T> reference_objects;
     private final InvertedFile<T> invFile;
@@ -58,7 +58,7 @@ public class MIFile<T> {
      * @param ki                Specifies the number of reference objects used for indexing. It must be smaller than n_ro
      * @param ks                Specifies the number of reference objects used for searching.
      */
-    public MIFile(Metric<T> d, Set<T> reference_objects, int ki, int ks) throws Exception {
+    public MIFile(Measure<T> d, Set<T> reference_objects, int ki, int ks) throws Exception {
 
         distance_wrapper = d;
         this.reference_objects = reference_objects;

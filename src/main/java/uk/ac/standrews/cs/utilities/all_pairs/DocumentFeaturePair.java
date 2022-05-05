@@ -16,7 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.all_pairs;
 
-import uk.ac.standrews.cs.utilities.metrics.implementation.FeatureVector;
+import uk.ac.standrews.cs.utilities.measures.implementation.FeatureVector;
 
 /**
  * Created by al on 27/09/2017.

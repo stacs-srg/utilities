@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.mi_file;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 
 import java.util.*;
 
@@ -30,14 +30,14 @@ public class CandidateSet<T> {
     private final TreeMap<Double, T> orderedRes;         //here we maintain the k current best using the distance as entry
     private final HashMap<T, Double> objectsOfOrderedRes; //here we maintain the k current best using the data as entry
     private final T query;                              // the object for which we are finding NN.
-    private final Metric<T> distance_wrapper;
+    private final Measure<T> distance_wrapper;
     private int k;                                      // number of objects to be retrieved
 
     private double kDist = Double.MAX_VALUE;
 
     private HashMap<T, Double> tempResults = new HashMap<>(); // Temporary results?
 
-    public CandidateSet(T query, Metric<T> distance_wrapper, int maxEntries, int k) {
+    public CandidateSet(T query, Measure<T> distance_wrapper, int maxEntries, int k) {
 
         this.query = query;
         this.distance_wrapper = distance_wrapper;

@@ -17,8 +17,8 @@
 package uk.ac.standrews.cs.utilities.m_tree;
 
 import uk.ac.standrews.cs.utilities.archive.Diagnostic;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,15 +47,15 @@ public class MTree<T> {
     public Node root = null;
     int number_of_entries = 0;
     private final int max_level_size; // size of a level
-    final Metric<T> distance_wrapper;
+    final Measure<T> distance_wrapper;
 
-    public MTree(final Metric<T> d, final int max_level_size) {
+    public MTree(final Measure<T> d, final int max_level_size) {
 
         distance_wrapper = d;
         this.max_level_size = max_level_size;
     }
 
-    public MTree(final Metric<T> d) {
+    public MTree(final Measure<T> d) {
 
         this(d, DEFAULT_MAX_LEVEL_SIZE);
     }

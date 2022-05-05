@@ -16,15 +16,15 @@
  */
 package uk.ac.standrews.cs.utilities.richard.dataPoints.cartesian;
 
-import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 
 /**
  * @param <T>
  * @author Richard Connor
  * Changed by al to return doubles to fit in with Distance elsewhere
  */
-public class Euclidean<T extends CartesianPoint> extends Metric<T> {
+public class Euclidean<T extends CartesianPoint> extends Measure<T> {
 
     public double calculateDistance(T x, T y) {
 
@@ -35,11 +35,16 @@ public class Euclidean<T extends CartesianPoint> extends Metric<T> {
             final double diff = xVal - ys[ptr++];
             acc += diff * diff;
         }
-        return normaliseArbitraryPositiveDistance(Math.sqrt(acc));
+        return Math.sqrt(acc);
     }
 
     @Override
-    public String getMetricName() {
+    public String getMeasureName() {
         return "euc";
+    }
+
+    @Override
+    public boolean maxDistanceIsOne() {
+        return false;
     }
 }

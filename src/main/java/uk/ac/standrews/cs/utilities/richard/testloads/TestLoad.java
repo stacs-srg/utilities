@@ -16,9 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities.richard.testloads;
 
-import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataSet;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataSet;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 import uk.ac.standrews.cs.utilities.richard.dataSets.fileReaders.CartesianPointFileReader;
 import uk.ac.standrews.cs.utilities.richard.dataSets.fileReaders.generators.CartesianPointGenerator;
 import uk.ac.standrews.cs.utilities.richard.searchStructures.SearchIndex;
@@ -96,7 +96,7 @@ public class TestLoad {
         }
     }
 
-    protected static double getThreshold(Metric<CartesianPoint> m,
+    protected static double getThreshold(Measure<CartesianPoint> m,
                                          CartesianPoint query, int req, double thresh,
                                          SearchIndex<CartesianPoint> vpt) {
         List<CartesianPoint> res = vpt.thresholdSearch(query, thresh);

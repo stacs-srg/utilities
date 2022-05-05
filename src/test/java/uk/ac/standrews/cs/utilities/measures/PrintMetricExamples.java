@@ -14,27 +14,25 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
+package uk.ac.standrews.cs.utilities.measures;
 
-import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
+public class PrintMetricExamples {
 
-public class EuclideanDistance extends Measure<Point> {
+    public static void main(String[] args) {
 
-    public double calculateDistance(Point p1, Point p2) {
-
-        double x_distance = p1.x - p2.x;
-        double y_distance = p1.y - p2.y;
-
-        return Math.sqrt((x_distance * x_distance) + (y_distance * y_distance));
-    }
-
-    @Override
-    public String getMeasureName() {
-        return "EuclideanDistance (2D)";
-    }
-
-    @Override
-    public boolean maxDistanceIsOne() {
-        return false;
+        BagDistance.main(null);
+        Cosine.main(null);
+        DamerauLevenshtein.main(null);
+        Dice.main(null);
+        Jaccard.main(null);
+        Jaro.main(null);
+        JaroWinkler.main(null);
+        JensenShannon.main(null);
+        JensenShannonKullbackLeibler.main(null);
+        Levenshtein.main(null);
+        LongestCommonSubstring.main(null);
+        NeedlemanWunsch.main(null);
+        SED.main(null);
+        SmithWaterman.main(null);
     }
 }

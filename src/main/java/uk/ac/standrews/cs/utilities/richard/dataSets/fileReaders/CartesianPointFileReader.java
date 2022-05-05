@@ -16,7 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.richard.dataSets.fileReaders;
 
-import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.measures.implementation.CartesianPoint;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

@@ -18,7 +18,7 @@ package uk.ac.standrews.cs.utilities.m_tree;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.standrews.cs.utilities.metrics.Levenshtein;
+import uk.ac.standrews.cs.utilities.measures.Levenshtein;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

@@ -18,29 +18,31 @@ package uk.ac.standrews.cs.utilities.phonetic;
 
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.StringEncoder;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
-public class PhoneticWrapper extends StringMetric {
+public class PhoneticWrapper extends StringMeasure {
 
     private final StringEncoder encoder;
-    private final Metric<String> metric;
+    private final StringMeasure metric;
     private final String metric_name;
 
-    public PhoneticWrapper(StringEncoder encoder, Metric<String> metric) {
+    public PhoneticWrapper(StringEncoder encoder, StringMeasure metric) {
 
         this.encoder = encoder;
         this.metric = metric;
-        this.metric_name = encoder.getClass().getSimpleName() + "-" + metric.getMetricName();
+        this.metric_name = encoder.getClass().getSimpleName() + "-" + metric.getMeasureName();
     }
 
     @Override
-    public String getMetricName() {
+    public String getMeasureName() {
         return metric_name;
     }
 
     @Override
-    public double calculateStringDistance(String x, String y) {
+    public boolean maxDistanceIsOne() { return metric.maxDistanceIsOne(); }
+
+    @Override
+    public double calculateDistance(String x, String y) {
         try {
             String str1 = encoder.encode(x);
             String str2 = encoder.encode(y);
@@ -48,7 +50,7 @@ public class PhoneticWrapper extends StringMetric {
             return metric.distance(str1, str2);
 
         } catch (EncoderException e) {
-            return 1.0;
+            throw new RuntimeException(e);
         }
     }
 }

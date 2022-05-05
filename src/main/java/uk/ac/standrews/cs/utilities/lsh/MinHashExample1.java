@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
-import uk.ac.standrews.cs.utilities.metrics.Jaccard;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.measures.Jaccard;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -32,8 +32,8 @@ public class MinHashExample1 {
         String input1 = "The attribute to awe and majesty.";
         String input2 = "But there's but one in all doth hold his place.";
 
-        Set<String> input1_2grams = StringMetric.extractNGrams(input1, 2);
-        Set<String> input2_2grams = StringMetric.extractNGrams(input2, 2);
+        Set<String> input1_2grams = StringMeasure.extractNGrams(input1, 2);
+        Set<String> input2_2grams = StringMeasure.extractNGrams(input2, 2);
 
         Integer[] input1_minHashSignature = MinHash.createMinHashSignature(input1, 50, 2);
         Integer[] input2_minHashSignature = MinHash.createMinHashSignature(input2, 50, 2);

@@ -16,9 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities.all_pairs;
 
-import uk.ac.standrews.cs.utilities.metrics.Cosine;
-import uk.ac.standrews.cs.utilities.metrics.implementation.FeatureVector;
-import uk.ac.standrews.cs.utilities.metrics.implementation.KeyFreqPair;
+import uk.ac.standrews.cs.utilities.measures.Cosine;
+import uk.ac.standrews.cs.utilities.measures.implementation.FeatureVector;
+import uk.ac.standrews.cs.utilities.measures.implementation.KeyFreqPair;
 
 import java.util.ArrayList;
 import java.util.HashMap;

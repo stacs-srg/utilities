@@ -558,14 +558,14 @@ public class JSONReader {
             }
             try {
                 if (s.indexOf('.') > -1 || s.indexOf('e') > -1 || s.indexOf('E') > -1) {
-                    theDouble = Double.valueOf(s);
+                    theDouble = Double.parseDouble(s);
                     setNextSymbol(DOUBLE);
                     return;
                 }
 
-                final Long myLong = new Long(s);
-                if (myLong == myLong.intValue()) {
-                    theInteger = myLong.intValue();
+                final long myLong = Long.parseLong(s);
+                if (myLong == (int) myLong) {
+                    theInteger = (int) myLong;
                     setNextSymbol(INTEGER);
                     return;
                 }

@@ -14,27 +14,38 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
+package uk.ac.standrews.cs.utilities.measures;
 
-import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
-public class EuclideanDistance extends Measure<Point> {
+import java.util.Set;
 
-    public double calculateDistance(Point p1, Point p2) {
-
-        double x_distance = p1.x - p2.x;
-        double y_distance = p1.y - p2.y;
-
-        return Math.sqrt((x_distance * x_distance) + (y_distance * y_distance));
-    }
+public class Dice extends StringMeasure {
 
     @Override
     public String getMeasureName() {
-        return "EuclideanDistance (2D)";
+        return "Dice";
     }
 
     @Override
-    public boolean maxDistanceIsOne() {
-        return false;
+    public boolean maxDistanceIsOne() { return true; }
+
+    @Override
+    public double calculateDistance(final String x, final String y) {
+
+        return 1.0 - similarity(x, y);
+    }
+
+    private double similarity(final String x, final String y) {
+
+        final Set<String> x_bigrams = extractNGrams(topAndTail(x), 2);
+        final Set<String> y_bigrams = extractNGrams(topAndTail(y), 2);
+
+        return 2.0 * intersection(x_bigrams, y_bigrams).size() / (x_bigrams.size() + y_bigrams.size());
+    }
+
+    public static void main(String[] a) {
+
+        new Dice().printExamples();
     }
 }

@@ -36,7 +36,7 @@ public class MTreeSizeCheck {
     private int increment = 5000000; // 5 million
     private int max = 30000000; // 30 million.
 
-    private EuclideanDistance distance_metric = new EuclideanDistance();
+    private EuclideanDistance distance_measure = new EuclideanDistance();
 
     private void loadTest() {
 
@@ -50,7 +50,7 @@ public class MTreeSizeCheck {
      */
     private void createTree(int size) {
 
-        MTree<Point> tree = new MTree<>(distance_metric);
+        MTree<Point> tree = new MTree<>(distance_measure);
 
         long time = System.currentTimeMillis();
         System.out.println("Creating tree of size " + size);

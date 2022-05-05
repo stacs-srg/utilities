@@ -17,12 +17,10 @@
 package uk.ac.standrews.cs.utilities.lsh;
 
 import org.junit.Test;
-import uk.ac.standrews.cs.utilities.metrics.Jaccard;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.measures.Jaccard;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -42,7 +40,7 @@ public class MinHashTest {
         String input1 = "The attribute to awe and majesty.";
         String input2 = "The attribute to awe and majesty.";
 
-        double jaccard_ngrams = jaccard.distance(StringMetric.extractNGrams(input1, 2), StringMetric.extractNGrams(input2, 2));
+        double jaccard_ngrams = jaccard.distance(StringMeasure.extractNGrams(input1, 2), StringMeasure.extractNGrams(input2, 2));
 
         double jaccard_minhash = jaccard.distance(
                 Arrays.asList(MinHash.createMinHashSignature(input1, DEFAULTSIGNATURESIZE_TEST, 2)),
@@ -57,7 +55,7 @@ public class MinHashTest {
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "Jul. O Romeo, 12345! wherefore art thou Romeo?";
 
-        double jaccard_ngrams = jaccard.distance(StringMetric.extractNGrams(input1, 2), StringMetric.extractNGrams(input2, 2));
+        double jaccard_ngrams = jaccard.distance(StringMeasure.extractNGrams(input1, 2), StringMeasure.extractNGrams(input2, 2));
 
         double jaccard_minhash = jaccard.distance(
                 Arrays.asList(MinHash.createMinHashSignature(input1, 20, 2)),
@@ -72,7 +70,7 @@ public class MinHashTest {
         String input1 = "Jul. O Romeo, Romeo! wherefore art thou Romeo?";
         String input2 = "This is a totally different string than above!";
 
-        double jaccard_ngrams = jaccard.distance(StringMetric.extractNGrams(input1, 2), StringMetric.extractNGrams(input2, 2));
+        double jaccard_ngrams = jaccard.distance(StringMeasure.extractNGrams(input1, 2), StringMeasure.extractNGrams(input2, 2));
 
         double jaccard_minhash = jaccard.distance(
                 Arrays.asList(MinHash.createMinHashSignature(input1, 20, 2)),

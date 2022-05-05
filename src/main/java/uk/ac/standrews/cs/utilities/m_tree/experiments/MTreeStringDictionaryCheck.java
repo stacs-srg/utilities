@@ -18,9 +18,8 @@ package uk.ac.standrews.cs.utilities.m_tree.experiments;
 
 import uk.ac.standrews.cs.utilities.FileManipulation;
 import uk.ac.standrews.cs.utilities.m_tree.MTree;
-import uk.ac.standrews.cs.utilities.metrics.Levenshtein;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.Levenshtein;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
 
 import java.io.IOException;
 import java.nio.file.Paths;

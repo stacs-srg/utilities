@@ -20,12 +20,11 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.DataDistance;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
-
 
 public class MTreeEuclidean2DTest {
 
@@ -85,13 +84,13 @@ public class MTreeEuclidean2DTest {
     public void addLinear15() {
 
         for (int i = 0; i < 15; i++) {
-            tree.add(new Point( i, 0.0F));
+            tree.add(new Point(i, 0.0F));
         }
 
         assertEquals(15, tree.size());
 
         for (int i = 0; i < 15; i++) {
-            assertTrue(tree.contains(new Point( i, 0.0F)));
+            assertTrue(tree.contains(new Point(i, 0.0F)));
         }
     }
 
@@ -104,29 +103,29 @@ public class MTreeEuclidean2DTest {
 
         // lay down 20 points in a line
         for (int i = 0; i < 3; i++) {
-            tree.add(new Point( i * 10, 0.0F));
+            tree.add(new Point(i * 10, 0.0F));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 3; i++) {
-            tree.add(new Point( (i * 10) + 4.0F, 0.0F));
+            tree.add(new Point((i * 10) + 4.0F, 0.0F));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 3; i++) {
-            tree.add(new Point( (i * 10) + 4.5F, 0.0F));
+            tree.add(new Point((i * 10) + 4.5F, 0.0F));
         }
 
         assertEquals(9, tree.size());
 
         for (int i = 0; i < 3; i++) {
-            assertTrue(tree.contains(new Point( i * 10, 0.0F)));
+            assertTrue(tree.contains(new Point(i * 10, 0.0F)));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 3; i++) {
-            assertTrue(tree.contains(new Point( (i * 10) + 4.0F, 0.0F)));
+            assertTrue(tree.contains(new Point((i * 10) + 4.0F, 0.0F)));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 3; i++) {
-            assertTrue(tree.contains(new Point( (i * 10) + 4.5F, 0.0F)));
+            assertTrue(tree.contains(new Point((i * 10) + 4.5F, 0.0F)));
         }
     }
 
@@ -180,21 +179,15 @@ public class MTreeEuclidean2DTest {
 
         // lay down 20 points in a line
         for (int i = 0; i < 20; i++) {
-            tree.add(new Point( i * 10, 0.0F));
-            //t.showTree();
-            //tree.check_invariants();
+            tree.add(new Point(i * 10, 0.0F));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 20; i++) {
-            tree.add(new Point( (i * 10) + 4.0F, 0.0F));
-            //t.showTree();
-            //tree.check_invariants();
+            tree.add(new Point((i * 10) + 4.0F, 0.0F));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 20; i++) {
-            tree.add(new Point( (i * 10) + 4.5F, 0.0F));
-            //t.showTree();
-            //tree.check_invariants();
+            tree.add(new Point((i * 10) + 4.5F, 0.0F));
         }
     }
 
@@ -210,11 +203,11 @@ public class MTreeEuclidean2DTest {
         assertEquals(60, tree.size());
 
         for (int i = 0; i < 20; i++) {
-            assertTrue(tree.contains(new Point( i * 10, 0.0F)));
+            assertTrue(tree.contains(new Point(i * 10, 0.0F)));
         }
         // new lay down 20 points in a line - that are all close (4 away) to the first 20
         for (int i = 0; i < 20; i++) {
-            assertTrue(tree.contains(new Point( (i * 10) + 4.0F, 0.0F)));
+            assertTrue(tree.contains(new Point((i * 10) + 4.0F, 0.0F)));
         }
         // new lay down another 20 points in a line - that are all close (1 away) to the second 20
         for (int i = 0; i < 20; i++) {
@@ -234,7 +227,7 @@ public class MTreeEuclidean2DTest {
         List<DataDistance<Point>> result = tree.rangeSearch(p, 10.0F);
         List<Point> values = tree.mapValues(result);
 
-        assertEquals(60,result.size());
+        assertEquals(6, result.size());
 
         for (Point pp : values) {
             assertTrue(tree.contains(pp));                 // point added to the tree

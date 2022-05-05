@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.richard.testloads;
 
-import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 import uk.ac.standrews.cs.utilities.richard.dataPoints.cartesian.Euclidean;
 
 import java.util.List;
@@ -35,9 +35,7 @@ public class TestContext {
     private TestLoad tl;
     private List<CartesianPoint> queries;
     private List<CartesianPoint> refPoints;
-    private List<CartesianPoint> data;
-    private Metric<CartesianPoint> metric;
-    private int dataSize;
+    private Measure<CartesianPoint> measure;
     private double threshold;
 
     /**
@@ -126,9 +124,8 @@ public class TestContext {
     }
 
     protected void setParams(Context c) {
-        this.dataSize = -1;
-        this.context = c;
-        this.metric = new Euclidean();
+        context = c;
+        measure = new Euclidean();
     }
 
     public List<CartesianPoint> getData() {
@@ -188,8 +185,8 @@ public class TestContext {
         }
     }
 
-    public Metric<CartesianPoint> metric() {
-        return metric;
+    public Measure<CartesianPoint> metric() {
+        return measure;
     }
 
     public int dataSize() {
@@ -205,5 +202,4 @@ public class TestContext {
     public enum Context {
         colors, nasa, euc10, euc20, euc30, euc100, euc1000, euc10000
     }
-
 }

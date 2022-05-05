@@ -16,7 +16,7 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
 import java.util.*;
 
@@ -77,7 +77,7 @@ public class MinHash<Data> {
      */
     public static Integer[] createMinHashSignature(String src, int sig_size, int shingle_size) {
 
-        Set<String> set_ngrams = StringMetric.extractNGrams(src, shingle_size);
+        Set<String> set_ngrams = StringMeasure.extractNGrams(src, shingle_size);
 
         // Create a min hash array initialized to all int max values
         Integer[] signature = new Integer[sig_size];

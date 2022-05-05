@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
-import uk.ac.standrews.cs.utilities.metrics.Jaccard;
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.StringMetric;
+import uk.ac.standrews.cs.utilities.measures.Jaccard;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -89,8 +89,8 @@ public class MinHashExample2 {
         for (String sentence : ozs_words) {
             for (String key : map.keySet()) {
 
-                Set<String> sentence_2grams = StringMetric.extractNGrams(sentence, 2);
-                Set<String> key_2grams = StringMetric.extractNGrams(key, 2);
+                Set<String> sentence_2grams = StringMeasure.extractNGrams(sentence, 2);
+                Set<String> key_2grams = StringMeasure.extractNGrams(key, 2);
 
                 Integer[] sentence_minHashSignature = MinHash.createMinHashSignature(sentence, 50, 2);
                 Integer[] key_minHashSignature = MinHash.createMinHashSignature(key, 50, 2);

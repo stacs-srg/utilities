@@ -14,27 +14,23 @@
  * You should have received a copy of the GNU General Public License along with utilities. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean;
+package uk.ac.standrews.cs.utilities.measures.implementation;
 
-import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
+/**
+ * Created by al on 27/09/2017.
+ */
+public class KeyFreqPair implements Comparable<KeyFreqPair> {
 
-public class EuclideanDistance extends Measure<Point> {
+    public String qgram;
+    public int frequency;
 
-    public double calculateDistance(Point p1, Point p2) {
-
-        double x_distance = p1.x - p2.x;
-        double y_distance = p1.y - p2.y;
-
-        return Math.sqrt((x_distance * x_distance) + (y_distance * y_distance));
+    public KeyFreqPair( String qgram, int frequency ){
+        this.qgram = qgram;
+        this.frequency = frequency;
     }
 
     @Override
-    public String getMeasureName() {
-        return "EuclideanDistance (2D)";
-    }
-
-    @Override
-    public boolean maxDistanceIsOne() {
-        return false;
+    public int compareTo(KeyFreqPair other) {
+        return Integer.compare(frequency, other.frequency);
     }
 }

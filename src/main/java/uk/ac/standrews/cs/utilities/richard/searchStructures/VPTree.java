@@ -16,10 +16,10 @@
  */
 package uk.ac.standrews.cs.utilities.richard.searchStructures;
 
-import uk.ac.standrews.cs.utilities.metrics.coreConcepts.Metric;
+import uk.ac.standrews.cs.utilities.measures.coreConcepts.Measure;
 import uk.ac.standrews.cs.utilities.richard.util.OrderedListAlt;
 import uk.ac.standrews.cs.utilities.richard.util.Range;
-import uk.ac.standrews.cs.utilities.metrics.implementation.CartesianPoint;
+import uk.ac.standrews.cs.utilities.measures.implementation.CartesianPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +42,8 @@ public class VPTree<T> extends SearchIndex<T> {
 				T piv = VPTree.this.data.get(VPTree.this.ids[start]);
 
 				for (int i = start + 1; i <= end; i++) {
-					assert VPTree.this.metric != null;
-					final double distance = VPTree.this.metric.distance(piv,
+					assert VPTree.this.measure != null;
+					final double distance = VPTree.this.measure.distance(piv,
 							VPTree.this.data.get(VPTree.this.ids[i]));
 					assert (Double.isFinite(distance)) : show(piv,
 							VPTree.this.data.get(VPTree.this.ids[i]));
@@ -78,7 +78,7 @@ public class VPTree<T> extends SearchIndex<T> {
 		public void nnquery() {
 
 			final T pivotValue = VPTree.this.data.get(this.pivot);
-			double qTOpDistance = VPTree.this.metric.distance(
+			double qTOpDistance = VPTree.this.measure.distance(
 					VPTree.this.nnQuery, pivotValue);
 
 			if (qTOpDistance < VPTree.this.nnThreshold) {
@@ -110,7 +110,7 @@ public class VPTree<T> extends SearchIndex<T> {
 		public void nnquery(OrderedListAlt<Integer, Double> ol) {
 
 			final T pivotValue = VPTree.this.data.get(this.pivot);
-			double qTOpDistance = VPTree.this.metric.distance(
+			double qTOpDistance = VPTree.this.measure.distance(
 					VPTree.this.nnQuery, pivotValue);
 
 			if (qTOpDistance < VPTree.this.nnThreshold) {
@@ -149,7 +149,7 @@ public class VPTree<T> extends SearchIndex<T> {
 
 			final T pivotValue = VPTree.this.data.get(this.pivot);
 
-			double queryToPivotDistance1 = VPTree.this.metric.distance(query,
+			double queryToPivotDistance1 = VPTree.this.measure.distance(query,
 					pivotValue);
 
 			if (queryToPivotDistance1 < threshold) {
@@ -178,7 +178,7 @@ public class VPTree<T> extends SearchIndex<T> {
 
 			final T pivotValue = VPTree.this.data.get(this.pivot);
 
-			double queryToPivotDistance1 = VPTree.this.metric.distance(query,
+			double queryToPivotDistance1 = VPTree.this.measure.distance(query,
 					pivotValue);
 
 			if (queryToPivotDistance1 < threshold) {
@@ -216,7 +216,7 @@ public class VPTree<T> extends SearchIndex<T> {
 
 	private double[] dists;
 
-	public VPTree(List<T> data, Metric<T> metric) {
+	public VPTree(List<T> data, Measure<T> metric) {
 		super(data, metric);
 
 		this.data = data;
