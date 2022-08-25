@@ -49,4 +49,9 @@ public class ClassificationMetrics {
         final long denominator = true_positives * 2 + false_positives + false_negatives;
         return denominator == 0 ? 0.0 : (double) (true_positives * 2) / denominator;
     }
+
+    // Specificity is ( TN / ( TN + FP )
+    public static double specificity(long true_negatives, long false_positives) {
+        return ((double) true_negatives) / ( true_negatives + false_positives );
+    }
 }
