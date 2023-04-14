@@ -40,7 +40,7 @@
         <jackcess-version>4.0.0</jackcess-version>
         <simmetrics-core-version>4.1.1</simmetrics-core-version>
         <bcprov-jdk15on-version>1.68</bcprov-jdk15on-version>
-        <json-version>20210307</json-version>
+        <json-version>20230227</json-version>
         <commons-io-version>2.9.0</commons-io-version>
 
     </properties>
