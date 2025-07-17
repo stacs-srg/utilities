@@ -361,11 +361,13 @@ public class FileManipulation {
 
             byte[] buf = new byte[INPUT_BUFFER_SIZE_IN_BYTES];
             for (File file : files) {
-                InputStream in = new FileInputStream(file);
                 int b;
-                while ((b = in.read(buf)) >= 0) {
-                    out.write(buf, 0, b);
-                    out.flush();
+                
+                try (InputStream in = new FileInputStream(file)) {
+                    while ((b = in.read(buf)) >= 0) {
+                        out.write(buf, 0, b);
+                        out.flush();
+                    }
                 }
             }
         }

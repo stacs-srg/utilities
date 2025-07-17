@@ -35,17 +35,17 @@ public class ShakespeareLSHExample {
     public static void loadupdata(MinHash mh, String filename ) throws IOException {
 
         File f  = new File(Resources.getResource(filename).getFile());
-
-        BufferedReader b = new BufferedReader(new FileReader(f));
-
         String readLine = "";
         int count = 0;
 
-        while ((readLine = b.readLine()) != null) {
-            mh.put( strip(readLine),readLine );         // map stripped string to original (not used)
-            count++;
+        try (BufferedReader b = new BufferedReader(new FileReader(f))) {
+
+            while ((readLine = b.readLine()) != null) {
+                mh.put( strip(readLine),readLine );         // map stripped string to original (not used)
+                count++;
+            }
+            System.out.println( "Read in " + count + " lines" );
         }
-        System.out.println( "Read in " + count + " lines" );
     }
 
     public static String strip( String src ) {
