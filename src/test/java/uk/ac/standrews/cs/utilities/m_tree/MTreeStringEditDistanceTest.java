@@ -16,18 +16,17 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.measures.Levenshtein;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MTreeStringEditDistanceTest {
 
     private MTree<String> tree;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         tree = new MTree<>(new Levenshtein());

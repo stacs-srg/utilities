@@ -16,36 +16,22 @@
  */
 package uk.ac.standrews.cs.utilities;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.Arrays;
-import java.util.Collection;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.Assert.assertEquals;
-
-@RunWith(Parameterized.class)
 public class BitManipulationTest {
 
     private static final int BITS_PER_BYTE = 8;
 
-    @Parameters
-    public static Collection<Object[]> generateData() {
-
-        return Arrays.asList(new Object[][]{{(byte) 0}, {(byte) 1}, {(byte) 2}, {(byte) 8}, {(byte) 32}, {(byte) -1}, {Byte.MAX_VALUE}, {Byte.MIN_VALUE}});
-    }
-
     private byte bits;
 
-    public BitManipulationTest(final byte bits) {
+    @ParameterizedTest
+    @ValueSource(bytes = {0, 1, 2, 8, 32, -1, Byte.MAX_VALUE, Byte.MIN_VALUE})
+    public void check(byte initialBits) {
 
-        this.bits = bits;
-    }
-
-    @Test
-    public void check() {
+        this.bits = initialBits;
 
         assertAllBitsSetCorrectlyTogether(true);
         assertAllBitsSetCorrectlyTogether(false);

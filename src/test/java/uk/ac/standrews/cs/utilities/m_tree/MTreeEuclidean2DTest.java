@@ -16,22 +16,22 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MTreeEuclidean2DTest {
 
     private MTree<Point> tree;
     private EuclideanDistance distance;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         distance = new EuclideanDistance();

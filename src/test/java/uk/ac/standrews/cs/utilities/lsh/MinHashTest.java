@@ -16,14 +16,13 @@
  */
 package uk.ac.standrews.cs.utilities.lsh;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.measures.Jaccard;
 import uk.ac.standrews.cs.utilities.measures.coreConcepts.StringMeasure;
 
 import java.util.Arrays;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Alan Dearle (alan.dearle@st-andrews.ac.uk)

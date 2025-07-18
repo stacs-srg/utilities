@@ -16,9 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Simone I. Conte "sic2@st-andrews.ac.uk"

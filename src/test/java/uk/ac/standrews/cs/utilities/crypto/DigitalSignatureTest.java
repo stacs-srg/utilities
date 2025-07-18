@@ -16,9 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities.crypto;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 
 import java.io.File;
@@ -31,7 +31,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Simone I. Conte "sic2@st-andrews.ac.uk"
@@ -105,12 +105,12 @@ public class DigitalSignatureTest {
             "1a 48 7f ab 37 87 56 e9 c5 c0 1d c7 d6 72 ff bb \n"+
             "03 31 41 d0 4f 6a fa 26 07 01 88 6e 23 52 77 60 \n";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         new File(TEST_RESOURCES_PATH).mkdirs();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         FileManipulation.deleteDirectory(TEST_RESOURCES_PATH);
     }

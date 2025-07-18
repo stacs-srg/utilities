@@ -17,30 +17,33 @@
 package uk.ac.standrews.cs.utilities.stats;
 
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.Statistics;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StatisticsTest {
 
     private static final double EPSILON = 0.0000001;
 
-    @Test(expected = NotStrictlyPositiveException.class)
+    @Test
     public void confidenceIntervalOfEmptyListThrowsException() {
 
-        assertTrue(Double.isNaN(Statistics.confidenceInterval(new ArrayList<>())));
+        assertThrows(NotStrictlyPositiveException.class, () -> {
+            assertTrue(Double.isNaN(Statistics.confidenceInterval(new ArrayList<>())));
+        });
     }
 
-    @Test(expected = NotStrictlyPositiveException.class)
+    @Test
     public void confidenceIntervalOfSingleElementListThrowsException() {
 
-        assertTrue(Double.isNaN(Statistics.confidenceInterval(Collections.singletonList(1.0))));
+        assertThrows(NotStrictlyPositiveException.class, () -> {
+            assertTrue(Double.isNaN(Statistics.confidenceInterval(Collections.singletonList(1.0))));
+        });
     }
 
     @Test

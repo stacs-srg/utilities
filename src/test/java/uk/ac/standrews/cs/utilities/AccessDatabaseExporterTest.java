@@ -17,8 +17,8 @@
 package uk.ac.standrews.cs.utilities;
 
 import com.healthmarketscience.jackcess.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -38,7 +38,7 @@ public class AccessDatabaseExporterTest {
     private Path table_file_path;
     private Path expected_table_file_path;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, URISyntaxException {
 
         test_directory_path = Files.createTempDirectory(null);
