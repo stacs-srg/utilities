@@ -30,6 +30,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -82,10 +83,22 @@ public class AsymmetricEncryption {
     public static final String DEFAULT_PUBLIC_KEY_FILE = "public_key" + KEY_EXTENSION;
 
     /**
-     * The delimiting header in the private key file.
+     * The delimiting header in older RSA private key files.
      */
     @SuppressWarnings("WeakerAccess")
-    public static final String PRIVATE_KEY_HEADER = "RSA PRIVATE KEY";
+    public static final String PRIVATE_KEY_HEADER_OLD = "RSA PRIVATE KEY";
+
+    /**
+     * The delimiting header in more modern RSA private key files.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static final String PRIVATE_KEY_HEADER_NEW = "PRIVATE KEY";
+
+    /**
+     * List containing all possible headers in an RSA private key file.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static final List<String> PRIVATE_KEY_HEADERS = new ArrayList<>(Arrays.asList(PRIVATE_KEY_HEADER_OLD, PRIVATE_KEY_HEADER_NEW));
 
     /**
      * The delimiting header in the public key file.
@@ -427,7 +440,7 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKeyFromPEMString(final String key_in_pem_format) throws CryptoException {
 
-        final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADER);
+        final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADERS);
         return getPrivateKeyFromString(base64_encoded_private_key);
     }
 
@@ -560,7 +573,7 @@ public class AsymmetricEncryption {
 
         try {
 
-            writePemFile(key_pair.getPrivate(), PRIVATE_KEY_HEADER, extension(private_key_filename, KEY_EXTENSION));
+            writePemFile(key_pair.getPrivate(), PRIVATE_KEY_HEADER_NEW, extension(private_key_filename, KEY_EXTENSION));
             writePemFile(key_pair.getPublic(), PUBLIC_KEY_HEADER, extension(public_key_filename, KEY_EXTENSION));
 
         } catch (final IOException e) {

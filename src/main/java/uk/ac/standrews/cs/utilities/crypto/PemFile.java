@@ -25,6 +25,9 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Utility methods to handle a Pem file
@@ -69,15 +72,39 @@ class PemFile {
      * Remove the headers from the key
      *
      * @param key_in_pem_format the key
-     * @param header the header to be removed (e.g. for PRIVATE KEY, it will remove -----BEGIN PRIVATE----- and -----END PRIVATE-----)
+     * @param header the header to be removed (e.g. for PRIVATE KEY, it will
+     * remove -----BEGIN PRIVATE----- and -----END PRIVATE-----)
      * @return the stripped key
      */
     static String stripKeyDelimiters(final String key_in_pem_format, String header) {
+        return stripKeyDelimiters(key_in_pem_format, new ArrayList<>(Arrays.asList(header)));
+    }
 
-        String beginHeader = "-----BEGIN " + header + "-----";
-        String endHeader = "-----END " + header + "-----";
+    /**
+     * Remove the headers from the key
+     *
+     * @param key_in_pem_format the key
+     * @param headers the list of all possible headers to remove (e.g. for
+     * PRIVATE KEY, it will remove -----BEGIN PRIVATE----- and
+     * -----END PRIVATE-----)
+     * @return the stripped key
+     */
+    static String stripKeyDelimiters(final String key_in_pem_format, List<String> headers) {
+        String beginHeader;
+        String endHeader;
 
-        return key_in_pem_format.replace(beginHeader + "\n", "").replace(endHeader, "");
+        for (String header : headers) {
+            
+            beginHeader = "-----BEGIN " + header + "-----";
+
+            if (key_in_pem_format.contains(beginHeader)) {
+                endHeader = "-----END " + header + "-----";
+                return key_in_pem_format.replace(beginHeader + "\n", "").replace(endHeader, "");
+            }
+        }
+
+        return key_in_pem_format;
+
     }
 
     /**
