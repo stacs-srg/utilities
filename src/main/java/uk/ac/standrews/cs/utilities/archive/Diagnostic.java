@@ -35,6 +35,7 @@ import java.util.Date;
  *
  * @author al, graham
  */
+@Deprecated
 public class Diagnostic {
 
     /**

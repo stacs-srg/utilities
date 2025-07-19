@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+
 /**
  * Queue of actions to be performed, serviced by a number of threads.
  * Queued actions may be performed in any order. Threads are created on
@@ -32,6 +33,7 @@ import java.util.concurrent.TimeoutException;
  *
  * @author graham
  */
+@Deprecated
 public class ActionQueue {
 
     // ******************** Static Fields *********************/

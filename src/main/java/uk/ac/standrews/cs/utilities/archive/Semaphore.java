@@ -26,6 +26,7 @@ package uk.ac.standrews.cs.utilities.archive;
  * @author graham
  */
 @SuppressWarnings("WeakerAccess")
+@Deprecated
 public class Semaphore {
 
     /**

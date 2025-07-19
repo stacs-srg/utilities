@@ -27,6 +27,7 @@ import org.junit.Test;
  *
  * @author graham
  */
+@Deprecated
 public class ActionQueueTest {
 
     /**

@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
  * @author graham
  */
 @SuppressWarnings("unused")
+@Deprecated
 public class CommandLineInput {
 
     private static final BufferedReader reader;
