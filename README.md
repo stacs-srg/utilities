@@ -10,7 +10,7 @@ A collection of utility code.
 <dependency>
     <groupId>uk.ac.standrews.cs</groupId>
     <artifactId>utilities</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ...
 <repository>
