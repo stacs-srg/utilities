@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
+@Deprecated
 public final class Input {
 
     private static final BufferedReader SYSTEM_READER = new BufferedReader(new InputStreamReader(System.in));

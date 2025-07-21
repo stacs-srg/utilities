@@ -29,6 +29,7 @@ import java.util.List;
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
+@Deprecated
 public class ReverseIterator<T> implements Iterator<T> {
 
     private int index;
