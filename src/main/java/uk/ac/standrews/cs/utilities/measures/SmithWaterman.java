@@ -94,7 +94,8 @@ public class SmithWaterman extends StringMeasure {
 
     @Override
     public double calculateDistance(final String x, final String y) {
-        return 1.0 - similarity(x, y);
+
+        return 1.0 - similarity(clean(x), clean(y));
     }
 
     private double similarity(final String x, final String y) {

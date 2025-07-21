@@ -52,8 +52,8 @@ public class Jaccard extends StringMeasure {
 
     private double similarity(final String x, final String y) {
 
-        final Set<String> bigrams_a = extractNGrams(topAndTail(x), 2);
-        final Set<String> bigrams_b = extractNGrams(topAndTail(y), 2);
+        final Set<String> bigrams_a = extractNGrams(topAndTail(clean(x)), 2);
+        final Set<String> bigrams_b = extractNGrams(topAndTail(clean(y)), 2);
 
         return similarity(bigrams_a, bigrams_b);
     }

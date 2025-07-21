@@ -71,7 +71,7 @@ public class Jaro extends StringMeasure {
     @Override
     public double calculateDistance(final String x, final String y) {
 
-        return 1.0 - similarity(x, y);
+        return 1.0 - similarity(clean(x), clean(y));
     }
 
     protected double similarity(final String x, final String y) {

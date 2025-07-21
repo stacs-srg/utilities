@@ -40,6 +40,10 @@ public abstract class StringMeasure extends Measure<String> {
         return a > b ? Math.max(a, c): Math.max(b, c);
     }
 
+    protected static String clean(String s) {
+        return s.replaceAll("\uFFFD", "");
+    }
+
     /**
      * Creates all the ngrams of length n of the source
      *
