@@ -68,6 +68,7 @@ public class MTreeStringDictionaryCheck {
     /**
      * test to ensure that the correct number of words are in MTree
      */
+    @SuppressWarnings("unused")
     private static void unixDictionarySizeTest() {
         assertEquals(count, tree.size());
     }
@@ -75,6 +76,7 @@ public class MTreeStringDictionaryCheck {
     /**
      * test nearest neighbour in  a dictionary of words
      */
+    @SuppressWarnings("unused")
     private static void nearestNeighbour() {
 
         DataDistance<String> result = tree.nearestNeighbour("absilute");
@@ -91,6 +93,7 @@ public class MTreeStringDictionaryCheck {
     /**
      * test nearest N in a dictionary of words
      */
+    @SuppressWarnings("unused")
     private static void nearestN() {
 
         List<DataDistance<String>> results = tree.nearestN("accelerat", 5);
@@ -106,6 +109,7 @@ public class MTreeStringDictionaryCheck {
     /**
      * test range search in a dictionary of words
      */
+    @SuppressWarnings("unused")
     private static void range() {
 
         List<DataDistance<String>> results = tree.rangeSearch("tomato", 2);

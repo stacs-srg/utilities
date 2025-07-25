@@ -160,6 +160,7 @@ public abstract class MTreeEuclidean2DSystematicTest {
         }
     }
 
+    @SuppressWarnings("unused")
     private static Stream<org.junit.jupiter.params.provider.Arguments> paramProvider() {
         int[] tree_sizes = new int[]{1, 2, 3, 5, 10, 50, 100};
         int repetitions = 10;

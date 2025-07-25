@@ -30,7 +30,6 @@ import java.util.Iterator;
 /**
  * @author stuart, graham
  */
-@SuppressWarnings("unused")
 public class Network {
 
     private static final int UNDEFINED_PORT = -1;
@@ -107,13 +106,13 @@ public class Network {
         String localIP = a.getHostAddress();
         boolean res = false;
         try {
-            ArrayList al = Collections.list(NetworkInterface.getNetworkInterfaces());
-            Iterator ali = al.iterator();
+            ArrayList<NetworkInterface> al = Collections.list(NetworkInterface.getNetworkInterfaces());
+            Iterator<NetworkInterface> ali = al.iterator();
 
             while (ali.hasNext() && !res) {
                 NetworkInterface ni = (NetworkInterface) ali.next();
-                ArrayList inet_al = Collections.list(ni.getInetAddresses());
-                Iterator inet_ali = inet_al.iterator();
+                ArrayList<InetAddress> inet_al = Collections.list(ni.getInetAddresses());
+                Iterator<InetAddress> inet_ali = inet_al.iterator();
 
                 while (inet_ali.hasNext() && !res) {
                     InetAddress currentInet = (InetAddress) inet_ali.next();

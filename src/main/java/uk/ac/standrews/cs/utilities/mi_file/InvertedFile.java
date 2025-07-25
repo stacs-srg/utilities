@@ -40,10 +40,10 @@ public class InvertedFile<T> {
             throw new RuntimeException("Score associated to the entry being inserted must be in the interval " + 0 + ".." + maxScore);
         }
 
-        PostingListEntry ple = new PostingListEntry(data, score);
+        PostingListEntry<T> ple = new PostingListEntry<>(data, score);
         PostingList<T> list = map.get(key);
         if (list == null) {
-            list = new PostingList();
+            list = new PostingList<>();
             map.put(key, list);
         }
         list.add(ple);

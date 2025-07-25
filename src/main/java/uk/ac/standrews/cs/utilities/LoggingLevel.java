@@ -21,7 +21,6 @@ package uk.ac.standrews.cs.utilities;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-@SuppressWarnings("unused")
 public enum LoggingLevel {
 
     NONE, SHORT_SUMMARY, LONG_SUMMARY, VERBOSE

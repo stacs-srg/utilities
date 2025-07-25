@@ -125,7 +125,7 @@ public class TestContext {
 
     protected void setParams(Context c) {
         context = c;
-        measure = new Euclidean();
+        measure = new Euclidean<>();
     }
 
     public List<CartesianPoint> getData() {

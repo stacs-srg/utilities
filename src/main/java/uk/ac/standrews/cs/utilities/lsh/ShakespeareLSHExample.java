@@ -32,7 +32,7 @@ public class ShakespeareLSHExample {
     public static String FILENAME = "Shakespeare.txt";
 
 
-    public static void loadupdata(MinHash mh, String filename ) throws IOException {
+    public static void loadupdata(MinHash<String> mh, String filename ) throws IOException {
 
         File f  = new File(Resources.getResource(filename).getFile());
         String readLine = "";
@@ -52,7 +52,7 @@ public class ShakespeareLSHExample {
         return src.replaceAll( "\\s","" ).replaceAll("[.,~{}()!\\\\]", ""); // replace all whitespace and other punctuation stops with nothing
     }
 
-    public static void lookupSomedata(MinHash mh, String[] sentences ) {
+    public static void lookupSomedata(MinHash<String> mh, String[] sentences ) {
         for( int i = 0; i < sentences.length; i++ ) {
             System.out.println( "looking up: " + sentences[i] );
             Set<String> matches = mh.getClosest(strip(sentences[i]));
@@ -78,9 +78,9 @@ public class ShakespeareLSHExample {
 
     public static void main( String[] args ) throws IOException {
 
-        MinHash minhash = new MinHash(2,10,5);
+        MinHash<String> minhash = new MinHash<>(2,10,5);
         loadupdata( minhash,FILENAME );
-//        minhash.printMap();
+        // minhash.printMap();
 
         lookupSomedata( minhash,exact_matches );
         lookupSomedata( minhash,almost_matches );

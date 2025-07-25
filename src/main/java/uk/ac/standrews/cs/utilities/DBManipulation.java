@@ -23,7 +23,6 @@ import java.sql.*;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-@SuppressWarnings("unused")
 public class DBManipulation {
 
     private static final String CREATE_DB_SYNTAX = "CREATE DATABASE IF NOT EXISTS ";

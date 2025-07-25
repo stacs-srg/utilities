@@ -76,7 +76,7 @@ public class UriUtilTest {
     @Test
     public void testPathElementIterator() throws URISyntaxException {
 
-        Iterator iterator = UriUtil.pathElementIterator(new URI(""));
+        Iterator<String> iterator = UriUtil.pathElementIterator(new URI(""));
         assertFalse(iterator.hasNext());
 
         iterator = UriUtil.pathElementIterator(new URI("/"));

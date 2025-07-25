@@ -269,7 +269,6 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if the plain text file cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static void encrypt(final PublicKey public_key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path)) {
@@ -287,7 +286,6 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if the encrypted file cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static void decrypt(final PrivateKey private_key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path)) {
@@ -411,7 +409,6 @@ public class AsymmetricEncryption {
      * @return this user's public key
      * @throws CryptoException if the public key cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static PublicKey getPublicKey() throws CryptoException {
 
         return getPublicKey(DEFAULT_PUBLIC_KEY_PATH);
@@ -592,7 +589,6 @@ public class AsymmetricEncryption {
      * @throws IOException     if the input stream cannot be read
      * @throws CryptoException if no key can be successfully decrypted
      */
-    @SuppressWarnings("unused")
     public static SecretKey getAESKey(final Path encrypted_keys) throws IOException, CryptoException {
 
         try (final InputStream encrypted_key_stream = Files.newInputStream(encrypted_keys)) {
@@ -658,7 +654,6 @@ public class AsymmetricEncryption {
         return encrypt(public_key, SymmetricEncryption.keyToString(AES_key)) + "\n";
     }
 
-    @SuppressWarnings("unused")
     public static void encryptAESKey(final SecretKey AES_key, final Path authorized_keys_path, final Path destination_path) throws IOException, CryptoException {
 
         List<String> original_contents = FileManipulation.readAllLines(Files.newInputStream(authorized_keys_path));

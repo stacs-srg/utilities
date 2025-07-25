@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-@SuppressWarnings("unused")
 public class Duration implements Comparable<Duration>, Serializable {
 
     private static final long serialVersionUID = 2022340212281366237L;

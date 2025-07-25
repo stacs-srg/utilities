@@ -28,7 +28,7 @@ public class PairTest {
     @Test
     public void intTest() {
 
-        Pair pair = new Pair<>(0, 1);
+        Pair<Integer, Integer> pair = new Pair<>(0, 1);
         assertEquals(0, pair.X());
         assertEquals(1, pair.Y());
     }
@@ -36,7 +36,7 @@ public class PairTest {
     @Test
     public void stringTest() {
 
-        Pair pair = new Pair<>("hello", "world");
+        Pair<String, String> pair = new Pair<>("hello", "world");
         assertEquals("hello", pair.X());
         assertEquals("world", pair.Y());
     }
@@ -44,7 +44,7 @@ public class PairTest {
     @Test
     public void mixedTest() {
 
-        Pair pair = new Pair<>("hello", 1);
+        Pair<String, Integer> pair = new Pair<>("hello", 1);
         assertEquals("hello", pair.X());
         assertEquals(1, pair.Y());
     }

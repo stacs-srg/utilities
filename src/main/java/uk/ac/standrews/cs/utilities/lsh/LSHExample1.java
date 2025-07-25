@@ -78,7 +78,7 @@ public class LSHExample1 {
             "String xomparison Algorithms ore it Zhe Beart of probabilistic linkage methods.", // edit distance of 6 but lots of discontinuous - first characters of comparison algorithms are at the heart
     };
 
-    public static void loadupdata( MinHash mh ) {
+    public static void loadupdata( MinHash<String> mh ) {
 
         for( int i = 0; i < ozs_words.length; i++ ) {
             mh.put(ozs_words[i],ozs_words[i]);          // for test just map string to itself.
@@ -86,7 +86,7 @@ public class LSHExample1 {
     }
 
 
-    public static void lookupdata( MinHash mh ) {
+    public static void lookupdata( MinHash<String> mh ) {
         for( int i = 0; i < almost_ozs_words.length; i++ ) {
             System.out.println( "looking up: " + almost_ozs_words[i] );
             Set<String> matches = mh.getClosest(almost_ozs_words[i]);
@@ -97,7 +97,7 @@ public class LSHExample1 {
 
     public static void main( String[] args ) {
 
-        MinHash minhash = new MinHash<String>(2,8,5);
+        MinHash<String> minhash = new MinHash<>(2,8,5);
         loadupdata( minhash );
         //minhash.printMap();
         lookupdata( minhash );

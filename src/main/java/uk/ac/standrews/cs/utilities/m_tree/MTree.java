@@ -704,7 +704,7 @@ public class MTree<T> {
 
         double furthestDistance() {
 
-            final DataDistance furthest_element = closest.get(closest.size() - 1);
+            final DataDistance<T> furthest_element = closest.get(closest.size() - 1);
             return furthest_element.distance;
         }
 
@@ -758,7 +758,6 @@ public class MTree<T> {
      * @param data_distances a list of distances from which to extract values
      * @return the set of distances from the list
      */
-    @SuppressWarnings("unused")
     public List<Double> mapDistances(final List<DataDistance<T>> data_distances) {
 
         final List<Double> result = new ArrayList<>();
@@ -814,6 +813,7 @@ public class MTree<T> {
      *
      * @param node - the (sub) tree whose requested_result_set_size is required
      */
+    @SuppressWarnings("unused")
     private int calculateSize(final Node node) {
 
         if (node == null) {
@@ -835,7 +835,6 @@ public class MTree<T> {
      * Debug method primarily but may be useful
      * Displays the tree.
      */
-    @SuppressWarnings("unused")
     public void showTree() {
         showTree(root, 0);
         System.out.println("----------------------");

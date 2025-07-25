@@ -18,7 +18,6 @@ package uk.ac.standrews.cs.utilities;
 
 import java.util.Iterator;
 
-@SuppressWarnings("unused")
 public class MappedIterator<T1, T2> implements Iterator<T2> {
 
     private final Iterator<T1> iterator;

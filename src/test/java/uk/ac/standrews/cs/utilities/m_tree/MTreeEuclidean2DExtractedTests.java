@@ -60,6 +60,7 @@ public class MTreeEuclidean2DExtractedTests {
         assertEquals(4, tree.nearestN(new Point(59f,34f), 4).size());
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void nearestNeighbour() {
 

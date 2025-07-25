@@ -19,7 +19,6 @@ package uk.ac.standrews.cs.utilities;
 import static java.util.concurrent.TimeUnit.*;
 
 // TODO - move in time package
-@SuppressWarnings("unused")
 public class TimeManipulation {
 
     public static void reportElapsedTime(final long start_time) {

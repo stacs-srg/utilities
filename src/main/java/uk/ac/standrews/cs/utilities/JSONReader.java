@@ -27,7 +27,7 @@ import java.io.Reader;
  *
  * @author Alan Dearle al@st-andrews.ac.uk
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({"WeakerAccess"})
 public class JSONReader {
 
     /**

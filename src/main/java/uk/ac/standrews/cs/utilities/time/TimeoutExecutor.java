@@ -101,7 +101,6 @@ public abstract class TimeoutExecutor {
 
     // -------------------------------------------------------------------------------------------------------
 
-    @SuppressWarnings("unused")
     public Duration getTimeout() {
 
         return timeout;

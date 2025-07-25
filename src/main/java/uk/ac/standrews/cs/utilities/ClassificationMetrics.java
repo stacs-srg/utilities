@@ -19,7 +19,6 @@ package uk.ac.standrews.cs.utilities;
 /**
  * Find list of all formulae here: https://en.wikipedia.org/wiki/Precision_and_recall
  */
-@SuppressWarnings("unused")
 public class ClassificationMetrics {
 
     // Precision is TP / (TP + FP).

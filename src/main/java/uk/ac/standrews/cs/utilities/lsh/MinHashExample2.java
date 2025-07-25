@@ -76,7 +76,7 @@ public class MinHashExample2 {
 
     public static Map<String, Integer[]> map = new HashMap<>();
 
-    public static void loadupdata(MinHash mh) {
+    public static void loadupdata(MinHash<String> mh) {
 
         for (String sentence : ozs_words) {
             Integer[] hash = MinHash.createMinHashSignature(sentence, 50, 2);
@@ -84,7 +84,7 @@ public class MinHashExample2 {
         }
     }
 
-    public static void showSimilarities(MinHash mh) {
+    public static void showSimilarities(MinHash<String> mh) {
 
         for (String sentence : ozs_words) {
             for (String key : map.keySet()) {
@@ -97,7 +97,7 @@ public class MinHashExample2 {
 
                 System.out.println("Sentence 1 = " + sentence);
                 System.out.println("Sentence 2 = " + key);
-                Set intersection = Jaccard.intersection(sentence_2grams, key_2grams);
+                Set<String> intersection = Jaccard.intersection(sentence_2grams, key_2grams);
                 System.out.println("2grams intersection = " + intersection + " size = " + intersection.size() + ", union = " + Jaccard.union(sentence_2grams, key_2grams).size());
                 System.out.println("Jaccard (ngrams) = " + new Jaccard().distance(sentence_2grams, key_2grams));
                 System.out.println("minhash intersection = " + Jaccard.intersection(Arrays.asList(sentence_minHashSignature), Arrays.asList(key_minHashSignature)).size() + ", union = " + Jaccard.union(Arrays.asList(sentence_minHashSignature), Arrays.asList(key_minHashSignature)).size());
@@ -109,7 +109,7 @@ public class MinHashExample2 {
 
     public static void main(String[] args) {
 
-        MinHash mh = new MinHash(2, 50, 2);
+        MinHash<String> mh = new MinHash<>(2, 50, 2);
         loadupdata(mh);
         showSimilarities(mh);
     }

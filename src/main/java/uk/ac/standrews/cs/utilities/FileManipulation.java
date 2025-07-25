@@ -72,7 +72,6 @@ public class FileManipulation {
      * @return the number of lines
      * @throws IOException if the file cannot be read
      */
-    @SuppressWarnings("unused")
     public static int countLines(final Path path) throws IOException {
 
         return countLines(getInputStream(path));
@@ -138,8 +137,7 @@ public class FileManipulation {
      * @param resource_name the name of the resource
      * @return the path of the resource
      */
-    @SuppressWarnings("unused")
-    public static Path getResourcePath(final Class the_class, final String resource_name) {
+    public static Path getResourcePath(final Class<?> the_class, final String resource_name) {
 
         final URL resource = getResource(the_class, resource_name);
         try {
@@ -156,8 +154,7 @@ public class FileManipulation {
      * @param resource_name the name of the resource
      * @return the input stream reader
      */
-    @SuppressWarnings("unused")
-    public static InputStreamReader getInputStreamReaderForResource(final Class the_class, final String resource_name) {
+    public static InputStreamReader getInputStreamReaderForResource(final Class<?> the_class, final String resource_name) {
 
         return new InputStreamReader(getInputStreamForResource(the_class, resource_name));
     }
@@ -170,7 +167,7 @@ public class FileManipulation {
      * @return the input stream
      */
     @SuppressWarnings("WeakerAccess")
-    public static InputStream getInputStreamForResource(final Class the_class, final String resource_name) {
+    public static InputStream getInputStreamForResource(final Class<?> the_class, final String resource_name) {
 
         // First try to get resource from the real file system.
         final InputStream stream_from_file_system = the_class.getResourceAsStream(resource_name);
@@ -224,7 +221,6 @@ public class FileManipulation {
      * @param path the path of the file
      * @throws IOException if the file cannot be created
      */
-    @SuppressWarnings("unused")
     public static void createFileIfDoesNotExist(final Path path) throws IOException {
 
         if (!Files.exists(path)) {
@@ -238,7 +234,6 @@ public class FileManipulation {
      * @param directory of the directory to be created
      * @throws IOException if one is thrown by Java IO layer
      */
-    @SuppressWarnings("unused")
     public static void createDirectoryIfDoesNotExist(final File directory) throws IOException {
 
         createDirectoryIfDoesNotExist(Paths.get(directory.getAbsolutePath()));
@@ -277,7 +272,6 @@ public class FileManipulation {
      * @return a list of entry paths
      * @throws IOException if the directory cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static List<Path> getDirectoryEntries(final Path directory) throws IOException {
 
         final List<Path> result = new ArrayList<>();
@@ -349,7 +343,6 @@ public class FileManipulation {
      * @return a list of entries
      * @throws IOException if the directory cannot be read
      */
-    @SuppressWarnings("unused")
     public static List<String> getResourceDirectoryEntries(final Path resource_directory_path, final ClassLoader class_loader) throws IOException {
 
         return getResourceDirectoryEntries(resource_directory_path.toString(), class_loader);
@@ -465,12 +458,12 @@ public class FileManipulation {
         return resource_directory_path.substring(start_index);
     }
 
-    private static URL getResource(final Class the_class, final String resource_name) {
+    private static URL getResource(final Class<?> the_class, final String resource_name) {
 
         return the_class.getResource(getResourceNamePrefixedWithClass(the_class, resource_name));
     }
 
-    private static String getResourceNamePrefixedWithClass(final Class the_class, final String resource_name) {
+    private static String getResourceNamePrefixedWithClass(final Class<?> the_class, final String resource_name) {
 
         return the_class.getSimpleName() + "/" + resource_name;
     }

@@ -163,7 +163,6 @@ public class CartesianPoint {
 	 * @return a list of integers, giving the dimensions, in order, according to
 	 *         the magnitude of the array values
 	 */
-	@SuppressWarnings("boxing")
 	public List<Integer> magnitudeOrdering() {
 		if (this.magOrdering == null) {
 			OrderedList<Integer, Double> ord = new OrderedList<>(
