@@ -23,7 +23,7 @@
     <parent>
         <groupId>uk.ac.standrews.cs</groupId>
         <artifactId>common-pom</artifactId>
-        <version>4.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>utilities</artifactId>
@@ -92,14 +92,6 @@
             <version>${commons-io-version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version> <!-- Use the latest version -->
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
     <developers>

@@ -19,8 +19,8 @@
  */
 package uk.ac.standrews.cs.utilities.archive;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for ActionQueue.
@@ -36,7 +36,7 @@ public class ActionQueueTest {
      * anything about relative progress of threads.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testQueue() {
 
         // Single action, single queue slot, single thread.
