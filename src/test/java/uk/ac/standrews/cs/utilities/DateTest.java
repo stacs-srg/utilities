@@ -16,13 +16,13 @@
  */
 package uk.ac.standrews.cs.utilities;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.standrews.cs.utilities.DateManipulation.START_YEAR;
 
 /**
@@ -39,7 +39,7 @@ public class DateTest {
 
     private int first_february_in_days, first_march_in_days, following_first_january_in_days;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         first_february_in_days = DAYS_IN_JANUARY;

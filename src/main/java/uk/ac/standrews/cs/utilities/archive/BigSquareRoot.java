@@ -26,6 +26,7 @@ import java.math.BigInteger;
  * @author http://www.merriampark.com/bigsqrt.htm#Source
  */
 @SuppressWarnings("unused")
+@Deprecated
 public class BigSquareRoot {
 
     private static final BigDecimal ZERO = new BigDecimal("0");

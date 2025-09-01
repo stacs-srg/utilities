@@ -34,7 +34,7 @@ public class Cosine extends StringMeasure {
     @Override
     protected double calculateDistance(final String x, final String y) {
 
-        return distance(new SparseDistribution(topAndTail(x)), new SparseDistribution(topAndTail(y)));
+        return distance(new SparseDistribution(topAndTail(clean(x))), new SparseDistribution(topAndTail(clean(y))));
     }
 
     public double distance(final FeatureVector x, final FeatureVector y) {

@@ -70,8 +70,9 @@ public final class LongestCommonSubstring extends StringMeasure {
 
     @Override
     public double calculateDistance(final String x, final String y) {
-
-        return x.length() + y.length() - 2 * lengthOfLongestCommonSubstring(x, y);
+        final String cleanX = clean(x);
+        final String cleanY = clean(y);
+        return cleanX.length() + cleanY.length() - 2 * lengthOfLongestCommonSubstring(cleanX, cleanY);
     }
 
     private int lengthOfLongestCommonSubstring(final String x, final String y) {

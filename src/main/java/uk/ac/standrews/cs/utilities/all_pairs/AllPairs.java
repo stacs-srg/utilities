@@ -63,7 +63,7 @@ public class AllPairs {
             int count = next.frequency;
             List<DocumentFeaturePair> list = indexMap.get(qgram);
                 if( list == null ) {
-                list = new ArrayList();
+                list = new ArrayList<>();
                 list.add(new DocumentFeaturePair(document,x,count));
                 indexMap.put(qgram,list);
             } else {

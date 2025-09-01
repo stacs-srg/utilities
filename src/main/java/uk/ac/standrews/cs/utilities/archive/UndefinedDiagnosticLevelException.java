@@ -22,6 +22,7 @@ package uk.ac.standrews.cs.utilities.archive;
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
 @SuppressWarnings("WeakerAccess")
+@Deprecated
 public class UndefinedDiagnosticLevelException extends Exception {
 
     private static final long serialVersionUID = 1627214856724122014L;

@@ -17,8 +17,8 @@
 package uk.ac.standrews.cs.utilities.crypto;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 
 import javax.crypto.SecretKey;
@@ -27,22 +27,23 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SymmetricEncryptionTest {
 
     private SecretKey valid_key;
 
-    @Before
+    @BeforeEach
     public void setup() throws CryptoException {
 
         valid_key = SymmetricEncryption.generateRandomKey();
     }
 
-    @Test(expected = CryptoException.class)
+    @Test
     public void encryptionWithShortKeyThrowsException() throws CryptoException {
-
-        SymmetricEncryption.getKey("too short".getBytes());
+        assertThrows(CryptoException.class, () -> {
+            SymmetricEncryption.getKey("too short".getBytes());
+        });
     }
 
     @Test
@@ -53,13 +54,15 @@ public class SymmetricEncryptionTest {
         assertEquals(plain_text, SymmetricEncryption.decrypt(valid_key, SymmetricEncryption.encrypt(valid_key, plain_text)));
     }
 
-    @Test(expected = CryptoException.class)
+    @Test
     public void decryptionWithWrongKeyThrowsException() throws CryptoException {
 
         String plain_text = "the quick brown fox jumps over the lazy dog";
         SecretKey corrupted_key = corruptKey(valid_key);
 
-        SymmetricEncryption.decrypt(corrupted_key, SymmetricEncryption.encrypt(valid_key, plain_text));
+        assertThrows(CryptoException.class, () -> {
+            SymmetricEncryption.decrypt(corrupted_key, SymmetricEncryption.encrypt(valid_key, plain_text));
+        });
     }
 
     @Test

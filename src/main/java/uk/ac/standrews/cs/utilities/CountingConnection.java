@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-@SuppressWarnings("unused")
 public class CountingConnection implements Connection {
 
     private static int number_of_connections = 0;

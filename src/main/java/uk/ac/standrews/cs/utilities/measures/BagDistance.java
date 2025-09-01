@@ -45,8 +45,11 @@ public class BagDistance extends StringMeasure {
     @Override
     public double calculateDistance(final String x, final String y) {
 
-        final List<Character> list1 = toList(x);
-        final List<Character> list2 = toList(y);
+        final String cleanX = clean(x);
+        final String cleanY = clean(y);
+
+        final List<Character> list1 = toList(cleanX);
+        final List<Character> list2 = toList(cleanY);
 
         for (Character ch : list1) {
             list2.remove(ch);                 // only removes if in the list
@@ -58,7 +61,7 @@ public class BagDistance extends StringMeasure {
             list1.remove(ch);                 // only removes if in the list
         }
 
-        return (((double) Math.max(list1.size(), list2.size())) / Math.max(x.length(), y.length()));
+        return (((double) Math.max(list1.size(), list2.size())) / Math.max(cleanX.length(), cleanY.length()));
     }
 
     private static List<Character> toList(String input) {

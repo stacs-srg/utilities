@@ -193,9 +193,7 @@ public class MIFile<T> {
 
     private List<DataDistance<T>> incrementalkNNSearch(T query, TreeMap<Double, T> query_k_nearest_reference_objects, int k) {
 
-        CandidateSet candidateSet = new CandidateSet(query, distance_wrapper, ki + 1, k);
-
-        boolean stop = false;
+        CandidateSet<T> candidateSet = new CandidateSet<>(query, distance_wrapper, ki + 1, k);
 
         Iterator<Map.Entry<Double, T>> q_iter = query_k_nearest_reference_objects.entrySet().iterator();
 

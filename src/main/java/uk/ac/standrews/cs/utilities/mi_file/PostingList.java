@@ -46,7 +46,7 @@ public class PostingList<T> {
         }
     }
 
-    public void add(PostingListEntry ple) {
+    public void add(PostingListEntry<T> ple) {
         int score = ple.getScore();
         ArrayList<PostingListEntry<T>> list = map.get(score);
         if( list == null ) {
@@ -56,8 +56,8 @@ public class PostingList<T> {
         list.add( ple );
     }
 
-    public <T> PostingList<T> getSubRange(int from, int to) {
-        return new PostingList( this, from, to );
+    public PostingList<T> getSubRange(int from, int to) {
+        return new PostingList<>( this, from, to );
     }
 
     public List<PostingListEntry<T>> getEntries() {

@@ -19,6 +19,7 @@
  */
 package uk.ac.standrews.cs.utilities.archive;
 
+@Deprecated
 public interface Action {
 
     void performAction();

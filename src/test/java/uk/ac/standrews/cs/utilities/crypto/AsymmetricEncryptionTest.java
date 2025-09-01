@@ -16,9 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities.crypto;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.FileManipulation;
 
 import javax.crypto.SecretKey;
@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AsymmetricEncryptionTest {
 
@@ -41,7 +41,7 @@ public class AsymmetricEncryptionTest {
     private PrivateKey private_key;
     private PublicKey public_key;
 
-    @Before
+    @BeforeEach
     public void setup() throws NoSuchAlgorithmException {
 
         generator = KeyPairGenerator.getInstance("RSA");
@@ -54,7 +54,7 @@ public class AsymmetricEncryptionTest {
         new File(TEST_RESOURCES_PATH).mkdirs();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         FileManipulation.deleteDirectory(TEST_RESOURCES_PATH);
     }
@@ -67,13 +67,15 @@ public class AsymmetricEncryptionTest {
         assertEquals(plain_text, AsymmetricEncryption.decrypt(private_key, AsymmetricEncryption.encrypt(public_key, plain_text)));
     }
 
-    @Test(expected = CryptoException.class)
+    @Test
     public void decryptionWithWrongKeyThrowsException() throws CryptoException, IOException {
 
         String plain_text = "the quick brown fox jumps over the lazy dog";
         PrivateKey wrong_key = generator.generateKeyPair().getPrivate();
 
-        AsymmetricEncryption.decrypt(wrong_key, AsymmetricEncryption.encrypt(public_key, plain_text));
+        assertThrows(CryptoException.class, () -> {
+            AsymmetricEncryption.decrypt(wrong_key, AsymmetricEncryption.encrypt(public_key, plain_text));
+        });
     }
 
     @Test
@@ -109,16 +111,19 @@ public class AsymmetricEncryptionTest {
         assertNotNull(AsymmetricEncryption.generateKeys(4096));
     }
 
-    @Test (expected = CryptoException.class)
+    @Test
     public void generateKeysFailShort() throws CryptoException {
-
-        assertNotNull(AsymmetricEncryption.generateKeys(511));
+        
+        assertThrows(CryptoException.class, () -> {
+            assertNotNull(AsymmetricEncryption.generateKeys(511));
+        });
     }
 
-    @Test (expected = CryptoException.class)
+    @Test
     public void generateLongKeysFail() throws CryptoException {
-
-        assertNotNull(AsymmetricEncryption.generateKeys(4097));
+        assertThrows(CryptoException.class, () -> {
+            assertNotNull(AsymmetricEncryption.generateKeys(4097));
+        });
     }
 
     @Test

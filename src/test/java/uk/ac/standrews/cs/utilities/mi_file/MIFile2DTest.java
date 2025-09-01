@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.mi_file;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class MIFile2DTest {
@@ -35,7 +35,7 @@ public class MIFile2DTest {
     private MIFile<Point> file;
     private EuclideanDistance distance;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         distance = new EuclideanDistance();

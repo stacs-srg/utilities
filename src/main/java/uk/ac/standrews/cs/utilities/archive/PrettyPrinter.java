@@ -27,6 +27,7 @@ import java.util.Map.Entry;
  * @author Angus Macdonald (angus.macdonald@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
+@Deprecated
 public final class PrettyPrinter {
 
     @SuppressWarnings("WeakerAccess")

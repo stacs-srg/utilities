@@ -25,6 +25,7 @@ import java.util.Map;
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
+@Deprecated
 public final class CommandLineArgs {
 
     /**

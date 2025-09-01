@@ -47,10 +47,12 @@ public class SED extends SparseProbabilityMeasure {
 
     @Override
     public double calculateDistance(final String x, final String y) {
+        final String cleanX = clean(x);
+        final String cleanY = clean(y);
 
-        if (x.isEmpty() || y.isEmpty()) return MAX_DISTANCE;
+        if (cleanX.isEmpty() || cleanY.isEmpty()) return MAX_DISTANCE;
 
-        final double k = doCalc(stringToSparseArray(x, char_val_upper_bound), stringToSparseArray(y, char_val_upper_bound));
+        final double k = doCalc(stringToSparseArray(cleanX, char_val_upper_bound), stringToSparseArray(cleanY, char_val_upper_bound));
         return Math.pow(Math.pow(2, Math.max(0, k)) - 1, 0.486); // TODO magic number
     }
 

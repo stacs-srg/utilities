@@ -45,7 +45,7 @@ public class AllPairs1 {
     private AllPairs1(double similarity, List<String> corpus ) {
         this.corpus = corpus;
         this.similarity_threshold = similarity;
-        initialise( corpus );
+        initialise( this.corpus );
     }
 
     private void initialise(List<String> corpus) {
@@ -79,7 +79,7 @@ public class AllPairs1 {
             int count = next.frequency;
             List<DocumentFeaturePair> list = indexMap.get(qgram);
                 if( list == null ) {
-                list = new ArrayList();
+                list = new ArrayList<>();
                 list.add(new DocumentFeaturePair(document,x,count));
                 indexMap.put(qgram,list);
             } else {

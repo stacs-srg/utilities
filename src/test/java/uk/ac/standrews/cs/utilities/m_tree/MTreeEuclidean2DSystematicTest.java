@@ -16,8 +16,8 @@
  */
 package uk.ac.standrews.cs.utilities.m_tree;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.EuclideanDistance;
 import uk.ac.standrews.cs.utilities.m_tree.experiments.euclidean.Point;
 import uk.ac.standrews.cs.utilities.measures.coreConcepts.DataDistance;
@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class MTreeEuclidean2DSystematicTest {
 
@@ -38,9 +38,9 @@ public abstract class MTreeEuclidean2DSystematicTest {
 
     private Random random;
     private List<Point> points;
-    private final int number_of_points;
-    private final int repetition_number;
-    private final boolean duplicate_values;
+    private int number_of_points;
+    private int repetition_number;
+    private boolean duplicate_values;
 
     private static final double range = 100.0f;
     private static final long SEED = 3459873497234L;
@@ -49,15 +49,10 @@ public abstract class MTreeEuclidean2DSystematicTest {
 
     private static final double[] radii = new double[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
 
-    public MTreeEuclidean2DSystematicTest(final int number_of_points, final int repetition_number, final boolean duplicate_values) {
-
-        this.number_of_points = number_of_points;
-        this.repetition_number = repetition_number;
-        this.duplicate_values = duplicate_values;
-    }
-
-    @Before
-    public void setUp()  {
+    private void setUp(int size, int repetition, boolean duplicates)  {
+        this.number_of_points = size;
+        this.repetition_number = repetition;
+        this.duplicate_values = duplicates;
 
         final Measure<Point> distance_metric = new EuclideanDistance();
 
@@ -101,51 +96,87 @@ public abstract class MTreeEuclidean2DSystematicTest {
         return new Point(random.nextFloat() * range, random.nextFloat() * range);
     }
 
-    @Test
-    public void treeContainsPoints() {
+    @ParameterizedTest(name = "containsPoints: size={0}, rep={1}, dup={2}")
+    @MethodSource("parameterProvider")
+    public void treeContainsPoints(int size, int repetition, boolean duplicates) {
 
+        setUp(size, repetition, duplicates);
+        
         for (final Point p : points) {
             assertTrue(tree.contains(p));
         }
     }
 
-    @Test
-    public void treeSizeIsCorrect() {
+    @ParameterizedTest(name = "treeSize: size={0}, rep={1}, dup={2}")
+    @MethodSource("parameterProvider")
+    public void treeSizeIsCorrect(int size, int repetition, boolean duplicates) {
 
+        setUp(size, repetition, duplicates);
+        
         assertEquals(points.size(), tree.size());
     }
 
-    @Test
-    public void pointsAreTheirOwnNearestNeighbours() {
+    @ParameterizedTest(name = "checkOwnN: size={0}, rep={1}, dup={2}")
+    @MethodSource("parameterProvider")
+    public void pointsAreTheirOwnNearestNeighbours(int size, int repetition, boolean duplicates) {
+
+        setUp(size, repetition, duplicates);
 
         for (final Point p : points) {
             assertEquals(p, tree.nearestNeighbour(p).value);
         }
     }
 
-    @Test
-    public void checkNearestNeighboursOfAllPoints() {
+    @ParameterizedTest(name = "nearestN: size={0}, rep={1}, dup={2}")
+    @MethodSource("parameterProvider")
+    public void checkNearestNeighboursOfAllPoints(int size, int repetition, boolean duplicates) {
 
+        setUp(size, repetition, duplicates);
+        
         for (final Point p : points) {
             checkNearestNeighboursOfPoint(p);
         }
     }
 
-    @Test
-    public void checkNeighboursWithinRangesForAllPoints() {
+    @ParameterizedTest(name = "withinRangeN: size={0}, rep={1}, dup={2}")
+    @MethodSource("parameterProvider")
+    public void checkNeighboursWithinRangesForAllPoints(int size, int repetition, boolean duplicates) {
 
+        setUp(size, repetition, duplicates);
+        
         for (final Point p : points) {
             checkNeighboursWithinRangesForPoint(p);
         }
     }
 
-    @Test
-    public void askingForTooManyNeighboursDoesntCrash() {
+    @ParameterizedTest(name = "tooManyN: size={0}, rep={1}, dup={2}")
+    @MethodSource("parameterProvider")
+    public void askingForTooManyNeighboursDoesntCrash(int size, int repetition, boolean duplicates) {
 
+        setUp(size, repetition, duplicates);
+        
         for (final Point p : points) {
             tree.nearestN(p, points.size() + 1);
         }
     }
+
+    @SuppressWarnings("unused")
+    private static Stream<org.junit.jupiter.params.provider.Arguments> paramProvider() {
+        int[] tree_sizes = new int[]{1, 2, 3, 5, 10, 50, 100};
+        int repetitions = 10;
+
+        List<org.junit.jupiter.params.provider.Arguments> args = new ArrayList<>();
+
+        for (int i = 0; i < repetitions; i++) {
+            for (int size : tree_sizes) {
+                args.add(org.junit.jupiter.params.provider.Arguments.of(size, i, false));
+                args.add(org.junit.jupiter.params.provider.Arguments.of(size, i, true));
+            }
+        }
+
+        return args.stream();
+    }
+
 
     private void checkNearestNeighboursOfPoint(final Point p) {
 

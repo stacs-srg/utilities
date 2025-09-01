@@ -30,6 +30,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -82,10 +83,22 @@ public class AsymmetricEncryption {
     public static final String DEFAULT_PUBLIC_KEY_FILE = "public_key" + KEY_EXTENSION;
 
     /**
-     * The delimiting header in the private key file.
+     * The delimiting header in older RSA private key files.
      */
     @SuppressWarnings("WeakerAccess")
-    public static final String PRIVATE_KEY_HEADER = "RSA PRIVATE KEY";
+    public static final String PRIVATE_KEY_HEADER_OLD = "RSA PRIVATE KEY";
+
+    /**
+     * The delimiting header in more modern RSA private key files.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static final String PRIVATE_KEY_HEADER_NEW = "PRIVATE KEY";
+
+    /**
+     * List containing all possible headers in an RSA private key file.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public static final List<String> PRIVATE_KEY_HEADERS = new ArrayList<>(Arrays.asList(PRIVATE_KEY_HEADER_OLD, PRIVATE_KEY_HEADER_NEW));
 
     /**
      * The delimiting header in the public key file.
@@ -256,7 +269,6 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if the plain text file cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static void encrypt(final PublicKey public_key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path)) {
@@ -274,7 +286,6 @@ public class AsymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if the encrypted file cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static void decrypt(final PrivateKey private_key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path)) {
@@ -398,7 +409,6 @@ public class AsymmetricEncryption {
      * @return this user's public key
      * @throws CryptoException if the public key cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static PublicKey getPublicKey() throws CryptoException {
 
         return getPublicKey(DEFAULT_PUBLIC_KEY_PATH);
@@ -427,7 +437,7 @@ public class AsymmetricEncryption {
     @SuppressWarnings("WeakerAccess")
     public static PrivateKey getPrivateKeyFromPEMString(final String key_in_pem_format) throws CryptoException {
 
-        final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADER);
+        final String base64_encoded_private_key = stripKeyDelimiters(key_in_pem_format, PRIVATE_KEY_HEADERS);
         return getPrivateKeyFromString(base64_encoded_private_key);
     }
 
@@ -560,7 +570,7 @@ public class AsymmetricEncryption {
 
         try {
 
-            writePemFile(key_pair.getPrivate(), PRIVATE_KEY_HEADER, extension(private_key_filename, KEY_EXTENSION));
+            writePemFile(key_pair.getPrivate(), PRIVATE_KEY_HEADER_NEW, extension(private_key_filename, KEY_EXTENSION));
             writePemFile(key_pair.getPublic(), PUBLIC_KEY_HEADER, extension(public_key_filename, KEY_EXTENSION));
 
         } catch (final IOException e) {
@@ -579,7 +589,6 @@ public class AsymmetricEncryption {
      * @throws IOException     if the input stream cannot be read
      * @throws CryptoException if no key can be successfully decrypted
      */
-    @SuppressWarnings("unused")
     public static SecretKey getAESKey(final Path encrypted_keys) throws IOException, CryptoException {
 
         try (final InputStream encrypted_key_stream = Files.newInputStream(encrypted_keys)) {
@@ -645,7 +654,6 @@ public class AsymmetricEncryption {
         return encrypt(public_key, SymmetricEncryption.keyToString(AES_key)) + "\n";
     }
 
-    @SuppressWarnings("unused")
     public static void encryptAESKey(final SecretKey AES_key, final Path authorized_keys_path, final Path destination_path) throws IOException, CryptoException {
 
         List<String> original_contents = FileManipulation.readAllLines(Files.newInputStream(authorized_keys_path));

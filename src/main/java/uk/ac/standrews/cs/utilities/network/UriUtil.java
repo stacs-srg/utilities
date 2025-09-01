@@ -81,7 +81,7 @@ public class UriUtil {
 
         StringBuilder parent_path = new StringBuilder("/");
 
-        Iterator element_iterator = pathElementIterator(uri);
+        Iterator<String> element_iterator = pathElementIterator(uri);
 
         String previous;
         String current = "";
@@ -105,7 +105,7 @@ public class UriUtil {
     public static String baseName(URI uri) {
 
         String base_name = "";
-        Iterator element_iterator = pathElementIterator(uri);
+        Iterator<String> element_iterator = pathElementIterator(uri);
 
         while (element_iterator.hasNext()) base_name = (String) element_iterator.next();
 
@@ -118,7 +118,7 @@ public class UriUtil {
      * @param uri the URI
      * @return an iterator over the names in the path of the URI
      */
-    public static Iterator pathElementIterator(URI uri) {
+    public static Iterator<String> pathElementIterator(URI uri) {
 
         String path = uri.normalize().getPath();
 
@@ -126,7 +126,7 @@ public class UriUtil {
 
         String[] path_elements = path.split("/");
 
-        List path_as_list = Arrays.asList(path_elements);
+        List<String> path_as_list = Arrays.asList(path_elements);
 
         while (path_as_list.size() > 0 && path_as_list.get(0).equals(""))
             path_as_list = path_as_list.subList(1, path_as_list.size());

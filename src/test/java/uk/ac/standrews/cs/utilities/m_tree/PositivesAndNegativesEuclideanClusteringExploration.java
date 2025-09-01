@@ -30,10 +30,12 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
 
     private static final double range = 100.0f;
     private static final long SEED = 3459873497234L;
+    @SuppressWarnings("unused")
     private static final double[] radii = new double[]{0.0f, 0.1f, 1.0f, 10.0f, 50.0f, 100.0f};
     private final int number_of_points;
     private final int repetition_number;
     private final boolean duplicate_values;
+    @SuppressWarnings("unused")
     private final Comparator<? super DataDistance<Point>> distance_comparator = (Comparator<DataDistance<Point>>) (o1, o2) -> Double.compare(o1.distance, o2.distance);
     private MTree<Point> tree;
     private Random random;
@@ -50,10 +52,6 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
         setUp();
         tree.showTree();
         tree.showStructure().printStats();
-    }
-
-    public static void main(String[] args) throws Exception {
-        PositivesAndNegativesEuclideanClusteringExploration pandn = new PositivesAndNegativesEuclideanClusteringExploration(30, 1, false);
     }
 
     public void setUp() {
@@ -93,6 +91,7 @@ public class PositivesAndNegativesEuclideanClusteringExploration {
     /*
      * Create all positives and then all negatives
      */
+    @SuppressWarnings("unused")
     private void createPoints2() {
 
         points = new ArrayList<>();

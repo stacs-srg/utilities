@@ -29,6 +29,7 @@ import java.util.Date;
  * @author Alan Dearle (al@cs.st-andrews.ac.uk)
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
+@Deprecated
 @SuppressWarnings("unused")
 public final class ErrorHandling {
 

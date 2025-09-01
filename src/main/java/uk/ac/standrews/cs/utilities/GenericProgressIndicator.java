@@ -23,7 +23,6 @@ import java.util.function.Consumer;
  *
  * @author Masih Hajiarab Derkani (m@derkani.org)
  */
-@SuppressWarnings("unused")
 public class GenericProgressIndicator extends ProgressIndicator {
 
     private final Consumer<Double> progress_consumer;
@@ -34,7 +33,6 @@ public class GenericProgressIndicator extends ProgressIndicator {
      * @param number_of_updates the number of progress updates to be indicated
      * @param progress_consumer the progress consumer
      */
-    @SuppressWarnings("unused")
     public GenericProgressIndicator(final int number_of_updates, Consumer<Double> progress_consumer) {
 
         super(number_of_updates);

@@ -84,10 +84,10 @@ public class TestLoad {
          *
          * very very temp!
          */
-        double[] colorsMine = {0.062744569, 0.079139633, 0.09994441, 0.126288016, 0.158184747};
-        double[] nasaMine = {0.3021816169379105, 0.3911328640777959, 0.4742702901844148, 0.5567372856302092, 0.6667229088576696};
+        // double[] colorsMine = {0.062744569, 0.079139633, 0.09994441, 0.126288016, 0.158184747};
+        // double[] nasaMine = {0.3021816169379105, 0.3911328640777959, 0.4742702901844148, 0.5567372856302092, 0.6667229088576696};
         double[] colorsEdgars = {0.051768, 0.082514, 0.131163};
-        double[] colorsLowerTest = {0.02, 0.03, 0.04};
+        // double[] colorsLowerTest = {0.02, 0.03, 0.04};
         double[] nasaEdgars = {0.12, 0.285, 0.53};
         if (file == SisapFile.colors) {
             return colorsEdgars;

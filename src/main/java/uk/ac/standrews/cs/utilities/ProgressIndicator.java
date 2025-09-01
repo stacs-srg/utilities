@@ -85,7 +85,6 @@ public abstract class ProgressIndicator {
      *
      * @return the proportion of completion, between 0 and 1
      */
-    @SuppressWarnings("unused")
     public double getProportionComplete() {
 
         return proportion_complete;

@@ -17,6 +17,7 @@
 package uk.ac.standrews.cs.utilities.archive;
 
 @SuppressWarnings("WeakerAccess")
+@Deprecated
 public class StopLoopingException extends Exception {
 
     private final Exception action_exception;

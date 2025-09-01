@@ -16,17 +16,13 @@
  */
 package uk.ac.standrews.cs.utilities.time;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DurationTest {
 
-    @SuppressWarnings("EqualsWithItself")
     @Test
     public void durationOrdering() {
 
@@ -34,17 +30,17 @@ public class DurationTest {
         final Duration d2 = new Duration(10, TimeUnit.MILLISECONDS);
         final Duration d3 = new Duration(1, TimeUnit.SECONDS);
 
-        assertThat(d1.compareTo(d1), is(equalTo(0)));
-        assertThat(d1.compareTo(d2), is(equalTo(-1)));
-        assertThat(d1.compareTo(d3), is(equalTo(-1)));
+        assertEquals(0, d1.compareTo(d1));
+        assertEquals(-1, d1.compareTo(d2));
+        assertEquals(-1, d1.compareTo(d3));
 
-        assertThat(d2.compareTo(d1), is(equalTo(1)));
-        assertThat(d2.compareTo(d2), is(equalTo(0)));
-        assertThat(d2.compareTo(d3), is(equalTo(-1)));
+        assertEquals(1, d2.compareTo(d1));
+        assertEquals(0, d2.compareTo(d2));
+        assertEquals(-1, d2.compareTo(d3));
 
-        assertThat(d3.compareTo(d1), is(equalTo(1)));
-        assertThat(d3.compareTo(d2), is(equalTo(1)));
-        assertThat(d3.compareTo(d3), is(equalTo(0)));
+        assertEquals(1, d3.compareTo(d1));
+        assertEquals(1, d3.compareTo(d2));
+        assertEquals(0, d3.compareTo(d3));
     }
 
     @Test
@@ -52,7 +48,7 @@ public class DurationTest {
 
         final Duration d = new Duration(1, TimeUnit.HOURS);
 
-        assertThat(d.convertTo(TimeUnit.SECONDS).getLength(), is(equalTo(3600L)));
+        assertEquals(3600L, d.convertTo(TimeUnit.SECONDS).getLength());
     }
 
     @Test
@@ -65,11 +61,11 @@ public class DurationTest {
         final Duration eleven_days_ish_in_seconds = new Duration(1000000, TimeUnit.SECONDS);
         final Duration one_day = new Duration(1, TimeUnit.DAYS);
 
-        assertThat(one_ns.toStringAsLargestTimeUnit(), is(equalTo("1 ns")));
-        assertThat(one_ms_in_ns.toStringAsLargestTimeUnit(), is(equalTo("1 ms")));
-        assertThat(one_s_in_micros.toStringAsLargestTimeUnit(), is(equalTo("1 s")));
-        assertThat(sixteen_mins_ish_in_millis.toStringAsLargestTimeUnit(), is(equalTo("16 min")));
-        assertThat(eleven_days_ish_in_seconds.toStringAsLargestTimeUnit(), is(equalTo("11 days")));
-        assertThat(one_day.toStringAsLargestTimeUnit(), is(equalTo("1 days")));
+        assertEquals("1 ns", one_ns.toStringAsLargestTimeUnit());
+        assertEquals("1 ms", one_ms_in_ns.toStringAsLargestTimeUnit());
+        assertEquals("1 s", one_s_in_micros.toStringAsLargestTimeUnit());
+        assertEquals("16 min", sixteen_mins_ish_in_millis.toStringAsLargestTimeUnit());
+        assertEquals("11 days", eleven_days_ish_in_seconds.toStringAsLargestTimeUnit());
+        assertEquals("1 days", one_day.toStringAsLargestTimeUnit());
     }
 }

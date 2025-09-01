@@ -16,9 +16,9 @@
  */
 package uk.ac.standrews.cs.utilities;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -28,10 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileManipulationTest {
 
@@ -42,7 +39,7 @@ public class FileManipulationTest {
 
     private String temp_file_tree_root;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
 
         temp_file_tree_root = TEMP_FILE_TREE_ROOT + RANDOM.nextInt();
@@ -50,7 +47,7 @@ public class FileManipulationTest {
         assertTreeContainsExpectedNumberOfDirectories();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
 
         assertNotExists(temp_file_tree_root);

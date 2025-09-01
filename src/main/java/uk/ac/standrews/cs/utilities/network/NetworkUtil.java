@@ -29,7 +29,6 @@ import java.util.Enumeration;
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
  * @author Simone Conte (sic2@st-andrews.ac.uk)
  */
-@SuppressWarnings("unused")
 public final class NetworkUtil {
 
     /**

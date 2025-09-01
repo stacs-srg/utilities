@@ -20,6 +20,7 @@ package uk.ac.standrews.cs.utilities.archive;
  * @author graham
  */
 @SuppressWarnings("unused")
+@Deprecated
 public class ExceptionFactory {
 
     public static Exception makeLabelledException(final Exception e) {

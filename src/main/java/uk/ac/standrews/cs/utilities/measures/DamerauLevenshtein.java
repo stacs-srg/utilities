@@ -118,47 +118,50 @@ public class DamerauLevenshtein extends StringMeasure {
     @Override
     public double calculateDistance(final String x, final String y) {
 
-        if (x.isEmpty()) return y.length();
-        if (y.isEmpty()) return x.length();
+        final String cleanX = clean(x);
+        final String cleanY = clean(y);
 
-        final int[][] table = new int[x.length()][y.length()];
+        if (cleanX.isEmpty()) return cleanY.length();
+        if (cleanY.isEmpty()) return cleanY.length();
+
+        final int[][] table = new int[cleanX.length()][cleanY.length()];
         final Map<Character, Integer> sourceIndexByCharacter = new HashMap<>();
 
-        if (x.charAt(0) != y.charAt(0)) {
+        if (cleanX.charAt(0) != cleanY.charAt(0)) {
             table[0][0] = Math.min(replaceCost, deleteCost + insertCost);
         }
 
-        sourceIndexByCharacter.put(x.charAt(0), 0);
+        sourceIndexByCharacter.put(cleanX.charAt(0), 0);
 
-        for (int i = 1; i < x.length(); i++) {
+        for (int i = 1; i < cleanX.length(); i++) {
 
             final int deleteDistance = table[i - 1][0] + deleteCost;
             final int insertDistance = (i + 1) * deleteCost + insertCost;
-            final int matchDistance = i * deleteCost + (x.charAt(i) == y.charAt(0) ? 0 : replaceCost);
+            final int matchDistance = i * deleteCost + (cleanX.charAt(i) == cleanY.charAt(0) ? 0 : replaceCost);
             table[i][0] = Math.min(Math.min(deleteDistance, insertDistance), matchDistance);
         }
 
-        for (int j = 1; j < y.length(); j++) {
+        for (int j = 1; j < cleanY.length(); j++) {
 
             final int deleteDistance = (j + 1) * insertCost + deleteCost;
             final int insertDistance = table[0][j - 1] + insertCost;
-            final int matchDistance = j * insertCost + (x.charAt(0) == y.charAt(j) ? 0 : replaceCost);
+            final int matchDistance = j * insertCost + (cleanX.charAt(0) == cleanY.charAt(j) ? 0 : replaceCost);
             table[0][j] = Math.min(Math.min(deleteDistance, insertDistance), matchDistance);
         }
 
-        for (int i = 1; i < x.length(); i++) {
+        for (int i = 1; i < cleanX.length(); i++) {
 
-            int maxSourceLetterMatchIndex = x.charAt(i) == y.charAt(0) ? 0 : -1;
+            int maxSourceLetterMatchIndex = cleanX.charAt(i) == cleanY.charAt(0) ? 0 : -1;
 
-            for (int j = 1; j < y.length(); j++) {
+            for (int j = 1; j < cleanY.length(); j++) {
 
-                Integer candidateSwapIndex = sourceIndexByCharacter.get(y.charAt(j));
+                Integer candidateSwapIndex = sourceIndexByCharacter.get(cleanY.charAt(j));
                 final int jSwap = maxSourceLetterMatchIndex;
                 final int deleteDistance = table[i - 1][j] + deleteCost;
                 final int insertDistance = table[i][j - 1] + insertCost;
                 int matchDistance = table[i - 1][j - 1];
 
-                if (x.charAt(i) != y.charAt(j)) {
+                if (cleanX.charAt(i) != cleanY.charAt(j)) {
                     matchDistance += replaceCost;
                 } else {
                     maxSourceLetterMatchIndex = j;
@@ -182,10 +185,10 @@ public class DamerauLevenshtein extends StringMeasure {
 
                 table[i][j] = Math.min(Math.min(Math.min(deleteDistance, insertDistance), matchDistance), swapDistance);
             }
-            sourceIndexByCharacter.put(x.charAt(i), i);
+            sourceIndexByCharacter.put(cleanX.charAt(i), i);
         }
 
-        return table[x.length() - 1][y.length() - 1];
+        return table[cleanX.length() - 1][cleanY.length() - 1];
     }
 
     public static void main(String[] a) {

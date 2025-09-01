@@ -153,7 +153,6 @@ public class SymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static void encrypt(final SecretKey key, final Path plain_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(plain_text_path)) {
@@ -171,7 +170,6 @@ public class SymmetricEncryption {
      * @throws CryptoException if the encryption cannot be completed
      * @throws IOException     if a file cannot be accessed
      */
-    @SuppressWarnings("unused")
     public static void decrypt(final SecretKey key, final Path cipher_text_path, final OutputStream output_stream) throws CryptoException, IOException {
 
         try (final InputStream input_stream = Files.newInputStream(cipher_text_path)) {

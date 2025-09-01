@@ -38,7 +38,7 @@ public class JensenShannonKullbackLeibler extends StringMeasure {
     @Override
     public double calculateDistance(final String x, final String y) {
 
-        return Math.sqrt(jensenShannonDivergence(x, y));
+        return Math.sqrt(jensenShannonDivergence(clean(x), clean(y)));
     }
 
     private static double jensenShannonDivergence(final String x, final String y) {

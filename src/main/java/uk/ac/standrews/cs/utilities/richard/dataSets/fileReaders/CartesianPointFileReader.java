@@ -160,8 +160,8 @@ public class CartesianPointFileReader extends ArrayList<CartesianPoint> {
 
 	private static int getDimension(String s, int lineNumber) throws Exception {
 		int dim = 0;
-		Scanner s1 = new Scanner(s);
-		try {
+		
+		try (Scanner s1 = new Scanner(s)) {
 			while (s1.nextDouble() <= Double.MAX_VALUE) {
 				dim++;
 			}

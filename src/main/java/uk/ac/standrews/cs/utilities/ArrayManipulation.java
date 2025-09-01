@@ -25,7 +25,6 @@ import java.util.List;
  * @author Alan Dearle (alan.dearle@st-andrews.ac.uk)
  * @author Graham Kirby (graham.kirby@st-andrews.ac.uk)
  */
-@SuppressWarnings("unused")
 public class ArrayManipulation {
 
     /**

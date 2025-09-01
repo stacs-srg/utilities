@@ -47,8 +47,11 @@ public final class Levenshtein extends StringMeasure {
     @Override
     public double calculateDistance(final String x, final String y) {
 
-        final int lengthX = x.length();
-        final int lengthY = y.length();
+        final String cleanX = clean(x);
+        final String cleanY = clean(y);
+
+        final int lengthX = cleanX.length();
+        final int lengthY = cleanY.length();
 
         double[] v0 = new double[lengthY + 1];
         double[] v1 = new double[lengthY + 1];
@@ -63,7 +66,7 @@ public final class Levenshtein extends StringMeasure {
             for (int j = 0; j < lengthY; ++j) {
                 v1[j + 1] = min(v1[j] + insertDeleteCost,
                         v0[j + 1] + insertDeleteCost,
-                        v0[j] + (x.charAt(i) == y.charAt(j) ? 0.0 : substituteCost));
+                        v0[j] + (cleanX.charAt(i) == cleanY.charAt(j) ? 0.0 : substituteCost));
             }
 
             final double[] swap = v0;

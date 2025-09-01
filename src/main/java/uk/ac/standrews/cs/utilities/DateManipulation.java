@@ -95,7 +95,6 @@ public class DateManipulation {
      * @return a java.sql.Date representation of the date
      * @throws ParseException if the date representation is not valid
      */
-    @SuppressWarnings("unused")
     public static synchronized java.sql.Date stringToSQLDate(final String date) throws ParseException {
 
         try {
@@ -185,7 +184,6 @@ public class DateManipulation {
         return new java.sql.Date(CALENDAR.getTimeInMillis());
     }
 
-    @SuppressWarnings("unused")
     public static synchronized java.sql.Date dateToSQLDate(final Date date) {
 
         return daysToSQLDate(dateToDays(date));
@@ -258,13 +256,11 @@ public class DateManipulation {
         return millisToDays();
     }
 
-    @SuppressWarnings("unused")
     public static synchronized int subtractYears(final int days, final int years) {
 
         return addYears(days, -years);
     }
 
-    @SuppressWarnings("unused")
     public static synchronized Date addDays(final Date date, final int days) {
 
         return daysToDate(dateToDays(date) + days);

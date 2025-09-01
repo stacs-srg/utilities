@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Masih Hajiarabderkani (mh638@st-andrews.ac.uk)
  */
 @SuppressWarnings("unused")
+@Deprecated
 public final class NamingThreadFactory implements ThreadFactory {
 
     private static final UncaughtExceptionHandler PRINT_UNCAUGHT_EXCEPTIONS = (t, e) -> e.printStackTrace();

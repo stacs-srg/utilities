@@ -129,18 +129,14 @@ public abstract class SearchIndex<T> {
 		double[] mins = new double[farthest.size()];
 		for (int i = 0; i < mins.length; i++) {
 			double min = Double.MAX_VALUE;
-			for (T d : farthest) {
-				T closestPivot = findNearest(d, pivots);
-			}
 			mins[i] = min;
 		}
-		int maxMin = 0;
+
 		double max = 0;
 		for (int i = 0; i < mins.length; i++) {
 			double m = mins[i];
 			if (m > max) {
 				max = m;
-				maxMin = i;
 			}
 		}
 		return null;
